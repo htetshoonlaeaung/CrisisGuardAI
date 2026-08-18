@@ -157,8 +157,16 @@ CrisisGuardAI/
 │   │   │   └── tests/
 │   │   │       ├── test_medical.pl
 │   │   │       └── test_hazards.pl
+│   │   ├── prolog/                    # Modular SWI-Prolog Engine & Bridge Layer
+│   │   │   ├── __init__.py            # Module exports & public facade
+│   │   │   ├── engine.py              # Thread-safe PySwip singleton & fallback engine
+│   │   │   ├── query_builder.py       # Serializes Python dicts & facts into Prolog terms
+│   │   │   ├── parser.py              # Normalizes raw Prolog atoms/lists to Python dicts
+│   │   │   ├── scheduler.py           # CLP(FD) constraint solving dispatcher
+│   │   │   ├── xai.py                 # Proof-tree visitor & explainability generator
+│   │   │   └── exceptions.py          # Prolog error boundaries & exceptions
 │   │   ├── services/
-│   │   │   ├── prolog_engine.py       # Thread-safe PySwip bridge
+│   │   │   ├── prolog_engine.py       # PySwip service bridge compatibility layer
 │   │   │   ├── triage_service.py      # Business logic & Neon persistence
 │   │   │   └── shelter_service.py     # Geolocation queries
 │   │   └── main.py                    # FastAPI entrypoint
@@ -527,7 +535,7 @@ prove(Goal, Facts, deduction(Goal, SubProofs)) :-
 
 ---
 
-### 5.4 Thread-Safe PySwip Engine Bridge (`backend/app/services/prolog_engine.py`)
+### 5.4 Thread-Safe PySwip Engine Bridge (`backend/app/prolog/engine.py`)
 
 ```python
 import threading

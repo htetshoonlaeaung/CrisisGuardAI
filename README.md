@@ -1,28 +1,28 @@
 # 🛡️ CrisisGuard AI — Intelligent Crisis Decision Support System
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Backend: FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688.svg?logo=fastapi)](https://fastapi.tiangolo.com)
-[![Logic Engine: SWI--Prolog](https://img.shields.io/badge/Engine-SWI--Prolog-orange.svg)](https://www.swi-prolog.org)
-[![Frontend: Next.js 14](https://img.shields.io/badge/Frontend-Next.js%2014-black.svg?logo=next.js)](https://nextjs.org)
+[![Frontend: React + Tailwind](https://img.shields.io/badge/Frontend-React%20%2B%20Tailwind-38bdf8.svg?logo=react)](https://react.dev)
+[![API Gateway: Node.js](https://img.shields.io/badge/Gateway-Node.js%20%2B%20TypeScript-339933.svg?logo=node.js)](https://nodejs.org)
+[![Database: Neon PostgreSQL](https://img.shields.io/badge/Database-Neon%20Serverless%20Postgres-00E599.svg?logo=postgresql)](https://neon.tech)
+[![Reasoning: FastAPI + SWI--Prolog](https://img.shields.io/badge/Reasoning-FastAPI%20%2B%20Prolog%20CLP(FD)-orange.svg)](https://www.swi-prolog.org)
 
-**CrisisGuard AI** is a safety-critical, explainable, rule-based decision support system designed to assist individuals, responders, and communities during acute emergency situations. 
+**CrisisGuard AI** is a safety-critical, explainable, rule-based decision support system designed to assist individuals, emergency responders, and communities during acute crises.
 
-Instead of generic advice or ungrounded generative predictions, CrisisGuard AI applies **deterministic first-order logical inference (SWI-Prolog)** combined with a **reactive full-stack architecture (FastAPI + Next.js 14 / React 19)** to generate personalized, dynamic, and life-saving recommendations with complete mathematical explainability (XAI).
+Instead of ungrounded generative predictions, CrisisGuard AI couples **deterministic first-order logical inference & Constraint Logic Programming (SWI-Prolog `clpfd` / `pyswip`)** with a modern **microservice full-stack (React + Tailwind CSS, Node.js API Gateway, Neon Serverless PostgreSQL, and FastAPI Reasoning Microservice)**.
 
 ---
 
-## 🚀 Key Highlights
+## 🏗️ System Architecture
 
-- **Symbolic AI Brain**: Pure deterministic rulebases covering Medical Emergencies, Natural Disasters, Fire & Chemical Hazards, and Road Accidents.
-- **Explainable AI (XAI)**: Generates human-auditable deduction proof trees explaining *why* an action is recommended and *what* actions are strictly prohibited.
-- **Dynamic Reasoning**: Re-evaluates guidance in real-time as new facts or escalating conditions emerge.
-- **CPR & First-Aid Metronome**: 110 BPM visual and audio rhythm generator for immediate resuscitation assistance.
-- **Offline Resilience**: Tau-Prolog edge fallback for disaster zones with severed internet connectivity.
+- **Frontend (`/frontend`)**: React + Tailwind CSS + Shadcn UI + Lucide + Web Audio CPR Metronome (110 BPM).
+- **Backend App Gateway (`/backend-node`)**: Node.js + TypeScript + Express/Fastify + Drizzle ORM.
+- **Database (`/database`)**: PostgreSQL on **Neon Serverless** with connection pooling and session telemetry.
+- **Reasoning Service (`/reasoning-engine`)**: FastAPI + SWI-Prolog (`pyswip` + `clpfd`) with proof-tree Explainable AI (XAI).
 
 ---
 
 ## 📖 Master Engineering Blueprint
 
-For the full architectural specification, directory layouts, Prolog rulebase code, backend API contracts, frontend state models, safety invariant test suites, and extension guidelines, refer to:
+For the full architectural specification, database DDL schemas, Drizzle models, Prolog CLP(FD) rulebases, API contracts, safety invariant tests, and extension guidelines, refer to:
 
 👉 **[skills.md](skills.md)**

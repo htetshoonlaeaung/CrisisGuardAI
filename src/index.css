@@ -1,0 +1,293 @@
+@import "tailwindcss";
+
+:root {
+  /* ── Amber/Gold Accent System ─────────────────────────── */
+  --accent-primary:      #FFAB00;              /* Main amber */
+  --accent-glow:         #FFD000;              /* Hover, shine */
+  --accent-subtle:       #FFE066;              /* Light text on dark */
+  --accent-tint:         rgba(255,171,0,0.10); /* Card bg tint */
+  --accent-tint-hover:   rgba(255,171,0,0.16); /* Hover tint */
+  --accent-border:       rgba(255,171,0,0.30); /* Border glow */
+  --accent-border-hover: rgba(255,171,0,0.55); /* Active border glow */
+
+  /* ── Glow Shadow (Apple-style ambient glow) ───────────── */
+  --glow-sm:  0 0 8px  rgba(255,171,0,0.35);
+  --glow-md:  0 0 16px rgba(255,171,0,0.30);
+  --glow-lg:  0 0 32px rgba(255,171,0,0.20);
+
+  /* ── Red Alert System (KEEP UNCHANGED) ───────────────── */
+  --alert-critical: #EF4444;
+  --alert-glow:     rgba(239,68,68,0.25);
+  --alert-tint:     rgba(239,68,68,0.10);
+  --alert-border:   rgba(239,68,68,0.40);
+
+  /* ── Deep Black Surfaces ─────────────────────────────── */
+  --bg-base:     #090909;    /* Deepest black — page bg */
+  --bg-surface:  #111111;    /* Cards, panels */
+  --bg-elevated: #1A1A1A;    /* Modals, dropdowns */
+  --bg-hover:    #1F1F1F;    /* Row hover */
+  --border-base: #2A2A2A;    /* Subtle dividers */
+  --border-mid:  #333333;    /* Card borders */
+  --fg-primary:  #F5F5F5;    /* Main text */
+  --fg-muted:    #888888;    /* Subtext */
+
+  /* Spring easing curves from Apple & Google Material */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);  /* Apple spring bounce */
+  --ease-snap: cubic-bezier(0.22, 1, 0.36, 1);       /* Google snap */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);         /* Netflix slide */
+
+  /* Durations */
+  --dur-fast: 120ms;
+  --dur-normal: 240ms;
+  --dur-slow: 380ms;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: #090909;
+    color: #F5F5F5;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    overflow-x: hidden;
+    user-select: auto;
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+
+  html.light-theme body {
+    background-color: #F8FAFC;
+    color: #0F172A;
+  }
+
+  html.dark-theme body {
+    background-color: #090909;
+    color: #F5F5F5;
+  }
+
+  html.alert-theme body {
+    background-color: #090909;
+    color: #F5F5F5;
+  }
+}
+
+/* ── Custom Scrollbars ── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 171, 0, 0.25);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 171, 0, 0.5);
+}
+
+html.light-theme ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.18);
+}
+html.light-theme ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+/* ── Amber Glow Utility Class ── */
+.amber-glow {
+  box-shadow:
+    0 0 0 1px rgba(255,171,0,0.40),   /* border ring */
+    0 0 16px rgba(255,171,0,0.25),    /* soft outer glow */
+    inset 0 1px 0 rgba(255,171,0,0.10); /* inner highlight */
+}
+
+.amber-glow:hover {
+  box-shadow:
+    0 0 0 1px rgba(255,171,0,0.60),
+    0 0 24px rgba(255,171,0,0.35),
+    inset 0 1px 0 rgba(255,171,0,0.15);
+}
+
+/* ── Skeuomorphic 3D Button Physics & Tactile Depth ── */
+.skeuo-btn {
+  position: relative;
+  transition: transform 140ms var(--ease-spring), box-shadow 140ms ease, filter 140ms ease, border-color 140ms ease, background-color 140ms ease;
+  will-change: transform, box-shadow;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.55), 0 6px 14px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 -1px 0 rgba(0, 0, 0, 0.4);
+}
+
+.skeuo-btn:hover {
+  filter: brightness(1.06);
+  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.6), 0 8px 18px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.22), inset 0 -1px 0 rgba(0, 0, 0, 0.4);
+}
+
+.skeuo-btn:active,
+.skeuo-btn.is-pressed {
+  transform: translateY(3px) scale(0.97);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.7), 0 2px 5px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Light theme skeuomorphic button */
+html.light-theme .skeuo-btn {
+  box-shadow: 0 3px 0 #d4d4d8, 0 5px 12px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9), inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+}
+html.light-theme .skeuo-btn:hover {
+  box-shadow: 0 4px 0 #cbd5e1, 0 7px 16px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+html.light-theme .skeuo-btn:active,
+html.light-theme .skeuo-btn.is-pressed {
+  transform: translateY(2px) scale(0.97);
+  box-shadow: 0 1px 0 #d4d4d8, 0 1px 3px rgba(0, 0, 0, 0.1), inset 0 2px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* Skeuomorphic Active Preset with Amber/Gold Neon Glow */
+.skeuo-preset-active {
+  background: rgba(255, 171, 0, 0.12) !important;
+  border-color: #FFAB00 !important;
+  color: #FFAB00 !important;
+  box-shadow: 0 0 20px rgba(255, 171, 0, 0.45), 0 4px 0 #cc8800, inset 0 1px 0 rgba(255, 255, 255, 0.4), inset 0 -1px 0 rgba(0, 0, 0, 0.2) !important;
+}
+
+.skeuo-preset-active:hover {
+  box-shadow: 0 0 26px rgba(255, 171, 0, 0.60), 0 5px 0 #cc8800, inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+}
+
+.skeuo-preset-active:active,
+.skeuo-preset-active.is-pressed {
+  transform: translateY(3px) scale(0.97) !important;
+  box-shadow: 0 0 15px rgba(255, 171, 0, 0.4), 0 1px 0 #cc8800, inset 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+html.light-theme .skeuo-preset-active {
+  background: #FFFBEB !important;
+  border-color: #D97706 !important;
+  color: #B45309 !important;
+  box-shadow: 0 0 14px rgba(217, 119, 6, 0.3), 0 3px 0 #b45309, inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
+}
+
+/* Skeuomorphic Electric Amber/Gold CTA Button */
+.skeuo-btn-amber {
+  background: linear-gradient(180deg, #FFD000 0%, #FFAB00 55%, #E69900 100%);
+  color: #090909;
+  border: 1px solid #FFAB00;
+  box-shadow: 0 4px 0 #b37700, 0 6px 20px rgba(255, 171, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -2px 0 rgba(0, 0, 0, 0.12);
+  transition: transform 140ms var(--ease-spring), box-shadow 140ms ease, filter 140ms ease;
+  will-change: transform, box-shadow;
+}
+
+.skeuo-btn-amber:hover {
+  filter: brightness(1.04);
+  box-shadow: 0 5px 0 #b37700, 0 8px 24px rgba(255, 171, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.9), inset 0 -2px 0 rgba(0, 0, 0, 0.12);
+}
+
+.skeuo-btn-amber:active,
+.skeuo-btn-amber.is-pressed {
+  transform: translateY(3px) scale(0.97);
+  box-shadow: 0 1px 0 #b37700, 0 2px 8px rgba(255, 171, 0, 0.3), inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Backward compatibility for cyan class mapping */
+.skeuo-btn-cyan {
+  background: linear-gradient(180deg, #FFD000 0%, #FFAB00 55%, #E69900 100%) !important;
+  color: #090909 !important;
+  border: 1px solid #FFAB00 !important;
+  box-shadow: 0 4px 0 #b37700, 0 6px 20px rgba(255, 171, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -2px 0 rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Skeuomorphic Chip / Badge */
+.skeuo-chip {
+  transition: transform 120ms var(--ease-spring), box-shadow 120ms ease;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.35), 0 3px 6px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.skeuo-chip:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.4), 0 4px 8px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.skeuo-chip:active,
+.skeuo-chip.is-pressed {
+  transform: translateY(2px) scale(0.96);
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0), inset 0 2px 3px rgba(0, 0, 0, 0.4);
+}
+
+html.light-theme .skeuo-chip {
+  box-shadow: 0 2px 0 #e4e4e7, 0 2px 5px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+html.light-theme .skeuo-chip:active,
+html.light-theme .skeuo-chip.is-pressed {
+  transform: translateY(1px) scale(0.96);
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0), inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* ── Haptic Press Animation & Apple Spring Physics ── */
+.hbtn {
+  transition: transform 160ms var(--ease-spring), filter 140ms var(--ease-snap), box-shadow 140ms ease, background-color 140ms ease, border-color 140ms ease;
+  will-change: transform;
+}
+
+.hbtn:active {
+  transform: translateY(2px) scale(0.95);
+  filter: brightness(0.94);
+}
+
+/* ── Google Material Ripple Animation ── */
+.ripple-dot {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 171, 0, 0.25);
+  pointer-events: none;
+  animation: ripple-anim 0.55s ease-out forwards;
+  transform-origin: center;
+}
+
+html.light-theme .ripple-dot {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+@keyframes ripple-anim {
+  0% {
+    transform: scale(0);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(7.5);
+    opacity: 0;
+  }
+}
+
+/* ── Pulse Keyframes ── */
+@keyframes cprPulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(255, 171, 0, 0.6);
+  }
+  70% {
+    transform: scale(1.08);
+    box-shadow: 0 0 0 16px rgba(255, 171, 0, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(255, 171, 0, 0);
+  }
+}
+
+.animate-cpr-pulse {
+  animation: cprPulse 0.545s infinite ease-in-out;
+}
+
+/* ── Amber Glow Animation ── */
+@keyframes amberGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(255, 171, 0, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(255, 171, 0, 0.45);
+  }
+}
+
+.animate-amber-glow {
+  animation: amberGlow 2.5s infinite ease-in-out;
+}

@@ -1,12 +1,25 @@
 # backend/app/db/models/audit.py
 # SQLAlchemy ORM model for TriageAuditTrail table in Neon PostgreSQL.
-# Records every Prolog evaluation result as an immutable audit log entry
-# for post-disaster analysis and compliance reporting.
 
+from datetime import datetime, timezone
+from sqlalchemy import Column, BigInteger, Integer, String, DateTime, ForeignKey, JSON
+from sqlalchemy.dialects.postgresql import UUID, JSONB
+from sqlalchemy.orm import relationship
 from app.core.database import Base
 
-# TODO: Define TriageAuditTrail model
-#   - session_id (FK to emergency_sessions)
-#   - recommended_action, severity
-#   - reasons (JSONB), prohibited_actions (JSONB)
-#   - evaluation_latency_ms, created_at
+def utc_now():
+    return datetime.now(timezone.utc)
+
+class TriageAuditTrail(Base):
+    __tablename__ = "triage_audit_trails"
+
+    id = Column(BigInteger().with_variant(Integer, "sqlite"), primary_key=True, autoincrement=True)
+    session_id = Column(UUID(as_uuid=True), ForeignKey("emergency_sessions.id", ondelete="CASCADE"), nullable=False, index=True)
+    recommended_action = Column(String(255), nullable=False)
+    severity = Column(String(20), nullable=False)
+    reasons = Column(JSON().with_variant(JSONB, "postgresql"), nullable=False)
+    prohibited_actions = Column(JSON().with_variant(JSONB, "postgresql"), nullable=False)
+    evaluation_latency_ms = Column(Integer, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+    session = relationship("EmergencySession", back_populates="audits")

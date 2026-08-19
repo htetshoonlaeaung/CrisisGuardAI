@@ -22,20 +22,24 @@ class PrologResultParser:
         """
         Extracts and cleans Action, Severity, Reasons, and Prohibitions from a Prolog solution.
         """
-        action = cls.decode_atom(raw_result.get("Action", "contact_emergency_services"))
+        action = cls.decode_atom(raw_result.get("Action", "call_emergency_services_immediately"))
         severity = cls.decode_atom(raw_result.get("Severity", "critical")).lower()
 
-        reasons = raw_result.get("Reasons", [])
-        if isinstance(reasons, list):
-            reasons = [cls.decode_atom(r) for r in reasons]
+        raw_reasons = raw_result.get("Reasons", [])
+        if isinstance(raw_reasons, list):
+            reasons = [cls.decode_atom(r) for r in raw_reasons]
+        elif raw_reasons:
+            reasons = [cls.decode_atom(raw_reasons)]
         else:
-            reasons = [cls.decode_atom(reasons)] if reasons else []
+            reasons = []
 
-        prohibitions = raw_result.get("Prohibitions", [])
-        if isinstance(prohibitions, list):
-            prohibitions = [cls.decode_atom(p) for p in prohibitions]
+        raw_prohibitions = raw_result.get("Prohibitions", [])
+        if isinstance(raw_prohibitions, list):
+            prohibitions = [cls.decode_atom(p) for p in raw_prohibitions]
+        elif raw_prohibitions:
+            prohibitions = [cls.decode_atom(raw_prohibitions)]
         else:
-            prohibitions = [cls.decode_atom(prohibitions)] if prohibitions else []
+            prohibitions = []
 
         return {
             "action": action,

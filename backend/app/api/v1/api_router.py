@@ -3,6 +3,18 @@
 
 from fastapi import APIRouter
 
+from app.api.v1.endpoints.crisis import router as crisis_router
+from app.api.v1.endpoints.sessions import router as sessions_router
+from app.api.v1.endpoints.shelters import router as shelters_router
+from app.api.v1.endpoints.scheduler import router as scheduler_router
+from app.api.v1.endpoints.health import router as health_router
+
 api_router = APIRouter(prefix="/api/v1")
 
-# TODO: Include crisis, sessions, shelters, scheduler, health routers
+api_router.include_router(crisis_router)
+api_router.include_router(sessions_router)
+api_router.include_router(shelters_router)
+api_router.include_router(scheduler_router)
+api_router.include_router(health_router)
+
+__all__ = ["api_router"]

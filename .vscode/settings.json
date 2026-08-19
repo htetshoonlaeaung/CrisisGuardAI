@@ -5,18 +5,7 @@
   "editor.detectIndentation": true,
   "files.autoSave": "onFocusChange",
   "files.associations": {
-    "*.ts": "typescript",
-    "*.tsx": "typescriptreact",
-    "*.js": "javascript",
-    "*.jsx": "javascriptreact",
-    "*.json": "json",
-    "*.css": "css",
-    "*.html": "html",
-    "*.md": "markdown",
-    "*.pl": "prolog",
-    "*.py": "python",
-    "*.toml": "toml",
-    ".env*": "properties",
+    ".env*": "ini",
     "Dockerfile*": "dockerfile"
   },
   "[typescript]": {
@@ -58,6 +47,12 @@
     "editor.wordWrap": "on",
     "editor.formatOnSave": false
   },
+  "markdown.validate.enabled": false,
+  "markdown.validate.fileLinks.enabled": "ignore",
+  "markdown.validate.fragmentLinks.enabled": "ignore",
+  "markdown.validate.referenceLinks.enabled": "ignore",
+  "markdown.validate.unusedLinkDefinitions.enabled": "ignore",
+  "markdown.validate.duplicateLinkDefinitions.enabled": "ignore",
   "[python]": {
     "editor.tabSize": 4,
     "editor.formatOnSave": true

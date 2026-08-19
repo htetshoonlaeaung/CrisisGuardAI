@@ -8,5 +8,17 @@
     prove/3
 ]).
 
-% TODO: Implement prove/3 meta-interpreter (base cases: true, conjunction, member fact, clause deduction)
-% TODO: Implement render_explanation_tree/2 to convert proof AST into JSON-serializable structure
+generate_xai_proof(Goal, Facts, ProofTree) :-
+    prove(Goal, Facts, ProofTree).
+
+prove(true, _, []) :- !.
+prove((A, B), Facts, [PA, PB]) :-
+    !,
+    prove(A, Facts, PA),
+    prove(B, Facts, PB).
+prove(Goal, Facts, evidence(Goal)) :-
+    member(Goal, Facts), !.
+prove(Goal, Facts, deduction(Goal, SubProofs)) :-
+    clause(Goal, Body),
+    prove(Body, Facts, SubProofs).
+prove(Goal, _Facts, assumed(Goal)).

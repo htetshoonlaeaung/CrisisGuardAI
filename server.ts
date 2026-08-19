@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
+import fs from 'fs';
 import { createServer as createViteServer } from 'vite';
 import { ruleEngine } from './src/server/ruleEngine';
 import { db } from './src/server/database';
@@ -8,7 +9,7 @@ import { EvaluateCrisisRequest, EvaluateCrisisResponse, IncidentItem, RescueTeam
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
   app.use(cors());
   app.use(express.json());
@@ -149,22 +150,48 @@ async function startServer() {
     const vite = await createViteServer({
       server: {
         middlewareMode: true,
-        hmr: false,
-        ws: false,
       },
       appType: 'spa',
     });
     app.use(vite.middlewares);
+
+    // Fallback for HTML navigation requests in SPA development mode
+    app.use('*', async (req, res, next) => {
+      if (req.originalUrl.startsWith('/api')) {
+        return res.status(404).json({ error: 'API endpoint not found' });
+      }
+
+      const url = req.originalUrl;
+      try {
+        const indexPath = path.resolve(process.cwd(), 'index.html');
+        let template = fs.readFileSync(indexPath, 'utf-8');
+        template = await vite.transformIndexHtml(url, template);
+        res.status(200).set({ 'Content-Type': 'text/html' }).end(template);
+      } catch (e: any) {
+        if (vite.ssrFixStacktrace) {
+          vite.ssrFixStacktrace(e);
+        }
+        next(e);
+      }
+    });
   } else {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
     app.get('*', (req, res) => {
+      if (req.originalUrl.startsWith('/api')) {
+        return res.status(404).json({ error: 'API endpoint not found' });
+      }
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }
 
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🛡️ CrisisGuard AI server active on http://0.0.0.0:${PORT}`);
+    console.log(`\n  🛡️  CrisisGuard AI Fullstack Server is active!`);
+    console.log(`  ──────────────────────────────────────────────────`);
+    console.log(`  ➜  Local (Open in Browser):  http://localhost:${PORT}`);
+    console.log(`  ➜  Network / Loopback:       http://127.0.0.1:${PORT}`);
+    console.log(`  ➜  API Health Check:         http://localhost:${PORT}/api/health`);
+    console.log(`  ──────────────────────────────────────────────────\n`);
   });
 }
 

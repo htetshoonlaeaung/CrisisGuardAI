@@ -1,7 +1,17 @@
-# backend/app/domain/constants.py
-# Application-wide constants.
-# Domain question trees used by the frontend wizard, emergency contact numbers,
-# and Prolog predicate naming conventions.
+from enum import Enum
+
+class SeverityLevel(str, Enum):
+    CRITICAL = "critical"
+    HIGH = "high"
+    MODERATE = "moderate"
+    LOW = "low"
+    INFORMATIONAL = "informational"
+
+class DomainType(str, Enum):
+    MEDICAL = "medical"
+    NATURAL_DISASTER = "natural_disaster"
+    FIRE_HAZARD = "fire_hazard"
+    ROAD_ACCIDENT = "road_accident"
 
 EMERGENCY_CONTACTS = {
     "default": "911",
@@ -17,4 +27,3 @@ DOMAIN_LABELS = {
     "road_accident": "Road Accident",
 }
 
-# TODO: Add domain-specific branching questionnaire definitions for the frontend wizard

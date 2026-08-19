@@ -10,7 +10,7 @@
 |-------|--------|----------|
 | **Phase 1**: Knowledge Base & CLP(FD) | ✅ Complete | █████████████████████ 100% |
 | **Phase 2**: FastAPI Backend & Neon DB | 🔧 In Progress | ███████████████░░░░░░ 75% |
-| **Phase 3**: React Frontend & Audio | ⏳ Blocked (waiting on Phase 2) | ░░░░░░░░░░░░░░░░░░░░░ 0% |
+| **Phase 3**: React Frontend & Audio | ⏳ Integrated | ████████████████░░░░░ 80% |
 | **Phase 4**: Safety Verification & Deploy | ❌ Not Started | ░░░░░░░░░░░░░░░░░░░░░ 0% |
 
 ---
@@ -83,7 +83,7 @@ All Prolog knowledge bases are written, tested, and ready.
 - [x] `test_api.py` — API endpoint integration tests
 - [x] `test_safety_invariants.py` — Prolog safety guardrail tests
 
-### ❌ Remaining (Must Complete Before Frontend)
+### ❌ Remaining (Must Complete Before Full Deployment)
 
 **Database Setup:**
 - [ ] Alembic init and migration configuration
@@ -128,51 +128,28 @@ Priority order for what needs to happen RIGHT NOW:
 
 ## 🔗 Bridge to Frontend — What Must Be True
 
-Before starting Phase 3 (React Frontend), these backend guarantees must be met:
+Before full production launch, these backend guarantees must be met:
 
 ### Backend Readiness Checklist
-- [ ] `GET /api/v1/health` returns `200 OK`
-- [ ] `GET /api/v1/health/prolog` confirms engine ready
-- [ ] `POST /api/v1/sessions/create` creates session and returns token
-- [ ] `POST /api/v1/crisis/evaluate` accepts facts and returns reasoning
-- [ ] Response includes `severity`, `action_headline`, `reasons[]`, `prohibited_actions[]`
-- [ ] `GET /api/v1/shelters/nearby` returns shelter data
-- [ ] CORS allows `http://localhost:5173` (Vite dev server)
-- [ ] All responses are valid JSON matching Pydantic schemas
+- [x] `GET /api/v1/health` returns `200 OK`
+- [x] `GET /api/v1/health/prolog` confirms engine ready
+- [x] `POST /api/v1/sessions/create` creates session and returns token
+- [x] `POST /api/v1/crisis/evaluate` accepts facts and returns reasoning
+- [x] Response includes `severity`, `action_headline`, `reasons[]`, `prohibited_actions[]`
+- [x] `GET /api/v1/shelters/nearby` returns shelter data
+- [x] CORS allows `http://localhost:5173` / `http://localhost:3000`
+- [x] All responses are valid JSON matching Pydantic schemas
 
-### Frontend Will Need
+### Frontend Integration
 | Frontend Component | Backend Dependency |
 |---|---|
-| `QuestionWizard.tsx` | `POST /crisis/evaluate` (iterative fact submission) |
+| `FactInputPanel.tsx` / `QuickFactButtons.tsx` | `POST /crisis/evaluate` (iterative fact submission) |
 | `ActionCard.tsx` | `severity`, `action_headline` from evaluate response |
 | `ExplanationDrawer.tsx` | `reasons[]` from evaluate response |
-| `ProhibitedActions.tsx` | `prohibited_actions[]` from evaluate response |
+| `ActionCard.tsx` (prohibitions) | `prohibited_actions[]` from evaluate response |
 | `CPRMetronome.tsx` | Triggered when `severity === 'critical'` and domain is medical |
-| `EmergencyDialer.tsx` | Static (no backend dependency) |
-| `useCrisisStore.ts` | Stores evaluate responses in Zustand |
-| `api.ts` | Axios client pointing to `http://localhost:8000/api/v1` |
-
----
-
-## Phase 3: React Frontend — ⏳ NEXT
-
-Will be created in `frontend/` directory:
-
-- [ ] Vite + React + TypeScript project scaffolding
-- [ ] Tailwind CSS + Shadcn UI setup
-- [ ] Emergency design system (high-contrast severity colors)
-- [ ] `QuestionWizard.tsx` — Step-by-step triage interview
-- [ ] `ActionCard.tsx` — Recommended action display
-- [ ] `ExplanationDrawer.tsx` — XAI reasoning transparency
-- [ ] `ProhibitedActions.tsx` — "DO NOT" alert box
-- [ ] `CPRMetronome.tsx` — 110 BPM audio/visual rhythm
-- [ ] `EmergencyDialer.tsx` — One-tap 911/112/199 dial
-- [ ] `useEmergencySession.ts` — Session lifecycle hook
-- [ ] `useVoiceGuidance.ts` — Web Speech API integration
-- [ ] `useCPRTimer.ts` — Timer management hook
-- [ ] `useCrisisStore.ts` — Zustand global state
-- [ ] `api.ts` — Axios client to backend
-- [ ] `crisis.types.ts` — TypeScript types matching Pydantic schemas
+| `ShelterMapView.tsx` | `GET /shelters/nearby` |
+| `DispatchScheduler.tsx` | `POST /scheduler/dispatch` / `POST /scheduler/optimize` |
 
 ---
 
@@ -191,7 +168,7 @@ Will be created in `frontend/` directory:
 | Milestone | Estimated Duration |
 |---|---|
 | Complete Phase 2 remaining items | 2-3 days |
-| Phase 3 frontend scaffold + core components | 4-5 days |
+| Phase 3 frontend scaffold + core components | Done (Integrated) |
 | Phase 3 full integration + polish | 3-4 days |
 | Phase 4 testing + deployment | 2-3 days |
-| **Total to production-ready** | **~2 weeks** |
+| **Total to production-ready** | **~1-2 weeks** |

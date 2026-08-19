@@ -1,7 +1,7 @@
 # 🔌 CrisisGuard AI — API Reference
 
 > **Context File** — Complete REST API specification, request/response contracts, frontend integration guide.  
-> See also: [structure.md](file:///C:/Users/USER/Downloads/CrisisGuardAI/structure.md) · [database.md](file:///C:/Users/USER/Downloads/CrisisGuardAI/database.md)
+> See also: [structure.md](./structure.md) · [database.md](./database.md)
 
 ---
 

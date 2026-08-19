@@ -1,7 +1,7 @@
 # 🗄️ CrisisGuard AI — Database Architecture
 
 > **Context File** — PostgreSQL schema, Neon Serverless config, ORM models, migrations.  
-> See also: [api.md](file:///C:/Users/USER/Downloads/CrisisGuardAI/api.md) · [structure.md](file:///C:/Users/USER/Downloads/CrisisGuardAI/structure.md)
+> See also: [api.md](./api.md) · [structure.md](./structure.md)
 
 ---
 

@@ -1,7 +1,7 @@
 # 🔧 CrisisGuard AI — Debugging & Troubleshooting
 
 > **Context File** — Error resolution, development setup, environment config, log analysis.  
-> See also: [structure.md](file:///C:/Users/USER/Downloads/CrisisGuardAI/structure.md) · [api.md](file:///C:/Users/USER/Downloads/CrisisGuardAI/api.md)
+> See also: [structure.md](./structure.md) · [api.md](./api.md)
 
 ---
 

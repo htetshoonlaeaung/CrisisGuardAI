@@ -1,7 +1,7 @@
 # 🧠 CrisisGuard AI — Prolog & Symbolic AI Engine
 
 > **Context File** — Prolog knowledge base, PySwip bridge, CLP(FD) constraint solver, and XAI explainability.  
-> See also: [structure.md](file:///C:/Users/USER/Downloads/CrisisGuardAI/structure.md) · [api.md](file:///C:/Users/USER/Downloads/CrisisGuardAI/api.md)
+> See also: [structure.md](./structure.md) · [api.md](./api.md)
 
 ---
 

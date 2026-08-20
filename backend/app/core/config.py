@@ -10,14 +10,26 @@ import json
 class Settings(BaseSettings):
     APP_NAME: str = "CrisisGuard AI"
     VERSION: str = "1.0.0"
-    DEBUG: bool = False
-    DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/crisisguard"
+    ENVIRONMENT: str = "development"
+    HOST: str = "0.0.0.0"
+    PORT: int = 8000
+    DEBUG: bool = True
+    LOG_LEVEL: str = "INFO"
+    
+    # Database: Supports SQLite (for immediate local development) or Neon PostgreSQL (production)
+    DATABASE_URL: str = "sqlite+aiosqlite:///./crisisguard.db"
+    
+    # CORS: Allowed frontend origins
     CORS_ORIGINS: Union[List[str], str] = [
         "http://localhost:3000",
         "http://localhost:5173",
         "http://127.0.0.1:3000",
         "http://127.0.0.1:5173",
     ]
+    
+    # Scheduler & Prolog engine parameters
+    RESCUE_DISPATCH_TIMEOUT_SECONDS: int = 30
+    PROLOG_ENGINE_RETRY_COUNT: int = 3
 
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod

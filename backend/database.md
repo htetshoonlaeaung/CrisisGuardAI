@@ -243,28 +243,21 @@ class EmergencyShelter(Base):
 
 ---
 
-## Migration Setup (TODO)
+## Migration Setup (Alembic Initialized)
 
-Alembic is listed in `requirements.txt` but not yet initialized. Steps needed:
+Alembic is configured with async driver support in `backend/alembic/env.py`.
 
 ```bash
 cd backend
 
-# 1. Initialize Alembic
-alembic init alembic
+# 1. Run migrations against your Neon PostgreSQL database
+uv run alembic upgrade head
 
-# 2. Edit alembic.ini — set sqlalchemy.url (or use env.py to read from settings)
+# 2. To generate a new migration after model changes:
+uv run alembic revision --autogenerate -m "describe_changes"
 
-# 3. Edit alembic/env.py — configure async support:
-#    - Import async engine
-#    - Set target_metadata = Base.metadata
-#    - Use run_async_migrations() pattern
-
-# 4. Generate initial migration
-alembic revision --autogenerate -m "create_initial_tables"
-
-# 5. Run migration
-alembic upgrade head
+# 3. Seed reference emergency shelters into Neon:
+uv run python -m app.db.seed
 ```
 
 ---

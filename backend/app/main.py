@@ -29,11 +29,16 @@ async def lifespan(app: FastAPI):
     """
     logger.info(f"Starting {settings.APP_NAME} v{settings.VERSION}...")
 
-    # 1. Ensure DB schema exists if running in dev/sqlite/test
+    # 1. Ensure DB schema exists and seed initial shelter reference data
     try:
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
         logger.info("Database schema verified successfully.")
+        
+        from app.db.seed import seed_emergency_shelters
+        from app.core.database import AsyncSessionLocal
+        async with AsyncSessionLocal() as session:
+            await seed_emergency_shelters(session)
     except Exception as exc:
         logger.warning(f"Database table verification deferred or handled by migrations: {exc}")
 
@@ -132,12 +137,14 @@ async def root():
     return RedirectResponse(url="/docs")
 
 @app.get("/health", include_in_schema=False)
+@app.get("/api/health", include_in_schema=False)
 async def root_health():
     """Root health alias."""
     return {
         "status": "healthy",
         "service": settings.APP_NAME,
-        "version": settings.VERSION
+        "version": settings.VERSION,
+        "reasoning_engine": "SWI-Prolog & CLP(FD) Deterministic Symbolic Reasoner"
     }
 
 if __name__ == "__main__":

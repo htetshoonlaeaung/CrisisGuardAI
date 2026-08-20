@@ -4,6 +4,7 @@
 import time
 import uuid
 import logging
+from datetime import datetime, timezone
 from typing import List, Optional, Any
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -119,6 +120,9 @@ class TriageService:
         severity = evaluation.get("severity", "critical")
         reasons = evaluation.get("reasons", [])
         prohibitions = evaluation.get("prohibited_actions", [])
+        step_by_step = evaluation.get("step_by_step_instructions", [])
+        proof_tree = evaluation.get("proof_tree", {})
+        timestamp_str = datetime.now(timezone.utc).isoformat()
 
         # 5. Persist audit trail and update session severity
         if db is not None and session_id is not None:
@@ -142,9 +146,12 @@ class TriageService:
             domain=domain,
             severity=severity,
             action_headline=action_headline,
+            step_by_step_instructions=step_by_step,
             reasons=reasons,
             prohibited_actions=prohibitions,
-            evaluation_latency_ms=latency_ms
+            proof_tree=proof_tree,
+            evaluation_latency_ms=latency_ms,
+            timestamp=timestamp_str
         )
 
     async def create_session(self, domain: str, db: AsyncSession) -> SessionResponse:
@@ -261,4 +268,67 @@ class TriageService:
             logger.warning(f"Error adding facts to session {token}: {e}")
             return []
 
+    async def get_session_audit(self, token: str, db: AsyncSession) -> List[AuditTrailResponse]:
+        """
+        Retrieves all audit trail records for a given session token.
+        """
+        try:
+            stmt = (
+                select(TriageAuditTrail)
+                .join(EmergencySession, EmergencySession.id == TriageAuditTrail.session_id)
+                .where(EmergencySession.session_token == token)
+                .order_by(TriageAuditTrail.created_at.desc())
+            )
+            result = await db.execute(stmt)
+            audits = result.scalars().all()
+            return [
+                AuditTrailResponse(
+                    id=a.id,
+                    session_token=token,
+                    recommended_action=a.recommended_action,
+                    severity=a.severity,
+                    reasons=a.reasons if isinstance(a.reasons, list) else [],
+                    prohibited_actions=a.prohibited_actions if isinstance(a.prohibited_actions, list) else [],
+                    evaluation_latency_ms=a.evaluation_latency_ms,
+                    created_at=a.created_at
+                )
+                for a in audits
+            ]
+        except Exception as e:
+            logger.warning(f"Error fetching session audits for {token}: {e}")
+            return []
+
+    async def get_all_audits(self, db: AsyncSession) -> List[AuditTrailResponse]:
+        """
+        Retrieves all immutable audit trail logs across all emergency sessions.
+        """
+        try:
+            stmt = (
+                select(TriageAuditTrail, EmergencySession.session_token, EmergencySession.domain)
+                .join(EmergencySession, EmergencySession.id == TriageAuditTrail.session_id)
+                .order_by(TriageAuditTrail.created_at.desc())
+            )
+            result = await db.execute(stmt)
+            rows = result.all()
+            audits = []
+            for audit, session_token, domain in rows:
+                audits.append(
+                    AuditTrailResponse(
+                        id=audit.id,
+                        session_token=session_token,
+                        domain=domain,
+                        recommended_action=audit.recommended_action,
+                        severity=audit.severity,
+                        reasons=audit.reasons if isinstance(audit.reasons, list) else [],
+                        prohibited_actions=audit.prohibited_actions if isinstance(audit.prohibited_actions, list) else [],
+                        evaluation_latency_ms=audit.evaluation_latency_ms,
+                        created_at=audit.created_at
+                    )
+                )
+            return audits
+        except Exception as e:
+            logger.warning(f"Error fetching all audits: {e}")
+            return []
+
 triage_service = TriageService()
+

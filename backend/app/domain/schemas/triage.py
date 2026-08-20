@@ -2,8 +2,9 @@
 # Pydantic v2 schemas for the crisis triage request and response data contracts.
 # These models validate all data entering and leaving the /crisis/evaluate endpoint.
 
+from datetime import datetime, timezone
 from enum import Enum
-from typing import Any, List, Union
+from typing import Any, Dict, List, Union
 from pydantic import BaseModel, Field, field_validator
 
 class TriageSeverity(str, Enum):
@@ -73,9 +74,12 @@ class EvaluateCrisisResponse(BaseModel):
     domain: str = Field(..., description="Crisis domain")
     severity: str = Field(..., description="Assessed severity level: critical, high, moderate, low, informational")
     action_headline: str = Field(..., description="Primary life-saving action directive")
+    step_by_step_instructions: List[str] = Field(default_factory=list, description="Ordered step-by-step procedural response instructions")
     reasons: List[str] = Field(default_factory=list, description="Deterministic logical explanations")
     prohibited_actions: List[str] = Field(default_factory=list, description="Strict life-safety prohibitions (never do)")
+    proof_tree: Union[Dict[str, Any], Any] = Field(default_factory=dict, description="Explainable AI deduction proof tree")
     evaluation_latency_ms: int = Field(0, description="Inference latency in milliseconds")
+    timestamp: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat(), description="ISO evaluation timestamp")
 
     model_config = {
         "json_schema_extra": {

@@ -15,45 +15,53 @@ DEFAULT_SHELTERS = [
         "id": 1,
         "name": "Central Emergency Relief & Evacuation Hub",
         "disaster_type": "natural_disaster",
+        "address": "Downtown Central Complex, Sector 1",
         "latitude": 16.8661,
         "longitude": 96.1951,
         "capacity": 1000,
         "current_occupancy": 150,
         "contact_phone": "+95-1-234567",
-        "is_open": True
+        "is_open": True,
+        "facilities": ["Medical Bay", "Clean Water", "Backup Generator", "Emergency Comms", "Helipad"]
     },
     {
         "id": 2,
         "name": "North Metro Disaster Shelter & Medical Post",
         "disaster_type": "natural_disaster",
+        "address": "North Ring Road Highway Junction",
         "latitude": 16.8750,
         "longitude": 96.1800,
         "capacity": 500,
         "current_occupancy": 80,
         "contact_phone": "+95-1-890123",
-        "is_open": True
+        "is_open": True,
+        "facilities": ["Trauma Station", "Food Rations", "Clean Water", "Boat Staging"]
     },
     {
         "id": 3,
         "name": "Industrial Hazard & Chemical Safe Haven",
         "disaster_type": "fire_hazard",
+        "address": "Industrial Park Zone 4 Safe Perimeter",
         "latitude": 16.8500,
         "longitude": 96.2050,
         "capacity": 300,
         "current_occupancy": 40,
         "contact_phone": "+95-1-567890",
-        "is_open": True
+        "is_open": True,
+        "facilities": ["Decontamination Bay", "SCBA Refill", "Burn Treatment", "Fire Perimeter Comms"]
     },
     {
         "id": 4,
         "name": "General Trauma & Emergency Triage Center",
         "disaster_type": "medical",
+        "address": "Metropolitan Medical Quad, Wing B",
         "latitude": 16.8600,
         "longitude": 96.1900,
         "capacity": 400,
         "current_occupancy": 110,
         "contact_phone": "+95-1-345678",
-        "is_open": True
+        "is_open": True,
+        "facilities": ["Intensive Care Unit", "Blood Bank", "Defibrillator Units", "Ambulance Bay"]
     }
 ]
 
@@ -126,12 +134,14 @@ class ShelterService:
                         id=s["id"],
                         name=s["name"],
                         disaster_type=s["disaster_type"],
+                        address=s.get("address", "Emergency Sector Facility"),
                         latitude=s["latitude"],
                         longitude=s["longitude"],
                         capacity=s["capacity"],
                         current_occupancy=s["current_occupancy"],
                         contact_phone=s["contact_phone"],
                         is_open=s["is_open"],
+                        facilities=s.get("facilities", ["Medical Bay", "Clean Water", "Backup Generator", "Emergency Comms"]),
                         distance_km=dist
                     )
                 )
@@ -140,7 +150,14 @@ class ShelterService:
 
         return ShelterListResponse(
             shelters=matched_shelters,
-            total=len(matched_shelters)
+            total=len(matched_shelters),
+            total_found=len(matched_shelters),
+            query={
+                "lat": lat,
+                "lng": lng,
+                "radius_km": radius_km,
+                "disaster_type": disaster_type or "all"
+            }
         )
 
     async def get_shelter_by_id(

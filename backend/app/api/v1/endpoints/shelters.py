@@ -20,7 +20,8 @@ router = APIRouter(prefix="/shelters", tags=["Emergency Shelters"])
 )
 async def get_nearby_shelters(
     lat: float = Query(..., description="User latitude coordinate"),
-    lng: float = Query(..., description="User longitude coordinate"),
+    lng: Optional[float] = Query(None, description="User longitude coordinate"),
+    lon: Optional[float] = Query(None, description="User longitude coordinate (alias)"),
     radius_km: float = Query(10.0, description="Search radius in kilometers"),
     disaster_type: Optional[str] = Query(None, description="Filter by disaster type"),
     db: AsyncSession = Depends(get_db),
@@ -29,9 +30,10 @@ async def get_nearby_shelters(
     """
     Computes nearby active emergency shelters using Haversine great-circle distance.
     """
+    target_lng = lng if lng is not None else (lon if lon is not None else 96.1951)
     return await shelter_service.get_nearby_shelters(
         lat=lat,
-        lng=lng,
+        lng=target_lng,
         radius_km=radius_km,
         disaster_type=disaster_type,
         db=db

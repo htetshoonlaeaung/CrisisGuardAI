@@ -147,3 +147,118 @@ async def test_scheduler_optimize():
         # Safety invariant: Critical incidents (0 and 3) must be assigned to teams 1 or 2
         assert data["assignments"][0] in [1, 2]
         assert data["assignments"][3] in [1, 2]
+
+@pytest.mark.asyncio
+async def test_session_audit_and_all_audits():
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        # Create session and evaluate to generate audit
+        token = "test-audit-token-99"
+        eval_payload = {
+            "session_token": token,
+            "domain": "medical",
+            "submitted_facts": [
+                {"key": "unconscious", "value": "true"},
+                {"key": "breathing", "value": "none"}
+            ]
+        }
+        eval_res = await client.post("/api/v1/crisis/evaluate", json=eval_payload)
+        assert eval_res.status_code == 200
+
+        # Session-specific audit
+        audit_res = await client.get(f"/api/v1/sessions/{token}/audit")
+        assert audit_res.status_code == 200
+        audits = audit_res.json()
+        assert len(audits) >= 1
+        assert audits[0]["recommended_action"] == "begin_cpr_and_call_emergency"
+
+        # Global audit list
+        all_res = await client.get("/api/v1/audit/all")
+        assert all_res.status_code == 200
+        all_audits = all_res.json()
+        assert len(all_audits) >= 1
+
+@pytest.mark.asyncio
+async def test_shelter_by_id_and_lon_query():
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        # Query with lon alias
+        res = await client.get("/api/v1/shelters/nearby?lat=16.8661&lon=96.1951&radius_km=25")
+        assert res.status_code == 200
+        data = res.json()
+        assert "shelters" in data
+        assert "total_found" in data
+        assert len(data["shelters"]) > 0
+
+        # Query single shelter by ID
+        s_res = await client.get("/api/v1/shelters/1")
+        assert s_res.status_code == 200
+        shelter = s_res.json()
+        assert shelter["id"] == 1
+        assert "name" in shelter
+        assert "facilities" in shelter
+
+@pytest.mark.asyncio
+async def test_scheduler_dispatch():
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        payload = {
+            "incidents": [
+                {
+                    "id": "inc-1",
+                    "name": "Arterial Hemorrhage Collision",
+                    "severity": "critical",
+                    "victims_count": 2,
+                    "hazard_type": "traffic",
+                    "location": "Highway 101 KM 4"
+                },
+                {
+                    "id": "inc-2",
+                    "name": "Minor Roadside Spill",
+                    "severity": "moderate",
+                    "victims_count": 1,
+                    "hazard_type": "spill",
+                    "location": "Avenue 5"
+                }
+            ],
+            "teams": [
+                {
+                    "id": 1,
+                    "name": "ALS Paramedic Unit 1",
+                    "type": "paramedic",
+                    "vehicle_capacity": 4,
+                    "is_available": True,
+                    "base_location": "Central Station"
+                },
+                {
+                    "id": 2,
+                    "name": "Engine Company 4",
+                    "type": "fire_rescue",
+                    "vehicle_capacity": 2,
+                    "is_available": True,
+                    "base_location": "Station 4"
+                }
+            ]
+        }
+        res = await client.post("/api/v1/scheduler/dispatch", json=payload)
+        assert res.status_code == 200
+        data = res.json()
+        assert data["success"] is True
+        assert "plans" in data
+        assert len(data["plans"]) == 2
+        # Critical incident assigned to ALS Paramedic
+        plan1 = next(p for p in data["plans"] if p["incident_id"] == "inc-1")
+        assert plan1["assigned_team_id"] == 1
+
+@pytest.mark.asyncio
+async def test_root_and_api_health_aliases():
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        res1 = await client.get("/health")
+        assert res1.status_code == 200
+        assert res1.json()["status"] == "healthy"
+
+        res2 = await client.get("/api/health")
+        assert res2.status_code == 200
+        assert res2.json()["status"] == "healthy"
+

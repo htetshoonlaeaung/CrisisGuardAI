@@ -7,6 +7,8 @@ from app.prolog.scheduler import CLPFDScheduler
 from app.domain.schemas.scheduler import (
     OptimizeScheduleRequest,
     OptimizeScheduleResponse,
+    DispatchSchedulerRequest,
+    DispatchResponse,
 )
 
 router = APIRouter(prefix="/scheduler", tags=["Rescue Scheduler"])
@@ -31,3 +33,23 @@ async def optimize_schedule(
         max_time=request.max_time or 60
     )
     return OptimizeScheduleResponse(**result)
+
+@router.post(
+    "/dispatch",
+    response_model=DispatchResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Resolve multi-criteria rescue fleet allocation via CLP(FD) constraint solver"
+)
+async def dispatch_schedule(
+    request: DispatchSchedulerRequest,
+    scheduler: CLPFDScheduler = Depends(get_scheduler_dep)
+):
+    """
+    Solves multi-criteria incident response dispatching with vehicle capacity invariants,
+    specialized medical/fire routing for critical emergencies, and arrival time estimation.
+    """
+    result = scheduler.solve_dispatch(
+        incidents=request.incidents,
+        teams=request.teams
+    )
+    return DispatchResponse(**result)

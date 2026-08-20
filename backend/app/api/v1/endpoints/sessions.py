@@ -14,6 +14,7 @@ from app.domain.schemas.session import (
     SessionDetailResponse,
     AddSessionFactsRequest,
     SessionFactResponse,
+    AuditTrailResponse,
 )
 
 router = APIRouter(prefix="/sessions", tags=["Emergency Sessions"])
@@ -78,3 +79,19 @@ async def add_session_facts(
             detail="Session not found"
         )
     return facts
+
+@router.get(
+    "/{token}/audit",
+    response_model=List[AuditTrailResponse],
+    status_code=status.HTTP_200_OK,
+    summary="Get full audit trail records for a specific session"
+)
+async def get_session_audit(
+    token: str,
+    db: AsyncSession = Depends(get_db),
+    triage_service: TriageService = Depends(get_triage_service_dep)
+):
+    """
+    Retrieves chronological reasoning audit trail logs for an emergency session.
+    """
+    return await triage_service.get_session_audit(token=token, db=db)

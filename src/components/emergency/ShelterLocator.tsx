@@ -9,10 +9,10 @@ export const ShelterLocator: React.FC = () => {
   const [disasterFilter, setDisasterFilter] = useState<string>('all');
   const [radiusKm, setRadiusKm] = useState<number>(30);
   const [userLocation, setUserLocation] = useState<{ lat: number; lon: number }>({
-    lat: 37.7749,
-    lon: -122.4194
+    lat: 16.8661,
+    lon: 96.1951
   });
-  const [locationStatus, setLocationStatus] = useState<string>('Default: San Francisco Metro');
+  const [locationStatus, setLocationStatus] = useState<string>('Default: Yangon Metro (Downtown)');
 
   useEffect(() => {
     loadShelters();

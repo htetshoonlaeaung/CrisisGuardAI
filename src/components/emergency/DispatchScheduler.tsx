@@ -11,27 +11,27 @@ export const DispatchScheduler: React.FC = () => {
   const [incidents] = useState<IncidentItem[]>([
     {
       id: 'INC-01',
-      name: 'Highway Multiple Pileup & Trauma',
+      name: 'Pyay Road Multi-Vehicle Crash & Trauma',
       severity: 'critical',
       victims_count: 4,
       hazard_type: 'road_accident',
-      location: 'Interstate 80, Mile 14',
+      location: 'Pyay Road (Near 8-Mile Junction)',
     },
     {
       id: 'INC-02',
-      name: 'Residential Kitchen Electrical Fire',
+      name: 'Apartment Transformer & Electrical Fire',
       severity: 'critical',
       victims_count: 2,
       hazard_type: 'fire_hazard',
-      location: '840 Elmwood Court',
+      location: 'Baho Road, Sanchaung Township',
     },
     {
       id: 'INC-03',
-      name: 'Severe Flash Flood Ground Floor Trap',
+      name: 'Monsoon Flash Flood Lowland Entrapment',
       severity: 'high',
       victims_count: 3,
       hazard_type: 'natural_disaster',
-      location: 'Lower River Road #12',
+      location: 'Hlaingthaya Lowlands / Strand Road',
     },
     {
       id: 'INC-04',
@@ -39,15 +39,15 @@ export const DispatchScheduler: React.FC = () => {
       severity: 'moderate',
       victims_count: 1,
       hazard_type: 'medical',
-      location: '5th Ave & Market St',
+      location: 'Sule Pagoda Road, Downtown Yangon',
     },
   ]);
 
   const [teams] = useState<RescueTeam[]>([
-    { id: 1, name: 'Medic Alpha (Critical Trauma Care)', type: 'paramedic', vehicle_capacity: 4, is_available: true, base_location: 'Central Station' },
-    { id: 2, name: 'Engine #12 (Hazmat & Fire Extrication)', type: 'fire_rescue', vehicle_capacity: 6, is_available: true, base_location: 'West District' },
-    { id: 3, name: 'Swiftwater Boat Unit #3', type: 'flood_boat', vehicle_capacity: 4, is_available: true, base_location: 'Riverfront Base' },
-    { id: 4, name: 'Squad 8 (General Medical Ambulance)', type: 'paramedic', vehicle_capacity: 2, is_available: true, base_location: 'East Substation' },
+    { id: 1, name: 'YGH Trauma Response Unit (Paramedic)', type: 'paramedic', vehicle_capacity: 4, is_available: true, base_location: 'Yangon General Hospital' },
+    { id: 2, name: 'Central Fire & Extrication Brigade #1', type: 'fire_rescue', vehicle_capacity: 6, is_available: true, base_location: 'Kyauktada Fire HQ' },
+    { id: 3, name: 'Yangon River SAR Swiftwater Boat #2', type: 'flood_boat', vehicle_capacity: 4, is_available: true, base_location: 'Botahtaung Jetty' },
+    { id: 4, name: 'North Okkalapa Ambulance Squad', type: 'paramedic', vehicle_capacity: 2, is_available: true, base_location: 'NOGH Substation' },
   ]);
 
   const [dispatchResult, setDispatchResult] = useState<DispatchResponse | null>(null);

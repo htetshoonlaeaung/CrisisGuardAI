@@ -16,8 +16,8 @@ export const ShelterMapView: React.FC<ShelterMapViewProps> = ({ initialDomain })
   const [selectedFilter, setSelectedFilter] = useState<string>(initialDomain || 'all');
   const [searchQuery, setSearchQuery] = useState('');
   const [userCoords, setUserCoords] = useState<{ lat: number; lon: number }>({
-    lat: 37.7749,
-    lon: -122.4194,
+    lat: 16.8661,
+    lon: 96.1951,
   });
 
   const fetchShelters = async () => {

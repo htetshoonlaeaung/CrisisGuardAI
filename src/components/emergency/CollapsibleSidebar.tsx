@@ -288,7 +288,7 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
         {/* 1-Tap Emergency Hotline CTA */}
         <div className="space-y-1.5">
           <a
-            href="tel:911"
+            href="tel:199"
             className={`w-full py-2.5 ${
               isCollapsed ? 'px-0' : 'px-3'
             } rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer hbtn ${
@@ -296,10 +296,10 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
                 ? 'bg-[#EF4444] hover:bg-[#FF3B30] text-white border border-[#EF4444]'
                 : 'bg-[#EF4444]/20 hover:bg-[#EF4444]/30 text-[#EF4444] hover:text-red-200 border border-[#EF4444]/40 hover:border-[#EF4444]/60'
             }`}
-            title="Call 911 Direct"
+            title="Call 199 Direct"
           >
             <PhoneCall className="w-4 h-4 flex-shrink-0" />
-            {!isCollapsed && <span className="truncate">Emergency 911</span>}
+            {!isCollapsed && <span className="truncate">Emergency 199</span>}
           </a>
         </div>
 

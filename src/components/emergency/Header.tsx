@@ -30,11 +30,11 @@ export const Header: React.FC<HeaderProps> = ({
 
           <div className="flex items-center gap-3">
             <a
-              id="dial-911-btn"
-              href="tel:911"
+              id="dial-199-btn"
+              href="tel:199"
               className="inline-flex items-center gap-1 bg-red-600 hover:bg-red-500 text-white px-3 py-1 rounded-md font-black text-xs transition shadow-sm"
             >
-              <PhoneCall className="w-3.5 h-3.5" /> 911 / 112
+              <PhoneCall className="w-3.5 h-3.5" /> 199 / 191 / 192
             </a>
             <a
               id="dial-poison-btn"
@@ -45,10 +45,10 @@ export const Header: React.FC<HeaderProps> = ({
             </a>
             <a
               id="dial-sms-btn"
-              href="sms:911"
+              href="sms:199"
               className="inline-flex items-center gap-1 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 px-2.5 py-1 rounded-md text-xs transition"
             >
-              SMS 911
+              SMS 199
             </a>
           </div>
         </div>

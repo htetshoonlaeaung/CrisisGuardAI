@@ -92,7 +92,7 @@ export const SessionStatusBar: React.FC<SessionStatusBarProps> = ({
         {/* Rapid One-Tap Emergency Hotlines */}
         <div className="flex items-center gap-1.5 flex-shrink-0">
           <a
-            href="tel:911"
+            href="tel:199"
             className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md font-bold text-[11px] sm:text-xs transition-all shadow-xs hbtn whitespace-nowrap ${
               isLight
                 ? 'bg-[#EF4444] hover:bg-[#FF3B30] text-white border border-[#EF4444]'
@@ -100,7 +100,7 @@ export const SessionStatusBar: React.FC<SessionStatusBarProps> = ({
             }`}
           >
             <PhoneCall className="w-3 h-3" />
-            <span>911 Emergency</span>
+            <span>199 Emergency</span>
           </a>
           <a
             href="tel:18002221222"

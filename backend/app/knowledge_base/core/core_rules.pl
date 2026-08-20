@@ -41,4 +41,4 @@ evaluate_emergency(road_accident, Facts, Action, Severity, Reasons, Prohibitions
 % Global safe fallback if domain is unknown or reasoning encounters an unhandled case
 evaluate_emergency(_Domain, _Facts, call_emergency_services_immediately, critical, Reasons, Prohibitions) :-
     Reasons = ['Uncertain emergency domain. Immediate contact with municipal emergency dispatch is required.'],
-    Prohibitions = ['Do not delay contacting 911/112.'].
+    Prohibitions = ['Do not delay contacting 199/191/192.'].

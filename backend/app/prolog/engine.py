@@ -242,7 +242,7 @@ class PrologEngineBridge:
                     "step_by_step_instructions": [
                         "Keep patient calm, seated, or lying on side with head slightly elevated.",
                         "Note exact time symptoms first appeared (crucial for tPA window).",
-                        "Call 911 / Emergency dispatch immediately and report suspected stroke.",
+                        "Call 199 / Emergency dispatch immediately and report suspected stroke.",
                         "Monitor breathing and airway continuously."
                     ],
                     "reasons": [
@@ -300,7 +300,7 @@ class PrologEngineBridge:
                 "severity": "critical",
                 "step_by_step_instructions": [
                     "Keep patient still and ensure open airway.",
-                    "Call emergency dispatch (911/112) immediately.",
+                    "Call emergency dispatch (199/191/192) immediately.",
                     "Report patient symptoms and exact location.",
                     "Stay on the line with dispatcher."
                 ],
@@ -387,7 +387,7 @@ class PrologEngineBridge:
                         "Evacuate all occupants immediately on foot.",
                         "Leave entry doors open as you exit to ventilate.",
                         "Do not flip any light switches, open flames, or phones.",
-                        "Call 911 / Gas emergency utility from 100 meters away outside."
+                        "Call 199 / Gas emergency utility from 100 meters away outside."
                     ],
                     "reasons": [
                         "Accumulated flammable gas presents severe explosion hazard.",
@@ -444,7 +444,7 @@ class PrologEngineBridge:
                 "severity": "critical",
                 "step_by_step_instructions": [
                     "Evacuate area immediately.",
-                    "Call Fire Department (911/112).",
+                    "Call Fire Department (199/191/192).",
                     "Keep bystanders beyond 100 meter safety perimeter."
                 ],
                 "reasons": ["Active fire or hazardous materials condition. Immediate evacuation to safe perimeter required."],
@@ -671,7 +671,7 @@ class PrologEngineBridge:
                     "action": "call_rescue_and_maintain_safe_distance",
                     "severity": "critical",
                     "step_by_step_instructions": [
-                        "Call 911 / Heavy extrication and fire rescue immediately.",
+                        "Call 199 / Heavy extrication and fire rescue immediately.",
                         "Discharge dry powder fire extinguisher under vehicle/engine to suppress flames.",
                         "Keep bystanders at least 50 meters back.",
                         "Prepare extrication path as firefighters arrive."
@@ -785,7 +785,7 @@ class PrologEngineBridge:
             "action": "call_emergency_services_immediately",
             "severity": "critical",
             "step_by_step_instructions": [
-                "Call local emergency dispatch (911/112/199) immediately.",
+                "Call local emergency dispatch (199/191/192) immediately.",
                 "Provide exact GPS coordinates and description of crisis.",
                 "Maintain scene safety and await professional responders."
             ],
@@ -794,7 +794,7 @@ class PrologEngineBridge:
                 f"Notice: {reason}" if reason else "Standard life-safety protocol activated. Immediate emergency dispatch recommended."
             ],
             "prohibited_actions": [
-                "Do not delay contacting local emergency dispatch (911/112).",
+                "Do not delay contacting local emergency dispatch (199/191/192).",
                 "Do not enter hazardous areas without professional emergency personnel."
             ],
             "proof_tree": {

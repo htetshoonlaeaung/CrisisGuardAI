@@ -83,7 +83,7 @@ export class PrologRuleEngine {
         action: 'BEGIN_CPR_AND_CALL_EMERGENCY',
         severity: 'critical',
         step_by_step_instructions: [
-          'Call 911 / 112 immediately and put phone on speaker mode.',
+          'Call 199 / 191 / 192 immediately and put phone on speaker mode.',
           'Send someone nearby to fetch an Automated External Defibrillator (AED).',
           'Position victim flat on their back on a firm, flat surface.',
           'Interlock your fingers, place the heel of your hand on the center of the chest.',
@@ -193,7 +193,7 @@ export class PrologRuleEngine {
         action: 'ACTIVATE_STROKE_EMERGENCY_DISPATCH_FAST',
         severity: 'critical',
         step_by_step_instructions: [
-          'Call 911 immediately and state: "I suspect an acute stroke patient; requesting rapid stroke center transport".',
+          'Call 199 immediately and state: "I suspect an acute stroke patient; requesting rapid stroke center transport".',
           'Note the EXACT time the patient was last seen normal (Time is Brain).',
           'Keep patient lying flat on their side with head elevated 15–30 degrees to reduce aspiration risk.',
           'Loosen any tight clothing around neck and maintain clear airway.',
@@ -307,7 +307,7 @@ export class PrologRuleEngine {
         severity: 'critical',
         step_by_step_instructions: [
           'If safe to access without touching fire, switch off the main electrical breaker panel immediately.',
-          'Evacuate all occupants and call Fire Department (911 / 112).',
+          'Evacuate all occupants and call Fire Department (199 / 191 / 192).',
           'If small and trained, use ONLY a Class C (CO2 or Dry Chemical) fire extinguisher.',
           'Aim at the base of the fire from 6–8 feet away using the PASS method (Pull, Aim, Squeeze, Sweep).',
           'If fire spreads or smoke darkens, evacuate immediately and close doors behind you.'
@@ -345,7 +345,7 @@ export class PrologRuleEngine {
           'Slide a tight-fitting metal lid, baking sheet, or fire blanket over the pan from the side to smother flames.',
           'Leave the lid on until the pan has completely cooled to room temperature (at least 30 minutes).',
           'Alternatively, generously douse with baking soda or a Class K / Class B extinguisher.',
-          'If fire escapes the cooktop, evacuate immediately and call 911.'
+          'If fire escapes the cooktop, evacuate immediately and call 199.'
         ],
         reasons: [
           'Cooking oils burn at temperatures > 300°C; cutting off oxygen via a metal lid extinguishes combustion instantly.',
@@ -379,7 +379,7 @@ export class PrologRuleEngine {
           'Evacuate all people and pets from the building immediately.',
           'Leave doors and windows open as you exit to facilitate natural ventilation.',
           'Move at least 300 feet away upwind from the building.',
-          'Call 911 and the emergency gas utility hotline ONLY after you are safely outside.',
+          'Call 199 and the emergency gas utility hotline ONLY after you are safely outside.',
           'Warn neighbors without ringing doorbells.'
         ],
         reasons: [
@@ -406,7 +406,7 @@ export class PrologRuleEngine {
           'Seal cracks around door and air vents with wet towels, blankets, or duct tape.',
           'Open the window slightly for fresh air if safe; hang a brightly colored sheet or towel out the window to signal firefighters.',
           'Stay low to the floor where air is cooler and cleaner (crawl on hands and knees).',
-          'Call 911 and report your exact room location in the structure.'
+          'Call 199 and report your exact room location in the structure.'
         ],
         reasons: [
           'Toxic smoke inhalation (CO, HCN) causes unconsciousness in under 2 minutes.',
@@ -604,7 +604,7 @@ export class PrologRuleEngine {
         action: 'BEGIN_CPR_PROTECT_CERVICAL_SPINE',
         severity: 'critical',
         step_by_step_instructions: [
-          'Call 911 / 112 with exact highway mile marker or GPS intersection.',
+          'Call 199 / 191 / 192 with exact highway mile marker or GPS intersection.',
           'Ensure scene is protected from oncoming traffic (hazard flashers, flares/triangles 100m back).',
           'Support victim\'s head and neck in a neutral alignment without twisting.',
           'If not breathing, perform CPR compressions on firm ground (100–120 BPM).',
@@ -633,7 +633,7 @@ export class PrologRuleEngine {
         action: 'EMERGENCY_EXTRICATION_OR_SAFE_PERIMETER_DEFENSE',
         severity: 'critical',
         step_by_step_instructions: [
-          'Call 911 Heavy Rescue & Fire Engine immediately.',
+          'Call 199 Heavy Rescue & Fire Engine immediately.',
           'If vehicle cabin is actively burning and victim is trapped, attempt rapid emergency drag (pull by clothing shoulders in line with long axis of body).',
           'Discharge Dry Chemical fire extinguisher under wheel wells and engine bay to suppress flames if available.',
           'If fire is uncontrollable, establish a 100-foot safe perimeter and protect bystanders from exploding fuel tanks/struts.'
@@ -689,7 +689,7 @@ export class PrologRuleEngine {
         action: 'EXECUTE_MASS_CASUALTY_START_TRIAGE',
         severity: 'high',
         step_by_step_instructions: [
-          'Request Mass Casualty Incident (MCI) response protocol from 911 dispatch.',
+          'Request Mass Casualty Incident (MCI) response protocol from 199 dispatch.',
           'Direct all walking wounded to move to a designated safe staging area (Tagged Green / Minor).',
           'Quickly assess non-walking victims: Breathing, Perfusion, Mental Status (RPM protocol).',
           'Apply rapid tourniquets to major arterial bleeds before moving to next victim.',
@@ -723,7 +723,7 @@ export class PrologRuleEngine {
       action: 'CALL_EMERGENCY_SERVICES_AND_MONITOR_VITALS',
       severity: 'critical',
       step_by_step_instructions: [
-        'Call 911 / 112 / local emergency services immediately to report the incident.',
+        'Call 199 / 191 / 192 / local emergency services immediately to report the incident.',
         'Provide your exact address, cross streets, or GPS coordinates to the dispatcher.',
         'Keep the victim calm, warm, and resting comfortably in a safe position.',
         'Monitor airway, breathing, and consciousness continuously until paramedics arrive.',

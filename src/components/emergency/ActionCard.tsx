@@ -247,7 +247,7 @@ export const ActionCard: React.FC<ActionCardProps> = ({
           </HapticButton>
         )}
         <a
-          href="tel:911"
+          href="tel:199"
           className={`flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-bold text-xs md:text-sm shadow-md transition-all hbtn ${
             isLight
               ? 'bg-[#EF4444] hover:bg-[#FF3B30] text-white border border-[#EF4444]'
@@ -255,7 +255,7 @@ export const ActionCard: React.FC<ActionCardProps> = ({
           }`}
         >
           <PhoneCall className="w-4 h-4" />
-          <span>Call 911 Dispatcher</span>
+          <span>Call 199 Dispatcher</span>
         </a>
       </div>
     </div>

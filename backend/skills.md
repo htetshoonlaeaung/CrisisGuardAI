@@ -116,7 +116,7 @@ The React frontend connects to the backend through these components:
 | `ExplanationDrawer.tsx` | `reasons[]` from evaluate response |
 | `ProhibitedActions.tsx` | `prohibited_actions[]` from evaluate response |
 | `CPRMetronome.tsx` | Triggered when severity=critical + medical domain |
-| `EmergencyDialer.tsx` | Static 1-tap 911/112/199 (no API call) |
+| `EmergencyDialer.tsx` | Static 1-tap 199/191/192 (no API call) |
 | `useCrisisStore.ts` | Zustand store consuming evaluate responses |
 | `api.ts` | Axios / Fetch client → `http://localhost:8000/api/v1` |
 

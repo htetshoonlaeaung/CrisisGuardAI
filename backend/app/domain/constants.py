@@ -14,7 +14,7 @@ class DomainType(str, Enum):
     ROAD_ACCIDENT = "road_accident"
 
 EMERGENCY_CONTACTS = {
-    "default": "911",
+    "default": "199",
     "myanmar": "199",
     "uk": "999",
     "europe": "112",

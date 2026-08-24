@@ -16,7 +16,7 @@ import { StatusScreen } from './components/emergency/StatusScreen';
 import { ExplanationDrawer } from './components/emergency/ExplanationDrawer';
 
 function AppContent() {
-  const { themeMode, isLight } = useTheme();
+  const { isLight } = useTheme();
   const { t, isMyanmar } = useLanguage();
 
   const [sessionToken] = useState<string>(() => {
@@ -122,25 +122,17 @@ function AppContent() {
 
   const currentSeverity: TriageSeverity = latestResult?.severity || 'moderate';
 
-  // Compute root background and style classes based on Theme Mode & Palette
-  const getThemeWrapperClass = () => {
-    if (themeMode === 'light') {
-      return 'bg-[#F4F6F9] text-zinc-900';
-    }
-    if (themeMode === 'alert') {
-      return 'bg-[#090909] text-zinc-100 ring-1 ring-red-500/30 shadow-inner';
-    }
-    // Default 'dark' mode (#090909 canvas with #111111 card surfaces)
-    return 'bg-[#090909] text-zinc-100';
-  };
-
   return (
-    <div className={`min-h-screen transition-colors duration-300 flex relative overflow-x-hidden ${getThemeWrapperClass()} ${isMyanmar ? 'break-words' : ''}`}>
+    <div
+      className={`min-h-screen ${
+        isLight ? 'bg-slate-50 text-slate-900' : 'bg-[#090A0F] text-slate-100'
+      } flex relative overflow-x-hidden transition-colors duration-200 ${isMyanmar ? 'break-words' : ''}`}
+    >
       {/* Mobile Backdrop Overlay when sidebar is open */}
       {!isSidebarCollapsed && (
         <div
           onClick={() => setIsSidebarCollapsed(true)}
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-xs lg:hidden transition-opacity duration-200"
+          className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-xs lg:hidden transition-opacity duration-200"
           aria-hidden="true"
         />
       )}
@@ -212,13 +204,7 @@ function AppContent() {
                       onOpenShelters={() => setActiveView('shelters')}
                     />
                   ) : (
-                    <div
-                      className={`p-8 md:p-12 text-center text-xs font-mono rounded-2xl border ${
-                        isLight
-                          ? 'bg-white border-zinc-200 text-zinc-500 shadow-sm'
-                          : 'bg-[#111111] border-[#2A2A2A] text-zinc-500'
-                      }`}
-                    >
+                    <div className="p-8 md:p-12 text-center text-xs font-mono rounded-2xl border border-slate-200 bg-white text-slate-500 shadow-sm">
                       {t('factInput.noFacts')}
                     </div>
                   )}
@@ -249,19 +235,13 @@ function AppContent() {
         />
 
         {/* 4. FOOTER */}
-        <footer
-          className={`border-t py-4 px-4 sm:px-6 text-center text-xs font-mono transition-colors ${
-            isLight
-              ? 'bg-white border-zinc-200 text-zinc-600'
-              : 'bg-[#090909] border-[#2A2A2A] text-zinc-400'
-          }`}
-        >
+        <footer className="border-t border-slate-200 py-4 px-4 sm:px-6 text-center text-xs font-mono bg-white text-slate-500">
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
             <span className="flex items-center gap-1.5 justify-center">
-              <span className={`w-2 h-2 rounded-full inline-block ${isLight ? 'bg-amber-600' : 'bg-[#FFAB00]'}`} />
+              <span className="w-2 h-2 rounded-full inline-block bg-blue-600" />
               {t('common.appFooter')}
             </span>
-            <span className={`font-semibold ${isLight ? 'text-amber-800' : 'text-[#FFAB00]'}`}>
+            <span className="font-semibold text-blue-900">
               {t('common.footerEngine')}
             </span>
           </div>

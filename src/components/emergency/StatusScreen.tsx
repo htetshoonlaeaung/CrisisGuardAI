@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Cpu, CheckCircle2, Server, Database, Sparkles, Layers } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 export const StatusScreen: React.FC = () => {
   const { isLight } = useTheme();
+  const { t } = useLanguage();
   const [healthData] = useState({
     apiStatus: 'ok',
     version: '3.0.0',
@@ -33,11 +35,11 @@ export const StatusScreen: React.FC = () => {
             <div className="flex items-center gap-2">
               <Cpu className={`w-5 h-5 ${isLight ? 'text-amber-700' : 'text-[#FFAB00]'}`} />
               <h2 className={`text-lg md:text-xl font-extrabold tracking-tight ${isLight ? 'text-zinc-950' : 'text-white'}`}>
-                System Health &amp; Knowledge Base Status
+                {t('statusPage.title')}
               </h2>
             </div>
             <p className={`text-xs mt-0.5 ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>
-              Live verification of reasoning modules, symbolic logic proof integrity, and API servers.
+              {t('statusPage.desc')}
             </p>
           </div>
 
@@ -49,7 +51,7 @@ export const StatusScreen: React.FC = () => {
             }`}
           >
             <span className={`w-2 h-2 rounded-full animate-ping ${isLight ? 'bg-emerald-600' : 'bg-[#FFAB00]'}`} />
-            <span>ALL SYSTEMS OPERATIONAL</span>
+            <span>{t('statusPage.allOperational')}</span>
           </div>
         </div>
 
@@ -69,11 +71,11 @@ export const StatusScreen: React.FC = () => {
                     : 'bg-[rgba(255,171,0,0.15)] text-[#FFAB00] border-[rgba(255,171,0,0.35)]'
                 }`}
               >
-                ACTIVE
+                {t('statusPage.active')}
               </span>
             </div>
-            <div className={`text-xs font-mono ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>API Server</div>
-            <div className={`text-sm font-bold ${isLight ? 'text-zinc-950' : 'text-zinc-100'}`}>Express &amp; Vite Proxy</div>
+            <div className={`text-xs font-mono ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>{t('statusPage.apiServer')}</div>
+            <div className={`text-sm font-bold ${isLight ? 'text-zinc-950' : 'text-zinc-100'}`}>{t('statusPage.proxy')}</div>
             <div className="text-[11px] font-mono text-zinc-500">Port 3000 • Latency &lt; 1ms</div>
           </div>
 
@@ -91,12 +93,12 @@ export const StatusScreen: React.FC = () => {
                     : 'bg-[rgba(255,171,0,0.15)] text-[#FFAB00] border-[rgba(255,171,0,0.35)]'
                 }`}
               >
-                GROUNDED
+                {t('statusPage.grounded')}
               </span>
             </div>
-            <div className={`text-xs font-mono ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Logic Engine</div>
-            <div className={`text-sm font-bold ${isLight ? 'text-zinc-950' : 'text-zinc-100'}`}>Deterministic First-Order Logic</div>
-            <div className="text-[11px] font-mono text-zinc-500">SWI-Prolog &amp; CLP(FD) Verified</div>
+            <div className={`text-xs font-mono ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>{t('statusPage.logicEngine')}</div>
+            <div className={`text-sm font-bold ${isLight ? 'text-zinc-950' : 'text-zinc-100'}`}>{t('statusPage.firstOrder')}</div>
+            <div className="text-[11px] font-mono text-zinc-500">{t('statusPage.verified')}</div>
           </div>
 
           <div
@@ -113,12 +115,12 @@ export const StatusScreen: React.FC = () => {
                     : 'bg-emerald-950 text-emerald-400 border-emerald-900'
                 }`}
               >
-                HEALTHY
+                {t('statusPage.healthy')}
               </span>
             </div>
-            <div className={`text-xs font-mono ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Data Storage</div>
-            <div className={`text-sm font-bold ${isLight ? 'text-zinc-950' : 'text-zinc-100'}`}>Encrypted Triagestore</div>
-            <div className="text-[11px] font-mono text-zinc-500">Audit Trails &amp; Shelters Loaded</div>
+            <div className={`text-xs font-mono ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>{t('statusPage.dataStorage')}</div>
+            <div className={`text-sm font-bold ${isLight ? 'text-zinc-950' : 'text-zinc-100'}`}>{t('statusPage.triagestore')}</div>
+            <div className="text-[11px] font-mono text-zinc-500">{t('statusPage.loadedData')}</div>
           </div>
         </div>
       </div>
@@ -133,7 +135,7 @@ export const StatusScreen: React.FC = () => {
           isLight ? 'text-zinc-900' : 'text-zinc-200'
         }`}>
           <Layers className={`w-4 h-4 ${isLight ? 'text-amber-700' : 'text-[#FFAB00]'}`} />
-          <span>Loaded Prolog Knowledge Bases (.pl)</span>
+          <span>{t('statusPage.loadedKb')}</span>
         </h3>
 
         <div className="space-y-2.5">
@@ -150,7 +152,7 @@ export const StatusScreen: React.FC = () => {
                   <span className={`text-xs ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>• {kb.domain}</span>
                 </div>
                 <div className="text-[11px] font-mono mt-0.5 text-zinc-500">
-                  {kb.rulesCount} formal Horn clauses &amp; safety invariants compiled
+                  {t('statusPage.clauses', { count: kb.rulesCount })}
                 </div>
               </div>
 
@@ -160,7 +162,7 @@ export const StatusScreen: React.FC = () => {
                   : 'text-emerald-400 bg-emerald-950/60 border-emerald-800/60'
               }`}>
                 <CheckCircle2 className="w-3.5 h-3.5" />
-                <span>COMPILED</span>
+                <span>{t('statusPage.compiled')}</span>
               </span>
             </div>
           ))}

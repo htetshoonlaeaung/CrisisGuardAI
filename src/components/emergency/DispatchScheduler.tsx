@@ -4,10 +4,12 @@ import { api } from '../../services/api';
 import { SeverityBadge } from './SeverityBadge';
 import { HapticButton } from '../ui/HapticButton';
 import { useTheme } from '../../context/ThemeContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { ListFilter, Play, CheckCircle2, Truck, Clock, Sparkles } from 'lucide-react';
 
 export const DispatchScheduler: React.FC = () => {
   const { isLight } = useTheme();
+  const { t } = useLanguage();
   const [incidents] = useState<IncidentItem[]>([
     {
       id: 'INC-01',
@@ -80,11 +82,11 @@ export const DispatchScheduler: React.FC = () => {
             <div className="flex items-center gap-2">
               <ListFilter className={`w-5 h-5 ${isLight ? 'text-amber-700' : 'text-[#FFAB00]'}`} />
               <h2 className={`text-lg md:text-xl font-extrabold tracking-tight ${isLight ? 'text-zinc-950' : 'text-white'}`}>
-                CLP(FD) Constraint Logic Dispatch Scheduler
+                {t('dispatch.title')}
               </h2>
             </div>
             <p className={`text-xs mt-0.5 ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>
-              Deterministic finite domain symbolic solver allocating emergency fleet without double-booking.
+              {t('dispatch.desc')}
             </p>
           </div>
 
@@ -100,27 +102,27 @@ export const DispatchScheduler: React.FC = () => {
             }`}
           >
             <Play className={`w-4 h-4 ${isLight ? 'fill-amber-300' : 'fill-zinc-950'}`} />
-            <span>{solving ? 'Solving Constraints...' : 'Execute CLP(FD) Optimization'}</span>
+            <span>{solving ? t('dispatch.solving') : t('dispatch.execute')}</span>
           </HapticButton>
         </div>
 
         {/* Solver Specs Ribbon */}
         <div className={`grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t text-xs font-mono ${isLight ? 'border-zinc-200' : 'border-[#2A2A2A]'}`}>
           <div className={`p-2.5 rounded-lg border ${isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-[#090909] border-[#2A2A2A]'}`}>
-            <span className="block text-[10px] text-zinc-500">SOLVER ENGINE</span>
+            <span className="block text-[10px] text-zinc-500">{t('dispatch.solverEngine')}</span>
             <span className={`font-semibold ${isLight ? 'text-amber-800' : 'text-[#FFAB00]'}`}>SWI-Prolog clpfd</span>
           </div>
           <div className={`p-2.5 rounded-lg border ${isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-[#090909] border-[#2A2A2A]'}`}>
-            <span className="block text-[10px] text-zinc-500">INCIDENT QUEUE</span>
-            <span className={`font-semibold ${isLight ? 'text-zinc-800' : 'text-zinc-200'}`}>{incidents.length} active calls</span>
+            <span className="block text-[10px] text-zinc-500">{t('dispatch.incidentQueue')}</span>
+            <span className={`font-semibold ${isLight ? 'text-zinc-800' : 'text-zinc-200'}`}>{t('dispatch.activeCalls', { count: incidents.length })}</span>
           </div>
           <div className={`p-2.5 rounded-lg border ${isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-[#090909] border-[#2A2A2A]'}`}>
-            <span className="block text-[10px] text-zinc-500">FLEET STATUS</span>
-            <span className="text-emerald-500 font-semibold">{teams.filter((t) => t.is_available).length} teams ready</span>
+            <span className="block text-[10px] text-zinc-500">{t('dispatch.fleetStatus')}</span>
+            <span className="text-emerald-500 font-semibold">{t('dispatch.teamsReady', { count: teams.filter((team) => team.is_available).length })}</span>
           </div>
           <div className={`p-2.5 rounded-lg border ${isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-[#090909] border-[#2A2A2A]'}`}>
-            <span className="block text-[10px] text-zinc-500">INVARIANTS</span>
-            <span className={`font-semibold ${isLight ? 'text-amber-800' : 'text-[#FFAB00]'}`}>Single-Assign &amp; Cap</span>
+            <span className="block text-[10px] text-zinc-500">{t('dispatch.invariants')}</span>
+            <span className={`font-semibold ${isLight ? 'text-amber-800' : 'text-[#FFAB00]'}`}>{t('dispatch.singleAssign')}</span>
           </div>
         </div>
       </div>
@@ -138,7 +140,7 @@ export const DispatchScheduler: React.FC = () => {
             <div className="flex items-center gap-2">
               <Sparkles className={`w-4 h-4 ${isLight ? 'text-amber-700 fill-amber-700' : 'text-[#FFAB00] fill-[#FFAB00]'}`} />
               <h3 className={`text-xs md:text-sm font-mono uppercase tracking-wider font-extrabold ${isLight ? 'text-amber-900' : 'text-[#FFAB00]'}`}>
-                CLP(FD) Optimal Dispatch Routing Plan
+                {t('dispatch.plan')}
               </h3>
             </div>
             <span className={`text-xs font-mono px-2.5 py-0.5 rounded border ${
@@ -146,7 +148,7 @@ export const DispatchScheduler: React.FC = () => {
                 ? 'text-emerald-800 bg-emerald-100 border-emerald-300 font-bold'
                 : 'text-emerald-400 bg-emerald-950/80 border-emerald-800/80'
             }`}>
-              Solved in {dispatchResult.total_latency_ms}ms
+              {t('dispatch.solvedIn', { ms: dispatchResult.total_latency_ms })}
             </span>
           </div>
 
@@ -175,7 +177,7 @@ export const DispatchScheduler: React.FC = () => {
                   </div>
                   <div className="flex items-center gap-1 text-emerald-600 font-bold">
                     <Clock className="w-3.5 h-3.5" />
-                    <span>~{plan.estimated_arrival_minutes} min ETA</span>
+                    <span>{t('dispatch.eta', { minutes: plan.estimated_arrival_minutes })}</span>
                   </div>
                 </div>
 
@@ -200,7 +202,7 @@ export const DispatchScheduler: React.FC = () => {
           isLight ? 'bg-white border-zinc-200 text-zinc-900 shadow-zinc-200/50' : 'border-[#2A2A2A] bg-[#111111]'
         }`}>
           <h3 className={`text-xs md:text-sm font-mono uppercase tracking-wider font-bold ${isLight ? 'text-zinc-900' : 'text-zinc-200'}`}>
-            Active Incident Queue ({incidents.length})
+            {t('dispatch.activeQueue', { count: incidents.length })}
           </h3>
           <div className="space-y-2">
             {incidents.map((inc) => (
@@ -227,12 +229,12 @@ export const DispatchScheduler: React.FC = () => {
           isLight ? 'bg-white border-zinc-200 text-zinc-900 shadow-zinc-200/50' : 'border-[#2A2A2A] bg-[#111111]'
         }`}>
           <h3 className={`text-xs md:text-sm font-mono uppercase tracking-wider font-bold ${isLight ? 'text-zinc-900' : 'text-zinc-200'}`}>
-            Available Rescue Fleet ({teams.length})
+            {t('dispatch.fleet', { count: teams.length })}
           </h3>
           <div className="space-y-2">
-            {teams.map((t) => (
+            {teams.map((team) => (
               <div
-                key={t.id}
+                key={team.id}
                 className={`p-3 rounded-xl border flex items-center justify-between gap-2 ${
                   isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-[#090909] border-[#2A2A2A]'
                 }`}
@@ -246,9 +248,9 @@ export const DispatchScheduler: React.FC = () => {
                     <Truck className="w-4 h-4" />
                   </div>
                   <div>
-                    <div className={`text-xs font-bold ${isLight ? 'text-zinc-900' : 'text-zinc-200'}`}>{t.name}</div>
+                    <div className={`text-xs font-bold ${isLight ? 'text-zinc-900' : 'text-zinc-200'}`}>{team.name}</div>
                     <div className={`text-[11px] font-mono ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>
-                      Cap: {t.vehicle_capacity} • {t.base_location}
+                      Cap: {team.vehicle_capacity} • {team.base_location}
                     </div>
                   </div>
                 </div>
@@ -257,7 +259,7 @@ export const DispatchScheduler: React.FC = () => {
                     ? 'bg-amber-100 text-amber-900 border-amber-300'
                     : 'bg-[rgba(255,171,0,0.15)] text-[#FFAB00] border-[rgba(255,171,0,0.35)]'
                 }`}>
-                  READY
+                  {t('dispatch.ready')}
                 </span>
               </div>
             ))}

@@ -3,8 +3,8 @@ import { TriageSeverity, CrisisDomain } from '../../types';
 import { SeverityBadge } from './SeverityBadge';
 import { useTheme } from '../../context/ThemeContext';
 import { HapticButton } from '../ui/HapticButton';
+import { useLanguage } from '../../context/LanguageContext';
 import {
-  Shield,
   Sparkles,
   PhoneCall,
   Copy,
@@ -34,6 +34,7 @@ export const SessionStatusBar: React.FC<SessionStatusBarProps> = ({
   onToggleSidebar,
 }) => {
   const { themeMode, setThemeMode, isLight } = useTheme();
+  const { language, setLanguage, languageNames, t } = useLanguage();
   const [copied, setCopied] = useState(false);
 
   const handleCopyToken = () => {
@@ -47,8 +48,8 @@ export const SessionStatusBar: React.FC<SessionStatusBarProps> = ({
       id="session-status-bar"
       className={`sticky top-0 z-40 border-b backdrop-blur-xl transition-colors duration-300 ${
         isLight
-          ? 'bg-white/95 border-zinc-200 text-zinc-900 shadow-xs'
-          : 'bg-[#090909]/95 border-[#2A2A2A] text-zinc-100'
+          ? 'bg-[#082B5C]/95 border-[#082B5C] text-white shadow-xs'
+          : 'bg-[#082B5C]/95 border-[#082B5C] text-white'
       }`}
     >
       {/* 1. Top emergency dispatch ribbon - Responsive single-row layout */}
@@ -69,11 +70,11 @@ export const SessionStatusBar: React.FC<SessionStatusBarProps> = ({
             }`}
           >
             <Sparkles className={`w-3 h-3 flex-shrink-0 ${isLight ? 'text-amber-700 fill-amber-700' : 'text-[#FFAB00] fill-[#FFAB00]'}`} />
-            <span><span className="hidden sm:inline">Grounding: </span>Prolog Symbolic KB</span>
+            <span><span className="hidden sm:inline">{t('common.groundingPrefix')}</span>{t('common.groundingKb')}</span>
           </div>
 
           <div className="hidden md:flex items-center gap-1.5 text-zinc-400 font-mono text-[11px]">
-            <span>Session:</span>
+            <span>{t('common.session')}</span>
             <button
               onClick={handleCopyToken}
               className={`inline-flex items-center gap-1 px-2 py-0.5 rounded border font-mono transition-colors cursor-pointer ${
@@ -81,7 +82,7 @@ export const SessionStatusBar: React.FC<SessionStatusBarProps> = ({
                   ? 'bg-white border-zinc-300 text-zinc-800 hover:text-black hover:bg-zinc-50 shadow-xs'
                   : 'bg-[#1A1A1A] border-[#2A2A2A] text-zinc-300 hover:text-white hover:border-zinc-500'
               }`}
-              title="Copy session token"
+              title={t('common.copySessionToken')}
             >
               <span>{sessionToken ? sessionToken.slice(0, 8) + '...' : 'init'}</span>
               {copied ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3 text-zinc-400" />}
@@ -100,7 +101,7 @@ export const SessionStatusBar: React.FC<SessionStatusBarProps> = ({
             }`}
           >
             <PhoneCall className="w-3 h-3" />
-            <span>199 Emergency</span>
+            <span>{t('common.emergency199')}</span>
           </a>
           <a
             href="tel:18002221222"
@@ -110,7 +111,7 @@ export const SessionStatusBar: React.FC<SessionStatusBarProps> = ({
                 : 'bg-[#1A1A1A] border-[#2A2A2A] text-zinc-300 hover:text-white hover:border-zinc-500'
             }`}
           >
-            <span>Poison: 1-800-222-1222</span>
+            <span>{t('common.poison')}</span>
           </a>
         </div>
       </div>
@@ -119,8 +120,8 @@ export const SessionStatusBar: React.FC<SessionStatusBarProps> = ({
       <div
         className={`px-3 sm:px-4 py-2 flex items-center justify-between gap-2 transition-colors duration-200 ${
           isLight
-            ? 'bg-white text-zinc-900'
-            : 'bg-[#090909] text-zinc-100'
+            ? 'bg-[#082B5C] text-white'
+            : 'bg-[#082B5C] text-white'
         }`}
       >
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
@@ -135,28 +136,26 @@ export const SessionStatusBar: React.FC<SessionStatusBarProps> = ({
                 ? 'bg-zinc-100 hover:bg-zinc-200 border-zinc-300 text-zinc-800 shadow-xs'
                 : 'bg-[#1A1A1A] hover:bg-[#2A2A2A] border-[#2A2A2A] text-zinc-200 hover:text-white shadow-xs'
             }`}
-            title="Toggle Left Taskbar / Sidebar"
+            title={t('common.toggleSidebar')}
           >
             <Sidebar className={`w-4 h-4 ${isLight ? 'text-amber-700' : 'text-[#FFAB00]'}`} />
             <span className="hidden md:inline font-mono">
-              {isSidebarCollapsed ? 'Taskbar' : 'Hide'}
+              {isSidebarCollapsed ? t('common.taskbar') : t('common.hide')}
             </span>
           </HapticButton>
 
-          <div className="flex items-center gap-2 min-w-0">
-            <div
-              className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center font-black shadow-xs flex-shrink-0 ${
-                isLight
-                  ? 'bg-amber-100 border border-amber-300 text-amber-800'
-                  : 'bg-[#1A1A1A] border border-[rgba(255,171,0,0.40)] text-[#FFAB00]'
-              }`}
-            >
-              <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          <div className="flex min-w-0 items-center gap-2" aria-label="CrisisGuard AI">
+            <div className="relative h-10 w-[39px] flex-shrink-0 overflow-hidden sm:h-11 sm:w-[43px] md:h-12 md:w-[47px]">
+              <img
+                src="/crisisguard-logo.png"
+                alt=""
+                aria-hidden="true"
+                className="h-full w-auto max-w-none object-contain object-left"
+              />
             </div>
-            <div className="min-w-0">
-              <span className={`font-extrabold text-xs sm:text-sm md:text-base tracking-tight truncate block ${isLight ? 'text-zinc-950' : 'text-white'}`}>
-                CrisisGuard <span className={isLight ? 'text-amber-600 font-black' : 'text-[#FFAB00]'}>AI</span>
-              </span>
+            <div className="flex min-w-0 items-baseline gap-2 text-[28px] font-black leading-none">
+              <span className="truncate text-[#FFFFFF]">CrisisGuard</span>
+              <span className="text-[#EA002C]">AI</span>
             </div>
           </div>
         </div>
@@ -174,6 +173,37 @@ export const SessionStatusBar: React.FC<SessionStatusBarProps> = ({
               <span>⚡ {evaluationLatencyMs}ms</span>
             </span>
           )}
+
+          <div
+            className={`flex items-center gap-0.5 p-0.5 sm:p-1 rounded-xl border flex-shrink-0 ${
+              isLight
+                ? 'bg-zinc-100 border-zinc-300 shadow-xs'
+                : 'bg-[#111111] border-[#2A2A2A] shadow-xs'
+            }`}
+            role="group"
+            aria-label={t('language.label')}
+          >
+            {(['en', 'my'] as const).map((option) => (
+              <button
+                key={option}
+                type="button"
+                onClick={() => setLanguage(option)}
+                aria-pressed={language === option}
+                aria-label={option === 'en' ? t('language.english') : t('language.myanmar')}
+                className={`h-7 rounded-lg px-2 text-[11px] font-bold transition-colors ${
+                  language === option
+                    ? isLight
+                      ? 'bg-white text-zinc-950 shadow border border-zinc-300'
+                      : 'bg-zinc-800 text-[#FFAB00] shadow'
+                    : isLight
+                    ? 'text-zinc-600 hover:text-black hover:bg-zinc-200'
+                    : 'text-zinc-400 hover:text-zinc-200'
+                }`}
+              >
+                {languageNames[option]}
+              </button>
+            ))}
+          </div>
 
           {/* Theme switcher with Haptic Buttons - Compact for mobile */}
           <div
@@ -194,7 +224,7 @@ export const SessionStatusBar: React.FC<SessionStatusBarProps> = ({
                   ? 'text-zinc-600 hover:text-black hover:bg-zinc-200'
                   : 'text-zinc-400 hover:text-zinc-200'
               }`}
-              title="Dark Mode"
+              title={t('common.darkMode')}
             >
               <Moon className="w-3.5 h-3.5" />
             </HapticButton>
@@ -209,7 +239,7 @@ export const SessionStatusBar: React.FC<SessionStatusBarProps> = ({
                   ? 'text-zinc-600'
                   : 'text-zinc-400 hover:text-zinc-200'
               }`}
-              title="Light Mode"
+              title={t('common.lightMode')}
             >
               <Sun className="w-3.5 h-3.5" />
             </HapticButton>
@@ -220,7 +250,7 @@ export const SessionStatusBar: React.FC<SessionStatusBarProps> = ({
               className={`p-1 sm:p-1.5 rounded-lg text-xs transition-colors ${
                 themeMode === 'alert' ? 'font-bold shadow' : isLight ? 'text-zinc-600' : 'text-zinc-400 hover:text-zinc-200'
               }`}
-              title="Alert Mode"
+              title={t('common.alertMode')}
             >
               <AlertTriangle className="w-3.5 h-3.5" />
             </HapticButton>

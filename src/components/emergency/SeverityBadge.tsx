@@ -1,6 +1,7 @@
 import React from 'react';
 import { TriageSeverity } from '../../types';
 import { getSeverityTheme } from '../../utils/severityColor';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface SeverityBadgeProps {
   severity?: TriageSeverity;
@@ -14,6 +15,7 @@ export const SeverityBadge: React.FC<SeverityBadgeProps> = ({
   showPulse = true,
 }) => {
   const theme = getSeverityTheme(severity);
+  const { ts } = useLanguage();
 
   const sizeClasses = {
     sm: 'text-[10px] sm:text-xs px-2 sm:px-2.5 py-0.5 tracking-wider font-bold',
@@ -24,13 +26,9 @@ export const SeverityBadge: React.FC<SeverityBadgeProps> = ({
   // Compact label for small size / mobile views to prevent text overflow
   const getDisplayLabel = () => {
     if (size === 'sm') {
-      if (severity === 'critical') return 'CRITICAL';
-      if (severity === 'high') return 'HIGH';
-      if (severity === 'moderate') return 'MODERATE';
-      if (severity === 'low') return 'LOW';
-      if (severity === 'informational') return 'INFO';
+      return ts(severity, true);
     }
-    return theme.label;
+    return ts(severity);
   };
 
   return (

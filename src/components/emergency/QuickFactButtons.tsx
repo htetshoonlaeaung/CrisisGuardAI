@@ -3,7 +3,7 @@ import { CrisisDomain, FactItem } from '../../types';
 import { QUICK_FACTS, QuickFactPreset } from '../../data/quickFacts';
 import { HapticButton } from '../ui/HapticButton';
 import { useTheme } from '../../context/ThemeContext';
-import { Zap } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface QuickFactButtonsProps {
   domain: CrisisDomain;
@@ -17,6 +17,7 @@ export const QuickFactButtons: React.FC<QuickFactButtonsProps> = ({
   onSelectPreset,
 }) => {
   const { isLight } = useTheme();
+  const { t, td, tp, tpd } = useLanguage();
   const [clickedPresetId, setClickedPresetId] = useState<string | null>(null);
   const presets = QUICK_FACTS[domain] || [];
 
@@ -36,13 +37,12 @@ export const QuickFactButtons: React.FC<QuickFactButtonsProps> = ({
   return (
     <div id="quick-presets-panel" className="space-y-2">
       <div
-        className={`flex items-center justify-between text-xs font-mono font-semibold uppercase tracking-wider ${
+        className={`flex items-center justify-between text-[13px] font-mono font-bold uppercase tracking-wider ${
           isLight ? 'text-amber-800' : 'text-[#FFAB00]'
         }`}
       >
-        <div className="flex items-center gap-1.5">
-          <Zap className={`w-3.5 h-3.5 ${isLight ? 'fill-amber-700 text-amber-700' : 'fill-[#FFAB00] text-[#FFAB00]'}`} />
-          <span>1-Tap Crisis Presets ({domain.replace('_', ' ')})</span>
+        <div className="flex items-center">
+          <span>{t('quickPresets.heading', { domain: td(domain) })}</span>
         </div>
       </div>
 
@@ -57,7 +57,7 @@ export const QuickFactButtons: React.FC<QuickFactButtonsProps> = ({
               variant="secondary"
               skeuomorphic={true}
               onClick={() => handlePresetClick(preset)}
-              className={`p-2.5 sm:p-3 text-left rounded-xl group w-full justify-start items-start flex-col transition-all border min-h-[58px] ${
+              className={`p-3 text-left rounded-xl group w-full justify-start items-start flex-col transition-all border min-h-[58px] ${
                 active
                   ? 'skeuo-preset-active'
                   : isLight
@@ -65,24 +65,23 @@ export const QuickFactButtons: React.FC<QuickFactButtonsProps> = ({
                   : 'bg-[#111111] hover:bg-[rgba(255,171,0,0.06)] border-[#2A2A2A] text-zinc-100 hover:border-[rgba(255,171,0,0.30)]'
               }`}
             >
-              <div className="flex items-center gap-2 w-full">
-                <span className="text-base flex-shrink-0 drop-shadow-xs">{preset.icon}</span>
+              <div className="flex items-center w-full">
                 <span
-                  className={`text-xs font-bold truncate flex-1 text-left transition-colors ${
+                  className={`text-[14px] font-semibold whitespace-normal flex-1 text-left leading-[1.3] [word-break:normal] [overflow-wrap:normal] transition-colors ${
                     active
                       ? isLight
-                        ? 'text-amber-950 font-black'
-                        : 'text-[#FFAB00] font-black'
+                        ? 'text-amber-950'
+                        : 'text-[#FFAB00]'
                       : isLight
                       ? 'text-zinc-900 group-hover:text-amber-800'
                       : 'text-zinc-100 group-hover:text-[#FFAB00]'
                   }`}
                 >
-                  {preset.label}
+                  {tp(preset.id, preset.label)}
                 </span>
               </div>
               <p
-                className={`text-[11px] font-sans text-left line-clamp-1 w-full pl-6 transition-colors ${
+                className={`text-[11px] font-sans text-left line-clamp-2 w-full transition-colors ${
                   active
                     ? isLight
                       ? 'text-amber-900/90 font-medium'
@@ -92,7 +91,7 @@ export const QuickFactButtons: React.FC<QuickFactButtonsProps> = ({
                     : 'text-zinc-400 group-hover:text-zinc-300'
                 }`}
               >
-                {preset.description}
+                {tpd(preset.id, preset.description)}
               </p>
             </HapticButton>
           );

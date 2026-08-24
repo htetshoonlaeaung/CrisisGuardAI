@@ -3,6 +3,7 @@ import { CrisisDomain, FactItem, EvaluateCrisisResponse, TriageSeverity } from '
 import { api } from './services/api';
 import { QuickFactPreset } from './data/quickFacts';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
+import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { CollapsibleSidebar } from './components/emergency/CollapsibleSidebar';
 import { SessionStatusBar } from './components/emergency/SessionStatusBar';
 import { FactInputPanel } from './components/emergency/FactInputPanel';
@@ -16,6 +17,7 @@ import { ExplanationDrawer } from './components/emergency/ExplanationDrawer';
 
 function AppContent() {
   const { themeMode, isLight } = useTheme();
+  const { t, isMyanmar } = useLanguage();
 
   const [sessionToken] = useState<string>(() => {
     const saved = localStorage.getItem('crisisguard_token');
@@ -133,7 +135,7 @@ function AppContent() {
   };
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 flex relative overflow-x-hidden ${getThemeWrapperClass()}`}>
+    <div className={`min-h-screen transition-colors duration-300 flex relative overflow-x-hidden ${getThemeWrapperClass()} ${isMyanmar ? 'break-words' : ''}`}>
       {/* Mobile Backdrop Overlay when sidebar is open */}
       {!isSidebarCollapsed && (
         <div
@@ -217,7 +219,7 @@ function AppContent() {
                           : 'bg-[#111111] border-[#2A2A2A] text-zinc-500'
                       }`}
                     >
-                      Assert emergency facts or pick a preset to evaluate life-safety protocols.
+                      {t('factInput.noFacts')}
                     </div>
                   )}
                 </div>
@@ -257,10 +259,10 @@ function AppContent() {
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
             <span className="flex items-center gap-1.5 justify-center">
               <span className={`w-2 h-2 rounded-full inline-block ${isLight ? 'bg-amber-600' : 'bg-[#FFAB00]'}`} />
-              CrisisGuard AI • Deterministic Life-Safety Decision Support System
+              {t('common.appFooter')}
             </span>
             <span className={`font-semibold ${isLight ? 'text-amber-800' : 'text-[#FFAB00]'}`}>
-              SWI-Prolog Horn-Clause Logic &amp; CLP(FD) Constraint Engine
+              {t('common.footerEngine')}
             </span>
           </div>
         </footer>
@@ -272,7 +274,9 @@ function AppContent() {
 export function App() {
   return (
     <ThemeProvider>
-      <AppContent />
+      <LanguageProvider>
+        <AppContent />
+      </LanguageProvider>
     </ThemeProvider>
   );
 }

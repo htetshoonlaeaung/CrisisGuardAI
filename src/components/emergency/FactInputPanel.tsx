@@ -5,6 +5,7 @@ import { COMMON_FACT_KEYS, QuickFactPreset, FactKeyConfig } from '../../data/qui
 import { HapticButton } from '../ui/HapticButton';
 import { useTheme } from '../../context/ThemeContext';
 import { Plus, X, Trash2, Zap, Layers, RefreshCw } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface FactInputPanelProps {
   domain: CrisisDomain;
@@ -30,6 +31,7 @@ export const FactInputPanel: React.FC<FactInputPanelProps> = ({
   onApplyPreset,
 }) => {
   const { isLight } = useTheme();
+  const { t, td, tf } = useLanguage();
   const [customKey, setCustomKey] = useState('');
   const [customVal, setCustomVal] = useState('');
   const [selectedQuickKey, setSelectedQuickKey] = useState('');
@@ -73,15 +75,15 @@ export const FactInputPanel: React.FC<FactInputPanelProps> = ({
       <div>
         <div className="flex items-center justify-between mb-2.5">
           <label
-            className={`text-xs font-mono uppercase tracking-wider font-semibold flex items-center gap-1.5 ${
+            className={`text-[13px] font-mono uppercase tracking-wider font-bold flex items-center gap-1.5 ${
               isLight ? 'text-zinc-600' : 'text-zinc-400'
             }`}
           >
             <Layers className={`w-3.5 h-3.5 ${isLight ? 'text-amber-700' : 'text-[#FFAB00]'}`} />
-            <span>Emergency Domain</span>
+            <span>{t('factInput.emergencyDomain')}</span>
           </label>
           <span className={`text-[11px] font-mono font-semibold ${isLight ? 'text-amber-800' : 'text-[#FFAB00]'}`}>
-            SWI-Prolog KB Module
+            {t('factInput.kbModule')}
           </span>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -94,18 +96,17 @@ export const FactInputPanel: React.FC<FactInputPanelProps> = ({
                 variant={isSelected ? (isLight ? 'primary' : 'amber') : 'secondary'}
                 skeuomorphic={true}
                 onClick={() => onChangeDomain(d.id)}
-                className={`h-11 sm:h-12 px-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all border flex items-center justify-center gap-1.5 ${
+                className={`h-11 sm:h-12 px-2.5 rounded-xl text-[13px] font-semibold leading-[1.2] transition-all border flex items-center justify-center text-center [word-break:normal] [overflow-wrap:normal] ${
                   isSelected
                     ? isLight
-                      ? 'bg-amber-500 text-zinc-950 font-bold border-amber-500 shadow-sm'
-                      : 'bg-[rgba(255,171,0,0.12)] border-[rgba(255,171,0,0.50)] text-[#FFAB00] shadow-[0_0_16px_rgba(255,171,0,0.25)] font-bold'
+                      ? 'bg-amber-500 text-zinc-950 border-amber-500 shadow-sm'
+                      : 'bg-[rgba(255,171,0,0.12)] border-[rgba(255,171,0,0.50)] text-[#FFAB00] shadow-[0_0_16px_rgba(255,171,0,0.25)]'
                     : isLight
                     ? 'bg-white hover:bg-zinc-50 text-zinc-800 border-zinc-300'
                     : 'border-[#2A2A2A] bg-[#111111] text-zinc-300 hover:border-[rgba(255,171,0,0.30)] hover:bg-[rgba(255,171,0,0.06)]'
                 }`}
               >
-                <span className="text-base flex-shrink-0 drop-shadow-xs">{d.icon}</span>
-                <span className="truncate">{d.label}</span>
+                <span className="min-w-0 whitespace-normal [word-break:normal] [overflow-wrap:normal]">{td(d.id)}</span>
               </HapticButton>
             );
           })}
@@ -123,7 +124,7 @@ export const FactInputPanel: React.FC<FactInputPanelProps> = ({
               isLight ? 'text-zinc-700' : 'text-zinc-300'
             }`}
           >
-            <span>Active Asserted Facts ({facts.length})</span>
+            <span>{t('factInput.activeFacts', { count: facts.length })}</span>
           </label>
           {facts.length > 0 && (
             <HapticButton
@@ -134,7 +135,7 @@ export const FactInputPanel: React.FC<FactInputPanelProps> = ({
                 isLight ? 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100' : 'text-zinc-400 hover:text-zinc-200'
               }`}
             >
-              <Trash2 className="w-3 h-3" /> Clear all
+              <Trash2 className="w-3 h-3" /> {t('factInput.clearAll')}
             </HapticButton>
           )}
         </div>
@@ -147,7 +148,7 @@ export const FactInputPanel: React.FC<FactInputPanelProps> = ({
                 : 'border-[#2A2A2A] bg-[#090909]/60 text-zinc-500'
             }`}
           >
-            No facts asserted yet. Select a 1-tap preset above or tap clinical signs below.
+            {t('factInput.noFacts')}
           </div>
         ) : (
           <div
@@ -201,7 +202,7 @@ export const FactInputPanel: React.FC<FactInputPanelProps> = ({
             isLight ? 'text-zinc-600' : 'text-zinc-400'
           }`}
         >
-          Add / Assert Fact
+          {t('factInput.addFact')}
         </label>
 
         {/* Quick select dropdown */}
@@ -215,10 +216,10 @@ export const FactInputPanel: React.FC<FactInputPanelProps> = ({
                 : 'bg-[#111111] border-[#2A2A2A] text-zinc-200 focus:border-[#FFAB00]'
             }`}
           >
-            <option value="">Select common clinical / hazard sign...</option>
+            <option value="">{t('factInput.selectCommonSign')}</option>
             {commonKeys.map((k: FactKeyConfig) => (
               <option key={k.key} value={k.key}>
-                {k.label} ({k.key})
+                {tf(k.label)} ({k.key})
               </option>
             ))}
           </select>
@@ -227,7 +228,7 @@ export const FactInputPanel: React.FC<FactInputPanelProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-5 gap-2">
           <input
             type="text"
-            placeholder="Fact Key (e.g. unconscious)"
+            placeholder={t('factInput.factKeyPlaceholder')}
             value={customKey}
             onChange={(e) => setCustomKey(e.target.value)}
             className={`sm:col-span-2 border text-xs rounded-lg px-3 py-2 focus:outline-none font-mono ${
@@ -238,7 +239,7 @@ export const FactInputPanel: React.FC<FactInputPanelProps> = ({
           />
           <input
             type="text"
-            placeholder="Value (e.g. true, severe)"
+            placeholder={t('factInput.valuePlaceholder')}
             value={customVal}
             onChange={(e) => setCustomVal(e.target.value)}
             className={`sm:col-span-2 border text-xs rounded-lg px-3 py-2 focus:outline-none font-mono ${
@@ -257,14 +258,14 @@ export const FactInputPanel: React.FC<FactInputPanelProps> = ({
             }`}
           >
             <Plus className={`w-3.5 h-3.5 ${isLight ? 'text-amber-400' : 'text-[#FFAB00]'}`} />
-            <span>Assert</span>
+            <span>{t('factInput.assert')}</span>
           </HapticButton>
         </div>
 
         {/* Rapid Clinical Sign Toggle Chips */}
         <div className="pt-2">
           <span className={`text-[11px] font-mono block mb-1.5 ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>
-            Quick Clinical Signs &amp; Conditions (tap to assert/unassert):
+            {t('factInput.quickSigns')}
           </span>
           <div className="flex flex-wrap gap-1.5">
             {commonKeys.map((item) => {
@@ -293,7 +294,7 @@ export const FactInputPanel: React.FC<FactInputPanelProps> = ({
                   }`}
                 >
                   {isAsserted ? '✓ ' : '+ '}
-                  {item.label}
+                  {tf(item.label)}
                 </HapticButton>
               );
             })}
@@ -317,12 +318,12 @@ export const FactInputPanel: React.FC<FactInputPanelProps> = ({
         {isEvaluating ? (
           <>
             <RefreshCw className="w-5 h-5 animate-spin" />
-            <span>Reasoning over Knowledge Base...</span>
+            <span>{t('factInput.reasoning')}</span>
           </>
         ) : (
           <>
             <Zap className="w-5 h-5 fill-zinc-950 text-zinc-950" />
-            <span>Evaluate Emergency with AI Engine</span>
+            <span>{t('factInput.evaluate')}</span>
           </>
         )}
       </HapticButton>

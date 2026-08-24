@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { HeartPulse, Play, Square, Volume2, VolumeX, CheckCircle2, RotateCcw, X } from 'lucide-react';
 import { HapticButton } from '../ui/HapticButton';
 import { useTheme } from '../../context/ThemeContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface CPRMetronomeProps {
   onClose?: () => void;
@@ -9,6 +10,7 @@ interface CPRMetronomeProps {
 
 export const CPRMetronome: React.FC<CPRMetronomeProps> = ({ onClose }) => {
   const { isLight } = useTheme();
+  const { t } = useLanguage();
   const [isActive, setIsActive] = useState(true);
   const [isMuted, setIsMuted] = useState(false);
   const [beatCount, setBeatCount] = useState(0);
@@ -116,7 +118,7 @@ export const CPRMetronome: React.FC<CPRMetronomeProps> = ({ onClose }) => {
           </div>
           <div>
             <h3 className={`font-extrabold text-sm md:text-base tracking-tight ${isLight ? 'text-zinc-950' : 'text-white'}`}>
-              AHA CPR Audio-Visual Metronome
+              {t('cpr.title')}
             </h3>
             <p className={`text-xs font-mono ${isLight ? 'text-red-700 font-bold' : 'text-[#FFAB00]'}`}>
               110 Beats Per Minute • 30:2 Cycle Guide
@@ -129,7 +131,7 @@ export const CPRMetronome: React.FC<CPRMetronomeProps> = ({ onClose }) => {
             variant="icon"
             onClick={() => setIsMuted(!isMuted)}
             className={`w-8 h-8 rounded-lg p-0 ${isLight ? 'bg-zinc-100 border border-zinc-300' : ''}`}
-            title={isMuted ? 'Unmute beat' : 'Mute beat'}
+            title={isMuted ? t('cpr.unmute') : t('cpr.mute')}
           >
             {isMuted ? (
               <VolumeX className="w-4 h-4 text-zinc-400" />
@@ -146,7 +148,7 @@ export const CPRMetronome: React.FC<CPRMetronomeProps> = ({ onClose }) => {
               }`}
             >
               <X className="w-3.5 h-3.5" />
-              <span>Close</span>
+              <span>{t('common.close')}</span>
             </HapticButton>
           )}
         </div>
@@ -168,25 +170,25 @@ export const CPRMetronome: React.FC<CPRMetronomeProps> = ({ onClose }) => {
           }`}
         >
           <span className="text-2xl md:text-3xl font-black font-mono tracking-wider">
-            {phase === 'breaths' ? 'BREATH' : isPushing ? 'PUSH' : 'RECOIL'}
+            {phase === 'breaths' ? t('cpr.breath') : isPushing ? t('cpr.push') : t('cpr.recoil')}
           </span>
           <span className="text-xs font-mono font-bold opacity-90">
-            {phase === 'breaths' ? 'Give 2 breaths' : 'Compress 2"'}
+            {phase === 'breaths' ? t('cpr.giveBreaths') : t('cpr.compress')}
           </span>
         </div>
 
         {/* Real-time counters */}
         <div className="grid grid-cols-3 gap-4 w-full max-w-sm mt-6 px-4 text-center">
           <div className={`p-2.5 rounded-lg border ${isLight ? 'bg-white border-zinc-200' : 'bg-[#111111] border-[#2A2A2A]'}`}>
-            <div className={`text-[10px] font-mono uppercase ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Current Beat</div>
+            <div className={`text-[10px] font-mono uppercase ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>{t('cpr.currentBeat')}</div>
             <div className={`text-xl font-bold font-mono ${isLight ? 'text-zinc-950' : 'text-white'}`}>{(beatCount % 30) || 30}/30</div>
           </div>
           <div className={`p-2.5 rounded-lg border ${isLight ? 'bg-white border-zinc-200' : 'bg-[#111111] border-[#2A2A2A]'}`}>
-            <div className={`text-[10px] font-mono uppercase ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>CPR Cycle</div>
+            <div className={`text-[10px] font-mono uppercase ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>{t('cpr.cycle')}</div>
             <div className={`text-xl font-bold font-mono ${isLight ? 'text-amber-700' : 'text-[#FFAB00]'}`}>#{cycleCount}</div>
           </div>
           <div className={`p-2.5 rounded-lg border ${isLight ? 'bg-white border-zinc-200' : 'bg-[#111111] border-[#2A2A2A]'}`}>
-            <div className={`text-[10px] font-mono uppercase ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>Cadence</div>
+            <div className={`text-[10px] font-mono uppercase ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>{t('cpr.cadence')}</div>
             <div className={`text-xl font-bold font-mono ${isLight ? 'text-amber-700' : 'text-[#FFAB00]'}`}>110 BPM</div>
           </div>
         </div>
@@ -204,12 +206,12 @@ export const CPRMetronome: React.FC<CPRMetronomeProps> = ({ onClose }) => {
           {isActive ? (
             <>
               <Square className={`w-4 h-4 fill-current ${isLight ? 'text-zinc-700' : 'text-[#FFAB00]'}`} />
-              <span>Pause Metronome</span>
+              <span>{t('cpr.pause')}</span>
             </>
           ) : (
             <>
               <Play className="w-4 h-4 fill-current text-zinc-950" />
-              <span>Start Metronome (110 BPM)</span>
+              <span>{t('cpr.start')}</span>
             </>
           )}
         </HapticButton>
@@ -218,7 +220,7 @@ export const CPRMetronome: React.FC<CPRMetronomeProps> = ({ onClose }) => {
           variant="secondary"
           onClick={handleReset}
           className={`p-3 rounded-xl ${isLight ? 'bg-zinc-100 border-zinc-300' : ''}`}
-          title="Reset counter"
+          title={t('cpr.reset')}
         >
           <RotateCcw className={`w-5 h-5 ${isLight ? 'text-zinc-700' : 'text-zinc-300'}`} />
         </HapticButton>
@@ -230,13 +232,13 @@ export const CPRMetronome: React.FC<CPRMetronomeProps> = ({ onClose }) => {
       }`}>
         <div className={`font-semibold flex items-center gap-1.5 font-mono ${isLight ? 'text-zinc-900' : 'text-zinc-200'}`}>
           <CheckCircle2 className={`w-3.5 h-3.5 ${isLight ? 'text-amber-700' : 'text-[#FFAB00]'}`} />
-          <span>AHA Guidelines for High-Quality CPR</span>
+          <span>{t('cpr.guidelines')}</span>
         </div>
         <div className={`space-y-1 pl-5 list-disc ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>
-          <div>• Push hard and fast in center of chest: 2–2.4 inches (5–6 cm) deep.</div>
-          <div>• Allow full chest recoil between compressions; do not lean on chest.</div>
-          <div>• Minimize interruptions to compressions (&lt; 10 seconds).</div>
-          <div>• Deliver 30 compressions followed by 2 rescue breaths (or continuous compressions if hands-only).</div>
+          <div>• {t('cpr.rule1')}</div>
+          <div>• {t('cpr.rule2')}</div>
+          <div>• {t('cpr.rule3')}</div>
+          <div>• {t('cpr.rule4')}</div>
         </div>
       </div>
     </div>

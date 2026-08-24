@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, PhoneCall, Radio, AlertTriangle } from 'lucide-react';
+import { PhoneCall, Radio, AlertTriangle } from 'lucide-react';
 import { CrisisDomain } from '../../types';
 
 interface HeaderProps {
@@ -16,7 +16,7 @@ export const Header: React.FC<HeaderProps> = ({
   onSelectTab
 }) => {
   return (
-    <header className="border-b border-neutral-800 bg-neutral-950/95 sticky top-0 z-40 backdrop-blur-md">
+    <header className="border-b border-[#082B5C] bg-[#082B5C]/95 sticky top-0 z-40 backdrop-blur-md">
       {/* Top Emergency Dialing Toolbar */}
       <div className="bg-red-950/80 border-b border-red-900/50 px-4 py-2 text-xs font-semibold text-red-200">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
@@ -56,21 +56,12 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Main Header Branding & Nav */}
       <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-red-600 to-amber-600 flex items-center justify-center shadow-lg shadow-red-900/30 text-white">
-            <Shield className="w-6 h-6" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl font-black tracking-tight text-white flex items-center gap-1.5">
-                CrisisGuard <span className="text-red-500">AI</span>
-              </h1>
-              <span className="bg-red-500/20 text-red-400 border border-red-500/30 text-[10px] font-mono font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
-                SWI-Prolog • XAI
-              </span>
-            </div>
-            <p className="text-xs text-neutral-400">Deterministic Life-Safety Decision Support System</p>
-          </div>
+        <div className="flex items-center">
+          <img
+            src="/crisisguard-logo.png"
+            alt="CrisisGuard AI"
+            className="h-10 w-auto max-w-[170px] object-contain sm:h-11 sm:max-w-[220px] md:h-12"
+          />
         </div>
 
         {/* Global Navigation Tabs */}

@@ -2,6 +2,7 @@ import React from 'react';
 import { ProofNode } from '../../types';
 import { HapticButton } from '../ui/HapticButton';
 import { useTheme } from '../../context/ThemeContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { X, GitBranch, ShieldAlert, CheckCircle2, FileCode, Layers } from 'lucide-react';
 
 interface ExplanationDrawerProps {
@@ -18,6 +19,7 @@ export const ExplanationDrawer: React.FC<ExplanationDrawerProps> = ({
   actionHeadline,
 }) => {
   const { isLight } = useTheme();
+  const { t, ta, tProof } = useLanguage();
   if (!isOpen || !proofTree) return null;
 
   const renderNode = (node: ProofNode, depth = 0) => {
@@ -68,8 +70,8 @@ export const ExplanationDrawer: React.FC<ExplanationDrawerProps> = ({
           <div className="mt-0.5 flex-shrink-0">{getNodeIcon()}</div>
           <div className="flex-1 space-y-1">
             <div className="font-bold flex items-center gap-2">
-              <span className="uppercase text-[10px] tracking-wider opacity-70">[{node.type}]</span>
-              <span>{node.label}</span>
+              <span className="uppercase text-[10px] tracking-wider opacity-70">[{t(`proof.node.${node.type}`)}]</span>
+              <span>{tProof(node.label)}</span>
             </div>
             {node.details && (
               <div
@@ -79,7 +81,7 @@ export const ExplanationDrawer: React.FC<ExplanationDrawerProps> = ({
                     : 'bg-[#1A1A1A] border-[#2A2A2A] text-zinc-300'
                 }`}
               >
-                {node.details}
+                {tProof(node.details)}
               </div>
             )}
           </div>
@@ -124,10 +126,10 @@ export const ExplanationDrawer: React.FC<ExplanationDrawerProps> = ({
             </div>
             <div>
               <h3 className={`font-extrabold text-sm md:text-base tracking-tight ${isLight ? 'text-zinc-950' : 'text-white'}`}>
-                Explainable AI (XAI) Deduction Proof Tree
+                {t('proof.title')}
               </h3>
               <p className={`text-xs font-mono ${isLight ? 'text-amber-800 font-semibold' : 'text-[#FFAB00]'}`}>
-                Formal First-Order Logic Horn Clause Evaluation
+                {t('proof.subtitle')}
               </p>
             </div>
           </div>
@@ -149,10 +151,10 @@ export const ExplanationDrawer: React.FC<ExplanationDrawerProps> = ({
             }`}
           >
             <span className="block text-[10px] uppercase text-zinc-500">
-              EVALUATED GOAL / ACTION DIRECTIVE:
+              {t('proof.evaluatedGoal')}
             </span>
             <span className={`font-bold text-sm ${isLight ? 'text-amber-900' : 'text-[#FFAB00]'}`}>
-              {actionHeadline || 'EMERGENCY_DIRECTIVE'}
+              {actionHeadline ? ta(actionHeadline) : t('proof.defaultDirective')}
             </span>
           </div>
 
@@ -163,7 +165,7 @@ export const ExplanationDrawer: React.FC<ExplanationDrawerProps> = ({
               }`}
             >
               <Layers className={`w-3.5 h-3.5 ${isLight ? 'text-amber-700' : 'text-[#FFAB00]'}`} />
-              <span>Hierarchical Deduction Proof Graph:</span>
+              <span>{t('proof.graph')}</span>
             </div>
             {renderNode(proofTree)}
           </div>
@@ -177,7 +179,7 @@ export const ExplanationDrawer: React.FC<ExplanationDrawerProps> = ({
               : 'border-[#2A2A2A] bg-[#090909] text-zinc-400'
           }`}
         >
-          <span>Deterministic &amp; Auditable Logic</span>
+          <span>{t('proof.footer')}</span>
           <HapticButton
             variant={isLight ? 'primary' : 'amber'}
             onClick={onClose}
@@ -185,7 +187,7 @@ export const ExplanationDrawer: React.FC<ExplanationDrawerProps> = ({
               isLight ? 'bg-zinc-900 hover:bg-black text-white' : 'skeuo-btn-amber text-zinc-950 font-bold'
             }`}
           >
-            Close Proof Tree
+            {t('proof.close')}
           </HapticButton>
         </div>
       </div>

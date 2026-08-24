@@ -3,6 +3,7 @@ import { TriageSeverity } from '../../types';
 import { humanizeAction } from '../../utils/humanizeAction';
 import { getSeverityTheme } from '../../utils/severityColor';
 import { useTheme } from '../../context/ThemeContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { AlertCircle, AlertTriangle, Info, CheckCircle2 } from 'lucide-react';
 
 interface ActionHeadlineProps {
@@ -12,8 +13,9 @@ interface ActionHeadlineProps {
 
 export const ActionHeadline: React.FC<ActionHeadlineProps> = ({ action, severity }) => {
   const { isLight } = useTheme();
+  const { t, ts, ta, language } = useLanguage();
   const theme = getSeverityTheme(severity);
-  const humanized = humanizeAction(action);
+  const humanized = language === 'my' ? ta(action) : humanizeAction(action);
 
   const getIcon = () => {
     switch (severity) {
@@ -57,9 +59,9 @@ export const ActionHeadline: React.FC<ActionHeadlineProps> = ({ action, severity
               isLight ? 'text-zinc-600' : 'text-zinc-400'
             }`}
           >
-            <span>Deterministic Triage Directive</span>
+            <span>{t('action.directive')}</span>
             <span className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
-            <span className={isLight ? 'text-zinc-900 font-black' : 'text-zinc-300'}>{theme.label}</span>
+            <span className={isLight ? 'text-zinc-900 font-black' : 'text-zinc-300'}>{ts(severity)}</span>
           </div>
 
           <h2
@@ -71,7 +73,7 @@ export const ActionHeadline: React.FC<ActionHeadlineProps> = ({ action, severity
           </h2>
 
           <p className={`text-xs md:text-sm pt-1 font-sans ${isLight ? 'text-zinc-600' : 'text-zinc-300'}`}>
-            Formal logic inference derived from Prolog horn clauses and current situational facts.
+            {t('action.directiveBody')}
           </p>
         </div>
       </div>

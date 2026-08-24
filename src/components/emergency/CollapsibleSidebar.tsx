@@ -9,7 +9,6 @@ import {
   Sparkles,
   ChevronLeft,
   ChevronRight,
-  Shield,
   Sun,
   Moon,
   AlertTriangle,
@@ -21,6 +20,7 @@ import { TriageSeverity } from '../../types';
 import { SeverityBadge } from './SeverityBadge';
 import { HapticButton } from '../ui/HapticButton';
 import { useTheme } from '../../context/ThemeContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface CollapsibleSidebarProps {
   activeView: 'triage' | 'shelters' | 'scheduler' | 'audit' | 'status';
@@ -42,6 +42,7 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
   onCloseMobile,
 }) => {
   const { themeMode, setThemeMode, isLight } = useTheme();
+  const { t } = useLanguage();
   const [copied, setCopied] = useState(false);
 
   const handleCopyToken = () => {
@@ -51,11 +52,11 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
   };
 
   const navItems = [
-    { id: 'triage', label: 'Triage & Directive', icon: Activity, tag: 'CORE' },
-    { id: 'shelters', label: 'Verified Shelters', icon: MapPin, tag: 'GEO' },
-    { id: 'scheduler', label: 'CLP(FD) Dispatch', icon: ListFilter, tag: 'SOLVER' },
-    { id: 'audit', label: 'Audit Trail (XAI)', icon: History, tag: 'LOGS' },
-    { id: 'status', label: 'Engine Health', icon: Cpu, tag: 'KB' },
+    { id: 'triage', labelKey: 'nav.triage', icon: Activity, tag: 'CORE' },
+    { id: 'shelters', labelKey: 'nav.shelters', icon: MapPin, tag: 'GEO' },
+    { id: 'scheduler', labelKey: 'nav.scheduler', icon: ListFilter, tag: 'SOLVER' },
+    { id: 'audit', labelKey: 'nav.audit', icon: History, tag: 'LOGS' },
+    { id: 'status', labelKey: 'nav.status', icon: Cpu, tag: 'KB' },
   ] as const;
 
   const handleNavClick = (viewId: typeof navItems[number]['id']) => {
@@ -89,33 +90,37 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
             isLight ? 'border-zinc-200 bg-zinc-50' : 'border-[#2A2A2A] bg-[#090909]'
           }`}
         >
-          <div className="flex items-center gap-3 overflow-hidden">
-            {/* Brand Badge */}
-            <div
-              className={`w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center shadow-md flex-shrink-0 ${
-                isLight
-                  ? 'bg-amber-100 border border-amber-300 text-amber-800'
-                  : 'bg-[#1A1A1A] border border-[rgba(255,171,0,0.40)] text-[#FFAB00] shadow-black/60'
-              }`}
-            >
-              <Shield className="w-4 h-4 md:w-5 md:h-5" />
-            </div>
-
-            {!isCollapsed && (
-              <div className="flex flex-col min-w-0 transition-opacity duration-200">
-                <div className="flex items-center gap-1.5">
-                  <span className={`font-extrabold tracking-tight text-sm md:text-base truncate ${isLight ? 'text-zinc-950' : 'text-white'}`}>
-                    CrisisGuard <span className={isLight ? 'text-amber-600 font-black' : 'text-[#FFAB00]'}>AI</span>
-                  </span>
+          <div className={`flex min-w-0 flex-col items-start overflow-hidden ${isCollapsed ? 'lg:items-center' : ''}`}>
+            {isCollapsed ? (
+              <img
+                src="/crisisguard-logo.png"
+                alt="CrisisGuard AI"
+                className="h-11 w-auto max-w-[54px] object-contain object-left"
+              />
+            ) : (
+              <div className="flex min-w-0 items-center gap-2.5 whitespace-nowrap" aria-label="CrisisGuard AI">
+                <div className="relative h-12 w-[47px] flex-shrink-0 overflow-hidden">
+                  <img
+                    src="/crisisguard-logo.png"
+                    alt=""
+                    aria-hidden="true"
+                    className="h-full w-auto max-w-none object-contain object-left"
+                  />
                 </div>
-                <span
-                  className={`text-[10px] font-mono uppercase tracking-wider font-semibold truncate ${
-                    isLight ? 'text-amber-800' : 'text-[#FFAB00]'
-                  }`}
-                >
-                  Prolog Symbolic Logic
-                </span>
+                <div className="flex items-baseline text-[20px] font-bold leading-none">
+                  <span className="text-[#0B2F63]">CrisisGuard</span>
+                  <span className="text-[#EF233C]">AI</span>
+                </div>
               </div>
+            )}
+            {!isCollapsed && (
+              <span
+                className={`mt-1 text-[10px] font-mono uppercase tracking-wider font-semibold truncate ${
+                  isLight ? 'text-amber-800' : 'text-[#FFAB00]'
+                }`}
+              >
+                {t('common.prologSymbolicLogic')}
+              </span>
             )}
           </div>
 
@@ -128,7 +133,7 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
               className={`w-8 h-8 rounded-lg p-0 flex items-center justify-center flex-shrink-0 ${
                 isLight ? 'bg-zinc-100 hover:bg-zinc-200 border border-zinc-300' : ''
               }`}
-              title={isCollapsed ? 'Expand Sidebar (Ctrl+B)' : 'Collapse Sidebar (Ctrl+B)'}
+              title={isCollapsed ? t('common.expandSidebar') : t('common.collapseSidebar')}
             >
               {isCollapsed ? (
                 <ChevronRight className={`w-4 h-4 ${isLight ? 'text-amber-700' : 'text-[#FFAB00]'}`} />
@@ -143,7 +148,7 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
                 variant="ghost"
                 onClick={onCloseMobile}
                 className="w-8 h-8 p-0 rounded-lg lg:hidden text-zinc-500 hover:text-zinc-900 flex items-center justify-center"
-                title="Close drawer"
+                title={t('common.closeDrawer')}
               >
                 <X className="w-4 h-4" />
               </HapticButton>
@@ -158,7 +163,7 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
           } ${
             isLight ? 'bg-amber-50/60 border-zinc-200' : 'bg-[#111111] border-[#2A2A2A]'
           }`}
-          title={isCollapsed ? "Grounding: Prolog Symbolic KB (Deterministic & Auditable)" : undefined}
+          title={isCollapsed ? `${t('common.groundingPrefix')}${t('common.groundingKb')} (${t('common.deterministicAuditable')})` : undefined}
         >
           <div
             className={`inline-flex items-center justify-center w-6 h-6 rounded-md flex-shrink-0 ${
@@ -170,10 +175,10 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
           {!isCollapsed && (
             <div className="flex-1 min-w-0">
               <div className={`text-[11px] font-mono font-bold leading-tight truncate ${isLight ? 'text-amber-900' : 'text-[#FFAB00]'}`}>
-                Grounding: Formal KB
+                {t('common.groundingFormal')}
               </div>
               <div className={`text-[10px] truncate ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>
-                Deterministic &amp; Auditable
+                {t('common.deterministicAuditable')}
               </div>
             </div>
           )}
@@ -184,7 +189,7 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
           <div className="px-2 pb-1">
             {!isCollapsed ? (
               <span className={`text-[10px] font-mono uppercase tracking-widest font-bold ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>
-                OPERATIONAL VIEWS
+                {t('common.operationalViews')}
               </span>
             ) : (
               <div className={`w-full h-px my-1 ${isLight ? 'bg-zinc-200' : 'bg-[#2A2A2A]'}`} />
@@ -211,7 +216,7 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
                     ? 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 border border-transparent'
                     : 'text-zinc-400 hover:text-zinc-100 hover:bg-[#111111] border border-transparent'
                 }`}
-                title={isCollapsed ? item.label : undefined}
+                title={isCollapsed ? t(item.labelKey) : undefined}
               >
                 <div
                   className={`flex items-center justify-center w-5 h-5 rounded-lg transition-colors flex-shrink-0 ${
@@ -225,7 +230,7 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
 
                 {!isCollapsed && (
                   <div className="flex-1 flex items-center justify-between min-w-0">
-                    <span className="truncate">{item.label}</span>
+                    <span className="truncate">{t(item.labelKey)}</span>
                     <span
                       className={`text-[9px] font-mono px-1.5 py-0.5 rounded border ${
                         isActive
@@ -266,7 +271,7 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
                 isLight ? 'bg-white border-zinc-200 shadow-xs' : 'bg-[#111111] border-[#2A2A2A]'
               }`}
             >
-              <span className={`text-[11px] font-mono ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>STATUS:</span>
+              <span className={`text-[11px] font-mono ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>{t('common.status')}</span>
               <SeverityBadge severity={currentSeverity} size="sm" />
             </div>
           ) : (
@@ -296,10 +301,10 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
                 ? 'bg-[#EF4444] hover:bg-[#FF3B30] text-white border border-[#EF4444]'
                 : 'bg-[#EF4444]/20 hover:bg-[#EF4444]/30 text-[#EF4444] hover:text-red-200 border border-[#EF4444]/40 hover:border-[#EF4444]/60'
             }`}
-            title="Call 199 Direct"
+            title={t('common.call199Direct')}
           >
             <PhoneCall className="w-4 h-4 flex-shrink-0" />
-            {!isCollapsed && <span className="truncate">Emergency 199</span>}
+            {!isCollapsed && <span className="truncate">{t('common.emergency199Short')}</span>}
           </a>
         </div>
 
@@ -307,7 +312,7 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
         <div className="space-y-1">
           {!isCollapsed && (
             <span className={`text-[10px] font-mono uppercase font-bold block ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>
-              THEME MODE:
+              {t('common.themeMode')}
             </span>
           )}
           <div
@@ -325,7 +330,7 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
                   ? 'bg-zinc-800 text-[#FFAB00] font-bold shadow'
                   : isLight ? 'text-zinc-600 hover:text-black' : 'text-zinc-400'
               }`}
-              title="Dark Mode (#090909)"
+              title={t('common.darkMode')}
             >
               <Moon className="w-3.5 h-3.5" />
             </HapticButton>
@@ -337,7 +342,7 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
                   ? 'bg-white text-zinc-950 font-bold shadow border border-zinc-300'
                   : 'text-zinc-400'
               }`}
-              title="Light Mode"
+              title={t('common.lightMode')}
             >
               <Sun className="w-3.5 h-3.5" />
             </HapticButton>
@@ -347,7 +352,7 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
               className={`py-1.5 ${isCollapsed ? 'w-full px-0' : ''} rounded-lg text-xs ${
                 themeMode === 'alert' ? 'font-bold shadow' : isLight ? 'text-zinc-600' : 'text-zinc-400'
               }`}
-              title="Alert Mode"
+              title={t('common.alertMode')}
             >
               <AlertTriangle className="w-3.5 h-3.5" />
             </HapticButton>
@@ -361,12 +366,12 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
               isLight ? 'border-zinc-200 text-zinc-600' : 'border-[#2A2A2A] text-zinc-400'
             }`}
           >
-            <span className="truncate">Sess: {sessionToken.slice(0, 8)}...</span>
+            <span className="truncate">{t('common.sess')} {sessionToken.slice(0, 8)}...</span>
             <HapticButton
               variant="ghost"
               onClick={handleCopyToken}
               className={`p-1 rounded ${isLight ? 'text-zinc-600 hover:text-black' : 'text-zinc-400 hover:text-[#FFAB00]'}`}
-              title="Copy Token"
+              title={t('common.copyToken')}
             >
               {copied ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
             </HapticButton>

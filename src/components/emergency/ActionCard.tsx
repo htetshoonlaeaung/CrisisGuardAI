@@ -7,6 +7,7 @@ import { SeverityBadge } from './SeverityBadge';
 import { TTS } from '../../utils/textToSpeech';
 import { HapticButton } from '../ui/HapticButton';
 import { useTheme } from '../../context/ThemeContext';
+import { useLanguage } from '../../context/LanguageContext';
 import {
   Volume2,
   VolumeX,
@@ -33,8 +34,18 @@ export const ActionCard: React.FC<ActionCardProps> = ({
   onOpenShelters,
 }) => {
   const { isLight } = useTheme();
+  const { t, tr, ta } = useLanguage();
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [checkedSteps, setCheckedSteps] = useState<Record<number, boolean>>({});
+  const translatedReasons = result.reasons.map((reason, index) =>
+    tr(result.action_headline, 'reasons', index, reason)
+  );
+  const translatedProhibitions = result.prohibited_actions.map((prohibition, index) =>
+    tr(result.action_headline, 'prohibitions', index, prohibition)
+  );
+  const translatedSteps = result.step_by_step_instructions.map((step, index) =>
+    tr(result.action_headline, 'steps', index, step)
+  );
 
   const toggleStep = (index: number) => {
     setCheckedSteps((prev) => ({ ...prev, [index]: !prev[index] }));
@@ -47,11 +58,11 @@ export const ActionCard: React.FC<ActionCardProps> = ({
     } else {
       setIsSpeaking(true);
       TTS.speak(
-        result.action_headline,
+        ta(result.action_headline),
         result.severity,
-        result.reasons,
-        result.prohibited_actions,
-        result.step_by_step_instructions,
+        translatedReasons,
+        translatedProhibitions,
+        translatedSteps,
         () => setIsSpeaking(false)
       );
     }
@@ -91,7 +102,7 @@ export const ActionCard: React.FC<ActionCardProps> = ({
             }`}
           >
             <Clock className={`w-3.5 h-3.5 ${isLight ? 'text-amber-700' : 'text-[#FFAB00]'}`} />
-            <span>⚡ Logic inference: {result.evaluation_latency_ms}ms</span>
+            <span>{t('action.logicInference', { ms: result.evaluation_latency_ms })}</span>
           </div>
         </div>
 
@@ -104,14 +115,14 @@ export const ActionCard: React.FC<ActionCardProps> = ({
             className={`px-3 py-1.5 rounded-lg text-xs font-bold ${
               isLight && !isSpeaking ? 'bg-zinc-100 border-zinc-300 text-zinc-800' : ''
             }`}
-            title="Read emergency directives aloud"
+            title={t('action.readAloud')}
           >
             {isSpeaking ? (
               <VolumeX className="w-4 h-4 text-zinc-950" />
             ) : (
               <Volume2 className={`w-4 h-4 ${isLight ? 'text-amber-700' : 'text-[#FFAB00]'}`} />
             )}
-            <span>{isSpeaking ? 'Stop Speech' : 'Read Directives'}</span>
+            <span>{isSpeaking ? t('action.stopSpeech') : t('action.readDirectives')}</span>
           </HapticButton>
 
           <HapticButton
@@ -121,10 +132,10 @@ export const ActionCard: React.FC<ActionCardProps> = ({
             className={`px-3 py-1.5 rounded-lg text-xs font-bold ${
               isLight ? 'bg-zinc-100 border-zinc-300 text-amber-800' : 'text-[#FFAB00] hover:border-[rgba(255,171,0,0.40)]'
             }`}
-            title="Inspect Prolog first-order logic deduction tree"
+            title={t('action.inspectProofTitle')}
           >
             <GitBranch className={`w-4 h-4 ${isLight ? 'text-amber-700' : 'text-[#FFAB00]'}`} />
-            <span className="hidden sm:inline">Inspect XAI Tree</span>
+            <span className="hidden sm:inline">{t('action.inspectTree')}</span>
           </HapticButton>
         </div>
       </div>
@@ -152,10 +163,10 @@ export const ActionCard: React.FC<ActionCardProps> = ({
             </div>
             <div>
               <div className={`font-extrabold text-sm uppercase tracking-wide ${isLight ? 'text-zinc-950' : 'text-white'}`}>
-                AHA 110 BPM CPR Rhythm Guide Available
+                {t('action.cprAvailable')}
               </div>
               <div className={`text-xs ${isLight ? 'text-zinc-600' : 'text-zinc-300'}`}>
-                Audio/visual metronome for continuous 100–120 BPM chest compressions &amp; 30:2 rescue breaths.
+                {t('action.cprDesc')}
               </div>
             </div>
           </div>
@@ -164,13 +175,13 @@ export const ActionCard: React.FC<ActionCardProps> = ({
             onClick={onOpenMetronome}
             className="w-full sm:w-auto px-4 py-2 rounded-lg text-xs uppercase tracking-wider whitespace-nowrap"
           >
-            Launch CPR Guide
+            {t('action.launchCpr')}
           </HapticButton>
         </div>
       )}
 
       {/* 4. Strict Prohibitions (Safety Invariants) */}
-      <ProhibitionsList prohibitions={result.prohibited_actions} />
+      <ProhibitionsList prohibitions={translatedProhibitions} />
 
       {/* 5. Step-by-Step Tactical Protocol Checklist */}
       {result.step_by_step_instructions && result.step_by_step_instructions.length > 0 && (
@@ -185,15 +196,15 @@ export const ActionCard: React.FC<ActionCardProps> = ({
               isLight ? 'text-zinc-900' : 'text-zinc-200'
             }`}>
               <CheckSquare className={`w-4 h-4 ${isLight ? 'text-amber-700' : 'text-[#FFAB00]'}`} />
-              <span>Step-by-Step Tactical Protocol</span>
+              <span>{t('action.protocol')}</span>
             </h3>
             <span className={`text-[11px] font-mono ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>
-              Tap steps to track execution
+              {t('action.tapSteps')}
             </span>
           </div>
 
           <div className="space-y-2">
-            {result.step_by_step_instructions.map((step, idx) => {
+            {translatedSteps.map((step, idx) => {
               const isChecked = !!checkedSteps[idx];
               return (
                 <div
@@ -230,7 +241,7 @@ export const ActionCard: React.FC<ActionCardProps> = ({
       )}
 
       {/* 6. Reasons / Evidence List (XAI) */}
-      <ReasonsList reasons={result.reasons} />
+      <ReasonsList reasons={translatedReasons} />
 
       {/* 7. Bottom Quick Action Triggers */}
       <div className={`grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2 border-t ${isLight ? 'border-zinc-200' : 'border-[#2A2A2A]'}`}>
@@ -243,7 +254,7 @@ export const ActionCard: React.FC<ActionCardProps> = ({
             }`}
           >
             <MapPin className={`w-4 h-4 ${isLight ? 'text-amber-700' : 'text-[#FFAB00]'}`} />
-            <span>Find Verified Shelters</span>
+            <span>{t('action.shelters')}</span>
           </HapticButton>
         )}
         <a
@@ -255,7 +266,7 @@ export const ActionCard: React.FC<ActionCardProps> = ({
           }`}
         >
           <PhoneCall className="w-4 h-4" />
-          <span>Call 199 Dispatcher</span>
+          <span>{t('action.callDispatcher')}</span>
         </a>
       </div>
     </div>

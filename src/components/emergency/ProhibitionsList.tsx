@@ -1,6 +1,7 @@
 import React from 'react';
 import { AlertOctagon, ShieldAlert } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface ProhibitionsListProps {
   prohibitions: string[];
@@ -8,6 +9,7 @@ interface ProhibitionsListProps {
 
 export const ProhibitionsList: React.FC<ProhibitionsListProps> = ({ prohibitions }) => {
   const { isLight } = useTheme();
+  const { t } = useLanguage();
   if (!prohibitions || prohibitions.length === 0) return null;
 
   return (
@@ -20,7 +22,7 @@ export const ProhibitionsList: React.FC<ProhibitionsListProps> = ({ prohibitions
       <div className={`flex items-center gap-2 pb-2 border-b ${isLight ? 'border-red-200' : 'border-zinc-800'}`}>
         <ShieldAlert className="w-4 h-4 text-red-600" />
         <h3 className="text-xs md:text-sm font-mono uppercase tracking-wider font-extrabold text-red-600">
-          Strict Safety Invariants (DO NOT DO)
+          {t('lists.prohibitions')}
         </h3>
       </div>
 

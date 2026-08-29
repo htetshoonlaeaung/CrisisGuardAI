@@ -1,0 +1,641 @@
+@import "tailwindcss";
+
+:root {
+  /* ── Core High-Contrast Medical Slate Tokens (Default / Light) ── */
+  --color-surface-dark:   #0F172A;   /* Slate 900 header/sidebar */
+  --color-bg-app:         #F8FAFC;   /* Slate 50 background */
+  --color-surface-card:   #FFFFFF;   /* Pure white card panel */
+  --color-border-subtle:  #E2E8F0;   /* Slate 200 border */
+
+  /* ── Text Tokens ────────────────────────────────────────── */
+  --color-text-primary:   #0F172A;   /* Slate 900 primary text */
+  --color-text-secondary: #475569;   /* Slate 600 descriptions */
+  --color-text-muted:     #64748B;   /* Slate 500 telemetry */
+
+  /* ── Active / Primary Accent (Blue 600) ─────────────────── */
+  --color-brand-primary:  #2563EB;   /* Blue 600 active tabs */
+  --color-brand-hover:    #1D4ED8;   /* Blue 700 hover */
+  --color-brand-light:    #EFF6FF;   /* Blue 50 tint */
+  --color-brand-border:   #BFDBFE;   /* Blue 200 border */
+
+  /* ── Emergency Critical Red (Red 600) ───────────────────── */
+  --color-alert-critical: #DC2626;   /* Red 600 critical CTA */
+  --color-alert-hover:    #B91C1C;   /* Red 700 hover */
+  --color-alert-bg:       #FEF2F2;   /* Red 50 banner tint */
+  --color-alert-border:   #FCA5A5;   /* Red 300 alert border */
+
+  /* ── Warning & Caution Tokens ───────────────────────────── */
+  --color-warning:        #D97706;   /* Amber 600 */
+  --color-warning-bg:     #FFFBEB;   /* Amber 50 */
+  --color-warning-border: #FDE68A;   /* Amber 200 */
+
+  /* ── Neutral Badge Tokens ───────────────────────────────── */
+  --color-badge-bg:       #F1F5F9;   /* Slate 100 */
+  --color-badge-text:     #334155;   /* Slate 700 */
+  --color-badge-border:   #CBD5E1;   /* Slate 300 */
+
+  /* ── Amber/Gold Accent System (for Dark Mode telemetry) ─── */
+  --accent-primary:       #F59E0B;
+  --accent-glow:          #FBBF24;
+  --accent-subtle:        #FDE68A;
+  --accent-tint:          rgba(245, 158, 11, 0.15);
+  --accent-border:        rgba(245, 158, 11, 0.35);
+
+  /* ── Deep Black Surfaces ────────────────────────────────── */
+  --bg-base:              #090A0F;
+  --bg-surface:           #0F172A;
+  --bg-elevated:          #12151E;
+  --bg-hover:             #1E293B;
+  --border-base:          #1E293B;
+  --border-mid:           #334155;
+  --fg-primary:           #F8FAFC;
+  --fg-muted:             #94A3B8;
+
+  /* Spring easing curves */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-snap: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button, input, select, textarea {
+    touch-action: manipulation;
+  }
+
+  body {
+    background-color: #F8FAFC;
+    color: #0F172A;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    overflow-x: hidden;
+    user-select: auto;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  html.myanmar-lang body {
+    font-family: 'Noto Sans Myanmar', 'Myanmar Text', 'Padauk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    line-height: 1.65;
+  }
+
+  html.light-theme body {
+    background-color: #F8FAFC;
+    color: #0F172A;
+  }
+
+  html.dark-theme body {
+    background-color: #090A0F;
+    color: #F8FAFC;
+  }
+
+  html.alert-theme body {
+    background-color: #0F0909;
+    color: #F8FAFC;
+  }
+}
+
+/* ── Custom Smooth Scrollbars ── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.25);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.45);
+}
+
+/* ── Spring Animation Utility ── */
+.ease-spring {
+  transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+/* ── PressButton & Skeuomorphic 3D Spring Physics ── */
+.press-btn,
+.skeuo-btn {
+  position: relative;
+  transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 200ms cubic-bezier(0.34, 1.56, 0.64, 1),
+              background-color 150ms ease,
+              border-color 150ms ease,
+              filter 150ms ease;
+  will-change: transform, box-shadow;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.press-btn:hover,
+.skeuo-btn:hover {
+  filter: brightness(1.02);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.press-btn:active,
+.press-btn.is-pressed,
+.skeuo-btn:active,
+.skeuo-btn.is-pressed {
+  transform: scale(0.93) translateY(1px) !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Active Preset (Light: Blue Tint; Dark: Amber Tint) with Spring Physics */
+.skeuo-preset-active {
+  background: #EFF6FF !important;
+  border-color: #2563EB !important;
+  color: #1E40AF !important;
+  box-shadow: 0 0 0 1px #2563EB, 0 4px 12px rgba(37, 99, 235, 0.22) !important;
+  transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 200ms cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.skeuo-preset-active:hover {
+  background: #DBEAFE !important;
+  box-shadow: 0 0 0 1px #1D4ED8, 0 6px 16px rgba(37, 99, 235, 0.3) !important;
+}
+
+.skeuo-preset-active:active,
+.skeuo-preset-active.is-pressed {
+  transform: scale(0.93) translateY(1px) !important;
+  box-shadow: 0 0 0 1px #1D4ED8, 0 1px 4px rgba(37, 99, 235, 0.2) !important;
+}
+
+/* Solid Blue CTA Button (Light Mode) with Swollen Spring Feel */
+.skeuo-btn-blue {
+  background: #2563EB;
+  color: #FFFFFF;
+  border: 1px solid #1D4ED8;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 200ms cubic-bezier(0.34, 1.56, 0.64, 1), filter 140ms ease;
+  will-change: transform, box-shadow;
+}
+
+.skeuo-btn-blue:hover {
+  background: #1D4ED8;
+  filter: brightness(1.05);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.skeuo-btn-blue:active,
+.skeuo-btn-blue.is-pressed {
+  transform: scale(0.93) translateY(2px) !important;
+  box-shadow: 0 1px 4px rgba(37, 99, 235, 0.25) !important;
+}
+
+/* Skeuomorphic Chip / Badge */
+.skeuo-chip {
+  transition: transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 180ms ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.skeuo-chip:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.skeuo-chip:active,
+.skeuo-chip.is-pressed {
+  transform: scale(0.93) translateY(1px);
+}
+
+/* ── Haptic Press Animation ── */
+.hbtn {
+  transition: transform 140ms var(--ease-spring), filter 120ms var(--ease-snap), box-shadow 120ms ease, background-color 120ms ease, border-color 120ms ease;
+  will-change: transform;
+}
+
+.hbtn:active {
+  transform: translateY(1.5px) scale(0.97);
+  filter: brightness(0.95);
+}
+
+/* ── Ripple Animation ── */
+.ripple-dot {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(37, 99, 235, 0.2);
+  pointer-events: none;
+  animation: ripple-anim 0.55s ease-out forwards;
+  transform-origin: center;
+}
+
+@keyframes ripple-anim {
+  0% {
+    transform: scale(0);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(7.5);
+    opacity: 0;
+  }
+}
+
+/* ── CPR Pulse Keyframes ── */
+@keyframes cprPulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.6);
+  }
+  70% {
+    transform: scale(1.06);
+    box-shadow: 0 0 0 14px rgba(220, 38, 38, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0);
+  }
+}
+
+.animate-cpr-pulse {
+  animation: cprPulse 0.545s infinite ease-in-out;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════ */
+/* ── DEEP OBSIDIAN BLACK + GOLDEN AMBER DARK THEME STYLING ──────────────── */
+/* ══════════════════════════════════════════════════════════════════════════ */
+
+html.dark-theme body {
+  background-color: #090A0F !important;
+  color: #F8FAFC !important;
+}
+
+/* Dark mode main background panels & card containers */
+html.dark-theme .bg-white {
+  background-color: #0F172A !important;
+  color: #F8FAFC !important;
+}
+
+html.dark-theme .bg-slate-50,
+html.dark-theme .bg-slate-50\/80,
+html.dark-theme .bg-slate-50\/50,
+html.dark-theme .bg-slate-100 {
+  background-color: #12151E !important;
+  color: #E2E8F0 !important;
+}
+
+html.dark-theme .bg-slate-200 {
+  background-color: #1E293B !important;
+}
+
+html.dark-theme .border-slate-200,
+html.dark-theme .border-slate-300 {
+  border-color: #1E293B !important;
+}
+
+/* Dark mode text tones */
+html.dark-theme .text-slate-950,
+html.dark-theme .text-slate-900 {
+  color: #F8FAFC !important;
+}
+
+html.dark-theme .text-slate-800,
+html.dark-theme .text-slate-700 {
+  color: #E2E8F0 !important;
+}
+
+html.dark-theme .text-slate-600,
+html.dark-theme .text-slate-500 {
+  color: #94A3B8 !important;
+}
+
+html.dark-theme .text-slate-400 {
+  color: #64748B !important;
+}
+
+/* Golden Amber Accents in Dark Mode */
+html.dark-theme .text-blue-900,
+html.dark-theme .text-blue-800,
+html.dark-theme .text-blue-600 {
+  color: #FBBF24 !important; /* Golden Amber 400 */
+}
+
+html.dark-theme .text-blue-400 {
+  color: #FCD34D !important; /* Golden Amber 300 */
+}
+
+html.dark-theme .fill-blue-600,
+html.dark-theme .fill-blue-400 {
+  fill: #F59E0B !important; /* Golden Amber 500 */
+}
+
+html.dark-theme .border-blue-600,
+html.dark-theme .border-blue-500,
+html.dark-theme .border-blue-400,
+html.dark-theme .border-blue-300,
+html.dark-theme .border-blue-200 {
+  border-color: rgba(245, 158, 11, 0.4) !important;
+}
+
+html.dark-theme .bg-blue-50,
+html.dark-theme .bg-blue-100,
+html.dark-theme .bg-blue-50\/50 {
+  background-color: rgba(245, 158, 11, 0.12) !important;
+  color: #FDE68A !important;
+  border-color: rgba(245, 158, 11, 0.3) !important;
+}
+
+html.dark-theme .bg-blue-600 {
+  background-color: #F59E0B !important;
+  color: #090A0F !important;
+  border-color: #D97706 !important;
+}
+
+html.dark-theme .hover\:bg-blue-700:hover,
+html.dark-theme .bg-blue-700 {
+  background-color: #D97706 !important;
+  color: #090A0F !important;
+}
+
+/* Dark Mode Base & Secondary Buttons */
+html.dark-theme .skeuo-btn {
+  background: #12151E !important;
+  color: #F8FAFC !important;
+  border: 1px solid #1E293B !important;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+html.dark-theme .skeuo-btn:hover {
+  background: #1A1E2B !important;
+  border-color: #334155 !important;
+}
+
+html.dark-theme .skeuo-btn.is-pressed,
+html.dark-theme .skeuo-btn:active {
+  background: #0D1017 !important;
+  transform: translateY(1px) scale(0.99);
+}
+
+/* 4 Quick Preset buttons inside QuickPresets panel */
+html.dark-theme #quick-presets-panel button,
+html.dark-theme button[id^="preset-btn-"] {
+  background: #12151E !important;
+  border: 1px solid #1E293B !important;
+}
+
+html.dark-theme #quick-presets-panel button:hover,
+html.dark-theme button[id^="preset-btn-"]:hover {
+  background: #1A1E2B !important;
+  border-color: rgba(245, 158, 11, 0.4) !important;
+}
+
+html.dark-theme #quick-presets-panel button span,
+html.dark-theme button[id^="preset-btn-"] span {
+  color: #F8FAFC !important;
+}
+
+html.dark-theme #quick-presets-panel button:hover span,
+html.dark-theme button[id^="preset-btn-"]:hover span {
+  color: #FBBF24 !important;
+}
+
+html.dark-theme #quick-presets-panel button p,
+html.dark-theme button[id^="preset-btn-"] p {
+  color: #94A3B8 !important;
+}
+
+html.dark-theme #quick-presets-panel button:hover p,
+html.dark-theme button[id^="preset-btn-"]:hover p {
+  color: #CBD5E1 !important;
+}
+
+/* Active Preset Button in Dark Mode */
+html.dark-theme #quick-presets-panel button.skeuo-preset-active,
+html.dark-theme button[id^="preset-btn-"].skeuo-preset-active {
+  background: rgba(245, 158, 11, 0.16) !important;
+  border-color: #F59E0B !important;
+  box-shadow: 0 0 0 1px #F59E0B, 0 3px 14px rgba(245, 158, 11, 0.3) !important;
+}
+
+html.dark-theme #quick-presets-panel button.skeuo-preset-active span,
+html.dark-theme button[id^="preset-btn-"].skeuo-preset-active span {
+  color: #FBBF24 !important;
+  font-weight: 800 !important;
+}
+
+html.dark-theme #quick-presets-panel button.skeuo-preset-active p,
+html.dark-theme button[id^="preset-btn-"].skeuo-preset-active p {
+  color: #FDE68A !important;
+  font-weight: 600 !important;
+}
+
+/* Primary evaluate / solve button becomes Golden Yellow / Amber in Dark Mode */
+html.dark-theme .skeuo-btn-blue {
+  background: #F59E0B !important;
+  color: #090A0F !important;
+  font-weight: 800 !important;
+  border: 1px solid #D97706 !important;
+  box-shadow: 0 3px 0 #B45309, 0 4px 16px rgba(245, 158, 11, 0.35) !important;
+}
+
+html.dark-theme .skeuo-btn-blue:hover {
+  background: #FBBF24 !important;
+  box-shadow: 0 4px 0 #B45309, 0 6px 20px rgba(245, 158, 11, 0.45) !important;
+}
+
+html.dark-theme .skeuo-btn-blue:active,
+html.dark-theme .skeuo-btn-blue.is-pressed {
+  transform: translateY(2px) scale(0.98);
+  box-shadow: 0 1px 0 #B45309, 0 2px 4px rgba(245, 158, 11, 0.25) !important;
+}
+
+/* Active Preset chips in Dark Mode: Golden Amber glow */
+html.dark-theme .skeuo-preset-active {
+  background: rgba(245, 158, 11, 0.18) !important;
+  border-color: #F59E0B !important;
+  color: #FCD34D !important;
+  box-shadow: 0 0 0 1px #F59E0B, 0 2px 12px rgba(245, 158, 11, 0.35) !important;
+}
+
+html.dark-theme .skeuo-preset-active:hover {
+  background: rgba(245, 158, 11, 0.28) !important;
+  box-shadow: 0 0 0 1px #FBBF24, 0 3px 16px rgba(245, 158, 11, 0.45) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════ */
+/* ── EMERGENCY ACTION HEADLINE & DIRECTIVE CARDS IN DARK MODE ────────────── */
+/* ══════════════════════════════════════════════════════════════════════════ */
+
+html.dark-theme #emergency-action-headline {
+  background-color: #12151E !important;
+  border-color: #1E293B !important;
+  color: #F8FAFC !important;
+}
+
+html.dark-theme #emergency-action-headline.bg-red-50 {
+  background-color: rgba(220, 38, 38, 0.16) !important;
+  border-color: rgba(239, 68, 68, 0.45) !important;
+  box-shadow: 0 0 24px rgba(220, 38, 38, 0.2) !important;
+}
+
+html.dark-theme #emergency-action-headline.bg-amber-50 {
+  background-color: rgba(245, 158, 11, 0.16) !important;
+  border-color: rgba(245, 158, 11, 0.45) !important;
+  box-shadow: 0 0 24px rgba(245, 158, 11, 0.2) !important;
+}
+
+html.dark-theme #emergency-action-headline.bg-slate-50 {
+  background-color: #12151E !important;
+  border-color: #1E293B !important;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+html.dark-theme #emergency-action-headline.bg-emerald-50 {
+  background-color: rgba(16, 185, 129, 0.16) !important;
+  border-color: rgba(16, 185, 129, 0.45) !important;
+  box-shadow: 0 0 24px rgba(16, 185, 129, 0.2) !important;
+}
+
+html.dark-theme #emergency-action-headline h2 {
+  color: #F8FAFC !important;
+}
+
+html.dark-theme #emergency-action-headline p {
+  color: #CBD5E1 !important;
+}
+
+/* Dark mode alerts, safety lists, and step checklists */
+html.dark-theme .bg-red-50,
+html.dark-theme .bg-red-50\/80 {
+  background-color: rgba(220, 38, 38, 0.12) !important;
+  border-color: rgba(239, 68, 68, 0.35) !important;
+}
+
+html.dark-theme .border-red-200,
+html.dark-theme .border-red-300 {
+  border-color: rgba(239, 68, 68, 0.35) !important;
+}
+
+html.dark-theme .text-red-700,
+html.dark-theme .text-red-600 {
+  color: #FCA5A5 !important;
+}
+
+html.dark-theme .bg-amber-50 {
+  background-color: rgba(245, 158, 11, 0.12) !important;
+  border-color: rgba(245, 158, 11, 0.35) !important;
+}
+
+html.dark-theme .border-amber-200 {
+  border-color: rgba(245, 158, 11, 0.35) !important;
+}
+
+html.dark-theme .bg-emerald-50 {
+  background-color: rgba(16, 185, 129, 0.12) !important;
+  border-color: rgba(16, 185, 129, 0.35) !important;
+}
+
+html.dark-theme .border-emerald-200,
+html.dark-theme .border-emerald-300 {
+  border-color: rgba(16, 185, 129, 0.35) !important;
+}
+
+html.dark-theme .text-emerald-700,
+html.dark-theme .text-emerald-600 {
+  color: #6EE7B7 !important;
+}
+
+/* Fact Chips in Dark Mode */
+html.dark-theme div[id^="fact-chip-"] {
+  background-color: #12151E !important;
+  border-color: #1E293B !important;
+  color: #F8FAFC !important;
+}
+
+html.dark-theme div[id^="fact-chip-"] span {
+  color: #F8FAFC !important;
+}
+
+html.dark-theme div[id^="fact-chip-"]:hover {
+  border-color: #F59E0B !important;
+}
+
+/* Dark Mode Inputs, Dropdowns, Selects */
+html.dark-theme input[type="text"],
+html.dark-theme select,
+html.dark-theme textarea {
+  background-color: #090A0F !important;
+  border-color: #1E293B !important;
+  color: #F8FAFC !important;
+}
+
+html.dark-theme input[type="text"]:focus,
+html.dark-theme select:focus,
+html.dark-theme textarea:focus {
+  border-color: #F59E0B !important;
+  box-shadow: 0 0 0 1px #F59E0B !important;
+}
+
+/* Dark Mode Assert / Custom button */
+html.dark-theme form button[type="submit"].bg-slate-900 {
+  background-color: #F59E0B !important;
+  color: #090A0F !important;
+}
+
+html.dark-theme form button[type="submit"].bg-slate-900:hover {
+  background-color: #FBBF24 !important;
+}
+
+/* Floating Sidebar styling reset */
+#collapsible-left-sidebar {
+  background-color: transparent !important;
+  border: none !important;
+}
+
+/* Light mode explicit black text for sidebar */
+html.light-theme #collapsible-left-sidebar,
+html:not(.dark-theme):not(.alert-theme) #collapsible-left-sidebar {
+  color: #000000 !important;
+}
+
+html.light-theme #collapsible-left-sidebar span,
+html.light-theme #collapsible-left-sidebar button,
+html.light-theme #collapsible-left-sidebar input,
+html.light-theme #collapsible-left-sidebar div,
+html:not(.dark-theme):not(.alert-theme) #collapsible-left-sidebar span,
+html:not(.dark-theme):not(.alert-theme) #collapsible-left-sidebar button,
+html:not(.dark-theme):not(.alert-theme) #collapsible-left-sidebar input {
+  color: #000000;
+}
+
+html.light-theme #collapsible-left-sidebar svg,
+html:not(.dark-theme):not(.alert-theme) #collapsible-left-sidebar svg {
+  color: #000000;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+}
+.no-scrollbar {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+/* Dark Mode Header & Footer */
+html.dark-theme #session-status-bar {
+  background-color: #090A0F !important;
+  border-bottom-color: rgba(245, 158, 11, 0.15) !important;
+}
+
+html.dark-theme footer {
+  background-color: #090A0F !important;
+  border-top-color: #1E293B !important;
+}
+
+/* XAI Proof Drawer Modal in Dark Mode */
+html.dark-theme #xai-proof-drawer-modal > div {
+  background-color: #0F172A !important;
+  border-color: #1E293B !important;
+}

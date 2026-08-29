@@ -1,0 +1,6 @@
+{
+  "name": "CrisisGuard AI",
+  "description": "Deterministic, explainable rule-based decision support system for emergency triage, CPR metronome, hazard response, and shelter routing.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

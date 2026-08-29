@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FFAB00' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/></svg>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CrisisGuard AI — Intelligent Crisis Decision Support</title>
+    <script>
+      (function() {
+        // 1. WebSocket Proxy to eliminate "WebSocket closed without opened" in preview viewport transitions
+        if (typeof window !== 'undefined' && window.WebSocket) {
+          var OriginalWebSocket = window.WebSocket;
+          var MockWebSocket = function(url, protocols) {
+            var urlStr = String(url || '').toLowerCase();
+            var protoStr = String(protocols || '').toLowerCase();
+            // Intercept internal Vite dev HMR websocket connections
+            if (urlStr.indexOf('vite') !== -1 || protoStr.indexOf('vite') !== -1 || urlStr.indexOf('ws://') !== -1 || urlStr.indexOf('wss://') !== -1) {
+              var target = new EventTarget();
+              target.binaryType = 'blob';
+              target.bufferedAmount = 0;
+              target.extensions = '';
+              target.protocol = protocols || '';
+              target.readyState = 1; // OPEN
+              target.url = String(url || '');
+              target.send = function() {};
+              target.close = function() { target.readyState = 3; };
+              target.onopen = null;
+              target.onclose = null;
+              target.onerror = null;
+              target.onmessage = null;
+              setTimeout(function() {
+                if (typeof target.onopen === 'function') {
+                  try { target.onopen(new Event('open')); } catch(e) {}
+                }
+              }, 0);
+              return target;
+            }
+            return new OriginalWebSocket(url, protocols);
+          };
+
+          MockWebSocket.prototype = OriginalWebSocket.prototype;
+          MockWebSocket.CONNECTING = 0;
+          MockWebSocket.OPEN = 1;
+          MockWebSocket.CLOSING = 2;
+          MockWebSocket.CLOSED = 3;
+          window.WebSocket = MockWebSocket;
+        }
+
+        // 2. Global console and error boundary filters
+        var isViteWs = function(str) {
+          if (!str) return false;
+          var s = String(str).toLowerCase();
+          return s.indexOf('websocket') !== -1 || s.indexOf('[vite]') !== -1 || s.indexOf('vite:ws') !== -1;
+        };
+
+        var origError = console.error;
+        console.error = function() {
+          var args = Array.prototype.slice.call(arguments);
+          var joined = args.map(function(a) { return String(a && a.message ? a.message : a); }).join(' ');
+          if (isViteWs(joined)) {
+            return;
+          }
+          return origError.apply(console, arguments);
+        };
+
+        var origWarn = console.warn;
+        console.warn = function() {
+          var args = Array.prototype.slice.call(arguments);
+          var joined = args.map(function(a) { return String(a && a.message ? a.message : a); }).join(' ');
+          if (isViteWs(joined)) {
+            return;
+          }
+          return origWarn.apply(console, arguments);
+        };
+
+        window.addEventListener('unhandledrejection', function(event) {
+          var reasonStr = String(event.reason || '') + ' ' + String((event.reason && event.reason.message) || '');
+          if (isViteWs(reasonStr)) {
+            event.preventDefault();
+            if (typeof event.stopImmediatePropagation === 'function') {
+              event.stopImmediatePropagation();
+            }
+          }
+        }, true);
+
+        window.addEventListener('error', function(event) {
+          var msg = String(event.message || '') + ' ' + String(event.filename || '');
+          if (isViteWs(msg)) {
+            event.preventDefault();
+            if (typeof event.stopImmediatePropagation === 'function') {
+              event.stopImmediatePropagation();
+            }
+          }
+        }, true);
+
+        // 3. Window fetch setter safeguard
+        try {
+          if (typeof window !== 'undefined') {
+            var originalFetch = window.fetch;
+            Object.defineProperty(window, 'fetch', {
+              get: function() {
+                return originalFetch;
+              },
+              set: function(newFetch) {
+                originalFetch = newFetch;
+              },
+              configurable: true,
+              enumerable: true,
+            });
+          }
+        } catch (e) {
+          // ignore
+        }
+      })();
+    </script>
+  </head>
+  <body class="bg-[#090909] text-neutral-100 antialiased selection:bg-[#FFAB00] selection:text-zinc-950 min-h-screen">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

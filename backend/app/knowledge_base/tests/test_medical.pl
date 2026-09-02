@@ -25,6 +25,26 @@ test(bleeding_triggers_tourniquet) :-
     Severity == critical,
     member('Do not remove soaked dressings; apply additional layers directly on top.', Prohibitions).
 
+test(tourniquet_temporal_escalation_second_tourniquet) :-
+    once(medical_eval([bleeding(severe_pulsing), first_tourniquet_applied(true), elapsed_minutes(2)], Action, Severity, Reasons, Prohibitions)),
+    Action == apply_second_proximal_tourniquet,
+    Severity == critical,
+    member('NEVER LOOSEN, UNTIE, OR REMOVE THE FIRST TOURNIQUET.', Prohibitions),
+    member('Primary tourniquet failed to achieve arterial haemostasis after >= 2 minutes; active life-threatening hemorrhage persists.', Reasons).
+
+test(tourniquet_temporal_escalation_atom_time) :-
+    once(medical_eval([bleeding(severe_pulsing), first_tourniquet_applied(true), elapsed_minutes('>=2')], Action, Severity, _Reasons, Prohibitions)),
+    Action == apply_second_proximal_tourniquet,
+    Severity == critical,
+    member('NEVER LOOSEN, UNTIE, OR REMOVE THE FIRST TOURNIQUET.', Prohibitions).
+
+test(tourniquet_haemostasis_monitored) :-
+    once(medical_eval([bleeding(severe_pulsing), first_tourniquet_applied(true), bleeding_stopped(true)], Action, Severity, Reasons, Prohibitions)),
+    Action == monitor_tourniquet_time_and_prevent_shock,
+    Severity == high,
+    member('NEVER LOOSEN OR PERIODICALLY RELEASE TOURNIQUET TO RESTORE CIRCULATION (causes fatal bolus exsanguination and reperfusion shock).', Prohibitions),
+    member('Arterial bleeding successfully arrested following tourniquet application.', Reasons).
+
 test(stroke_fast_dispatches_correctly) :-
     once(medical_eval([face_droop(true), arm_weakness(true)], Action, Severity, _Reasons, Prohibitions)),
     Action == activate_stroke_emergency_dispatch,

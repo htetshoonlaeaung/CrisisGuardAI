@@ -354,8 +354,87 @@ class PrologEngineBridge:
                         ]
                     }
                 }
-            # 3. Arterial Bleeding
-            if fact_dict.get("bleeding") in ("severe_pulsing", "arterial", "severe", "pulsing"):
+            # 3A. Arterial Bleeding (Temporal Escalation — 2nd Tourniquet if bleeding continues >= 2 min)
+            is_arterial_bleed = fact_dict.get("bleeding") in ("severe_pulsing", "arterial", "severe", "pulsing", "continued")
+            first_tq_applied = fact_dict.get("first_tourniquet_applied") in ("true", "yes", "1") or fact_dict.get("tourniquet_applied") in ("true", "yes", "1") or fact_dict.get("bleeding_stopped") in ("false", "no", "0") or fact_dict.get("bleeding_controlled") in ("false", "no", "0")
+
+            elapsed_m = None
+            for time_key in ("elapsed_minutes", "elapsed_minutes_since_tourniquet"):
+                if time_key in fact_dict:
+                    try:
+                        elapsed_m = float(fact_dict[time_key])
+                        break
+                    except (ValueError, TypeError):
+                        if str(fact_dict[time_key]).strip() in (">=2", "two_or_more"):
+                            elapsed_m = 2.0
+                            break
+
+            if is_arterial_bleed and (first_tq_applied or (elapsed_m is not None and elapsed_m >= 2.0)) and elapsed_m is not None and elapsed_m >= 2.0:
+                return {
+                    "action": "apply_second_proximal_tourniquet",
+                    "severity": "critical",
+                    "step_by_step_instructions": [
+                        "Do not remove, loosen, or untie the first tourniquet.",
+                        "Apply a second commercial tourniquet 2-3 inches proximal (above) the first tourniquet.",
+                        "Tighten windlass until all active bleeding stops completely.",
+                        "Secure windlass in clip and mark exact application time on tourniquet."
+                    ],
+                    "reasons": [
+                        "Primary tourniquet failed to achieve arterial haemostasis after >= 2 minutes; active life-threatening hemorrhage persists.",
+                        "Apply a second commercial tourniquet immediately adjacent and 2-3 inches proximal (above) the first tourniquet.",
+                        "Tighten windlass rod until all bleeding stops completely, and record application time."
+                    ],
+                    "prohibited_actions": [
+                        "NEVER LOOSEN, UNTIE, OR REMOVE THE FIRST TOURNIQUET.",
+                        "Do not place tourniquet directly over a joint (knee or elbow).",
+                        "Do not cover tourniquets with clothing or blankets (must remain visible for trauma surgeons)."
+                    ],
+                    "proof_tree": {
+                        "type": "rule",
+                        "label": "medical_rule_03a: TOURNIQUET_TEMPORAL_ESCALATION",
+                        "details": "bleeding(continued) AND first_tourniquet_applied(true) AND elapsed_minutes(>=2) -> apply_second_proximal_tourniquet",
+                        "children": [
+                            {"type": "evidence", "label": "first_tourniquet_applied(true)"},
+                            {"type": "evidence", "label": f"elapsed_minutes({elapsed_m})"},
+                            {"type": "deduction", "label": "Refractory high-pressure arterial hemorrhage"},
+                            {"type": "safety_invariant", "label": "NEVER LOOSEN THE FIRST TOURNIQUET"}
+                        ]
+                    }
+                }
+
+            # 3B. Arterial Bleeding (Haemostasis Achieved)
+            if (fact_dict.get("first_tourniquet_applied") in ("true", "yes", "1") or fact_dict.get("tourniquet_applied") in ("true", "yes", "1")) and (fact_dict.get("bleeding_stopped") in ("true", "yes", "1") or fact_dict.get("bleeding_controlled") in ("true", "yes", "1")):
+                return {
+                    "action": "monitor_tourniquet_time_and_prevent_shock",
+                    "severity": "high",
+                    "step_by_step_instructions": [
+                        "Keep tourniquet fully tightened and unobstructed.",
+                        "Write exact application time (T=time) on forehead or tourniquet band.",
+                        "Keep patient warm with blankets to prevent trauma hypothermia.",
+                        "Elevate bleeding limb if no suspected fracture."
+                    ],
+                    "reasons": [
+                        "Arterial bleeding successfully arrested following tourniquet application.",
+                        "Record exact tourniquet application timestamp clearly on patient (e.g., write T=time on forehead/tourniquet band), keep limb elevated, and maintain warmth to prevent hypothermia."
+                    ],
+                    "prohibited_actions": [
+                        "NEVER LOOSEN OR PERIODICALLY RELEASE TOURNIQUET TO RESTORE CIRCULATION (causes fatal bolus exsanguination and reperfusion shock).",
+                        "Do not remove tourniquet before surgical trauma handoff."
+                    ],
+                    "proof_tree": {
+                        "type": "rule",
+                        "label": "medical_rule_03b: TOURNIQUET_HAEMOSTASIS_MAINTAINED",
+                        "details": "tourniquet_applied(true) AND bleeding_stopped(true) -> monitor_tourniquet_time_and_prevent_shock",
+                        "children": [
+                            {"type": "evidence", "label": "bleeding_stopped(true)"},
+                            {"type": "deduction", "label": "Arterial haemostasis achieved"},
+                            {"type": "safety_invariant", "label": "Never loosen or release tourniquet"}
+                        ]
+                    }
+                }
+
+            # 3C. Arterial Bleeding (Initial Hemorrhage)
+            if is_arterial_bleed:
                 return {
                     "action": "apply_direct_pressure_and_tourniquet",
                     "severity": "critical",
@@ -375,7 +454,7 @@ class PrologEngineBridge:
                     ],
                     "proof_tree": {
                         "type": "rule",
-                        "label": "medical_rule_03: ARTERIAL_HEMORRHAGE",
+                        "label": "medical_rule_03c: ARTERIAL_HEMORRHAGE",
                         "details": "bleeding(severe_pulsing) -> apply_direct_pressure_and_tourniquet",
                         "children": [
                             {"type": "evidence", "label": "bleeding(severe_pulsing)"},

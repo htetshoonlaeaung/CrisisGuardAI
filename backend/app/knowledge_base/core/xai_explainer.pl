@@ -65,10 +65,32 @@ explain_triage(medical, _Facts, Action, high, ProofTree) :-
     ).
 
 explain_triage(medical, _Facts, Action, critical, ProofTree) :-
+    Action == apply_second_proximal_tourniquet,
+    !,
+    ProofTree = proof_tree(
+        'medical_rule_03a: TOURNIQUET_TEMPORAL_ESCALATION',
+        Action,
+        [evidence(first_tourniquet_applied(true)), evidence(elapsed_minutes('>=2'))],
+        'NEVER LOOSEN THE FIRST TOURNIQUET; apply second proximal tourniquet immediately',
+        ['Persistent arterial hemorrhage after primary tourniquet failure']
+    ).
+
+explain_triage(medical, _Facts, Action, high, ProofTree) :-
+    Action == monitor_tourniquet_time_and_prevent_shock,
+    !,
+    ProofTree = proof_tree(
+        'medical_rule_03b: TOURNIQUET_HAEMOSTASIS_MAINTAINED',
+        Action,
+        [evidence(tourniquet_applied(true)), evidence(bleeding_stopped(true))],
+        'Never loosen or release tourniquet to restore blood flow; record application time',
+        ['Arterial haemostasis maintained; hypovolemic shock prevention initiated']
+    ).
+
+explain_triage(medical, _Facts, Action, critical, ProofTree) :-
     Action == apply_direct_pressure_and_tourniquet,
     !,
     ProofTree = proof_tree(
-        'medical_rule_03: ARTERIAL_HEMORRHAGE',
+        'medical_rule_03c: ARTERIAL_HEMORRHAGE',
         Action,
         [evidence(bleeding(severe_pulsing))],
         'Immediate tourniquet occlusion required 2-3 inches proximal to wound',

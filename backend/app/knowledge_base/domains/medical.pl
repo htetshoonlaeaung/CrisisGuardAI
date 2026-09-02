@@ -79,7 +79,38 @@ medical_eval(Facts, encourage_forceful_coughing_and_monitor, high, Reasons, Proh
         'Do not give liquids or fluids while patient is attempting to clear airway.'
     ].
 
-% 3. ARTERIAL BLEEDING — severe pulsing bleeding -> Tourniquet / Direct Pressure
+% 3A. ARTERIAL BLEEDING (TEMPORAL ESCALATION) — 2nd Tourniquet if bleeding continues >= 2 min
+medical_eval(Facts, apply_second_proximal_tourniquet, critical, Reasons, Prohibitions) :-
+    ( member(bleeding(severe_pulsing), Facts) ; member(bleeding(arterial), Facts) ; member(bleeding(severe), Facts) ; member(bleeding(continued), Facts) ),
+    ( member(first_tourniquet_applied(true), Facts) ; member(tourniquet_applied(true), Facts) ; member(bleeding_stopped(false), Facts) ; member(bleeding_controlled(false), Facts) ; is_elapsed_ge_2(Facts) ),
+    is_elapsed_ge_2(Facts),
+    !,
+    Reasons = [
+        'Primary tourniquet failed to achieve arterial haemostasis after >= 2 minutes; active life-threatening hemorrhage persists.',
+        'Apply a second commercial tourniquet immediately adjacent and 2-3 inches proximal (above) the first tourniquet.',
+        'Tighten windlass rod until all bleeding stops completely, and record application time.'
+    ],
+    Prohibitions = [
+        'NEVER LOOSEN, UNTIE, OR REMOVE THE FIRST TOURNIQUET.',
+        'Do not place tourniquet directly over a joint (knee or elbow).',
+        'Do not cover tourniquets with clothing or blankets (must remain visible for trauma surgeons).'
+    ].
+
+% 3B. ARTERIAL BLEEDING (HAEMOSTASIS ACHIEVED) — Monitor and record application time
+medical_eval(Facts, monitor_tourniquet_time_and_prevent_shock, high, Reasons, Prohibitions) :-
+    ( member(first_tourniquet_applied(true), Facts) ; member(tourniquet_applied(true), Facts) ),
+    ( member(bleeding_stopped(true), Facts) ; member(bleeding_controlled(true), Facts) ),
+    !,
+    Reasons = [
+        'Arterial bleeding successfully arrested following tourniquet application.',
+        'Record exact tourniquet application timestamp clearly on patient (e.g., write T=time on forehead/tourniquet band), keep limb elevated, and maintain warmth to prevent hypothermia.'
+    ],
+    Prohibitions = [
+        'NEVER LOOSEN OR PERIODICALLY RELEASE TOURNIQUET TO RESTORE CIRCULATION (causes fatal bolus exsanguination and reperfusion shock).',
+        'Do not remove tourniquet before surgical trauma handoff.'
+    ].
+
+% 3C. ARTERIAL BLEEDING (INITIAL HEMORRHAGE) — Tourniquet / Direct Pressure
 medical_eval(Facts, apply_direct_pressure_and_tourniquet, critical, Reasons, Prohibitions) :-
     ( member(bleeding(severe_pulsing), Facts) ; member(bleeding(arterial), Facts) ; member(bleeding(severe), Facts) ),
     !,
@@ -205,3 +236,14 @@ medical_eval(Facts, administer_naloxone_and_rescue_breathing, critical, Reasons,
 medical_eval(_Facts, call_emergency_services_immediately, critical, Reasons, Prohibitions) :-
     Reasons = ['Uncertain or high-risk medical condition. Immediate dispatch of paramedic services recommended.'],
     Prohibitions = ['Do not administer prescription medications without direct medical dispatch guidance.'].
+
+% =============================================================================
+% HELPER PREDICATES
+% =============================================================================
+
+% Helper predicate to check if elapsed time >= 2 minutes
+is_elapsed_ge_2(Facts) :-
+    ( member(elapsed_minutes(Val), Facts) ; member(elapsed_minutes_since_tourniquet(Val), Facts) ),
+    ( number(Val) -> Val >= 2
+    ; atom(Val) -> ( atom_number(Val, Num) -> Num >= 2 ; ( Val == '>=2' ; Val == two_or_more ) )
+    ).

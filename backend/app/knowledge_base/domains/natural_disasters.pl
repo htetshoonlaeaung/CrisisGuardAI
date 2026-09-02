@@ -1,7 +1,7 @@
 % backend/app/knowledge_base/domains/natural_disasters.pl
 % Natural disaster emergency decision rules for CrisisGuard AI.
 % Covers: Flood (rising water, single/multi-story), Earthquake (active shaking, post-quake gas leak),
-%         Cyclone, Tsunami, Landslide.
+%         Cyclone/Hurricane, Tsunami, Landslide.
 
 :- module(disasters_kb, [disaster_eval/5]).
 
@@ -10,6 +10,7 @@ disaster_eval(Facts, evacuate_to_higher_ground_now, critical, Reasons, Prohibiti
     ( member(disaster(flood), Facts) ; member(flood(true), Facts) ),
     member(water_rising(true), Facts),
     member(building(single_story), Facts),
+    !,
     Reasons = [
         'Rapidly rising floodwaters in single-story structure create severe entrapment and drowning risk.',
         'Evacuate immediately on foot to elevated ground or designated high-altitude emergency shelter.'
@@ -24,6 +25,7 @@ disaster_eval(Facts, vertical_evacuation_to_upper_floors, high, Reasons, Prohibi
     ( member(disaster(flood), Facts) ; member(flood(true), Facts) ),
     member(water_rising(true), Facts),
     ( member(building(multi_story), Facts) ; member(building(high_rise), Facts) ),
+    !,
     Reasons = [
         'Floodwaters rising on ground level; upper structural floors remain dry and load-bearing.',
         'Move occupants, emergency supplies, and communications gear to second floor or roof access.'
@@ -37,6 +39,7 @@ disaster_eval(Facts, vertical_evacuation_to_upper_floors, high, Reasons, Prohibi
 disaster_eval(Facts, drop_cover_and_hold_on, critical, Reasons, Prohibitions) :-
     ( member(disaster(earthquake), Facts) ; member(earthquake(true), Facts) ),
     member(shaking(active), Facts),
+    !,
     Reasons = [
         'Violent ground motion and risk of non-structural falling debris.',
         'Drop to hands and knees, take cover under a sturdy desk or table, and hold on until shaking stops.'
@@ -51,6 +54,7 @@ disaster_eval(Facts, evacuate_and_shut_main_gas_valve, critical, Reasons, Prohib
     ( member(disaster(earthquake), Facts) ; member(earthquake(true), Facts) ),
     member(shaking(stopped), Facts),
     member(smell_gas(true), Facts),
+    !,
     Reasons = [
         'Post-earthquake gas pipe rupture detected.',
         'Shut off exterior master gas valve if safe to do so and evacuate immediately to open area.'
@@ -64,6 +68,7 @@ disaster_eval(Facts, evacuate_and_shut_main_gas_valve, critical, Reasons, Prohib
 disaster_eval(Facts, evacuate_inland_immediately, critical, Reasons, Prohibitions) :-
     ( member(disaster(tsunami), Facts) ; member(tsunami(true), Facts) ),
     ( member(coastal(true), Facts) ; member(proximity(coastal), Facts) ),
+    !,
     Reasons = [
         'High-velocity tsunami wave train imminent following seismic event.',
         'Move immediately at least 2 miles inland or to high ground at least 100 feet above sea level.'
@@ -73,7 +78,34 @@ disaster_eval(Facts, evacuate_inland_immediately, critical, Reasons, Prohibition
         'Do not wait for visual confirmation before beginning evacuation.'
     ].
 
-% 6. GENERAL DISASTER FALLBACK
+% 6. CYCLONE / HURRICANE LANDFALL — Interior safe room
+disaster_eval(Facts, shelter_in_interior_windowless_room, critical, Reasons, Prohibitions) :-
+    ( member(disaster(cyclone), Facts) ; member(disaster(hurricane), Facts) ; member(cyclone(true), Facts) ),
+    ( member(wind_speed(extreme), Facts) ; member(storm_category(major), Facts) ),
+    !,
+    Reasons = [
+        'Category 4/5 cyclone eyewall and destructive hurricane-force winds imminent.',
+        'Seek immediate shelter in an interior windowless room or reinforced bathroom on lowest non-flooding level.'
+    ],
+    Prohibitions = [
+        'Do not stay in rooms adjacent to exterior glass windows or skylights.',
+        'Do not venture outside during the eye of the storm (winds resume abruptly in reverse).'
+    ].
+
+% 7. LANDSLIDE / DEBRIS FLOW — Perpendicular evacuation
+disaster_eval(Facts, evacuate_perpendicular_to_landslide_path, critical, Reasons, Prohibitions) :-
+    ( member(disaster(landslide), Facts) ; member(debris_flow(true), Facts) ),
+    !,
+    Reasons = [
+        'High-velocity hillside slope failure or mudflow in motion.',
+        'Run immediately perpendicular to the downward path of the slide toward stable bedrock ridge.'
+    ],
+    Prohibitions = [
+        'Do not attempt to outrun a debris flow downhill.',
+        'Do not cross drainage channels or stream beds during heavy saturated rains.'
+    ].
+
+% 8. GENERAL DISASTER FALLBACK
 disaster_eval(_Facts, seek_safe_shelter_and_monitor_emergency_broadcasts, high, Reasons, Prohibitions) :-
     Reasons = ['Natural disaster conditions detected. Seek certified storm/emergency shelter and monitor civil defense radio.'],
     Prohibitions = ['Do not travel on compromised bridges, coastal highways, or steep hillsides.'].

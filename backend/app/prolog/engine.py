@@ -1,6 +1,8 @@
 # backend/app/prolog/engine.py
 # Thread-safe PySwip bridge to embedded SWI-Prolog runtime with deterministic symbolic fallback.
 
+import os
+import sys
 import threading
 import logging
 from pathlib import Path
@@ -35,11 +37,60 @@ class PrologEngineBridge:
         self._init_engine()
         self._initialized = True
 
+    @staticmethod
+    def _setup_windows_swipl_paths():
+        """
+        Configures DLL search directories and SWI_HOME_DIR on Windows to ensure PySwip
+        reliably locates libswipl.dll on Windows Python >= 3.8.
+        """
+        if sys.platform != "win32":
+            return
+
+        try:
+            from app.core.config import settings
+        except Exception:
+            settings = None
+
+        candidate_dirs = []
+        if settings:
+            if getattr(settings, "SWI_BIN_DIR", None):
+                candidate_dirs.append(Path(settings.SWI_BIN_DIR))
+            if getattr(settings, "SWI_HOME_DIR", None):
+                candidate_dirs.append(Path(settings.SWI_HOME_DIR) / "bin")
+
+        env_home = os.environ.get("SWI_HOME_DIR")
+        if env_home:
+            candidate_dirs.append(Path(env_home) / "bin")
+
+        # Standard installation locations on Windows
+        candidate_dirs.extend([
+            Path(r"C:\Program Files\swipl\bin"),
+            Path(r"C:\Program Files (x86)\swipl\bin"),
+            Path(r"C:\swipl\bin"),
+            Path(os.path.expandvars(r"%LOCALAPPDATA%\Programs\swipl\bin")),
+        ])
+
+        for b_dir in candidate_dirs:
+            if b_dir.is_dir() and (b_dir / "libswipl.dll").is_file():
+                home_dir = b_dir.parent
+                if not os.environ.get("SWI_HOME_DIR"):
+                    os.environ["SWI_HOME_DIR"] = str(home_dir)
+                if str(b_dir) not in os.environ.get("PATH", ""):
+                    os.environ["PATH"] = f"{str(b_dir)};{os.environ.get('PATH', '')}"
+                if hasattr(os, "add_dll_directory"):
+                    try:
+                        os.add_dll_directory(str(b_dir))
+                    except Exception as dll_err:
+                        logger.debug(f"os.add_dll_directory({b_dir}): {dll_err}")
+                logger.info(f"SWI-Prolog configured at {home_dir}")
+                break
+
     def _init_engine(self):
         """
         Initializes the PySwip Prolog instance and consults core & domain .pl rulebases.
         """
         try:
+            self._setup_windows_swipl_paths()
             from pyswip import Prolog
             self.prolog = Prolog()
             self._load_knowledge_base()
@@ -112,7 +163,13 @@ class PrologEngineBridge:
                 try:
                     results = list(self.prolog.query(query_str))
                     if results:
-                        return PrologResultParser.parse_triage_result(results[0])
+                        parsed = PrologResultParser.parse_triage_result(results[0])
+                        symbolic_meta = self._evaluate_symbolic(clean_domain, facts)
+                        if not parsed.get("step_by_step_instructions"):
+                            parsed["step_by_step_instructions"] = symbolic_meta.get("step_by_step_instructions", [])
+                        if not parsed.get("proof_tree"):
+                            parsed["proof_tree"] = symbolic_meta.get("proof_tree", {})
+                        return parsed
                 except Exception as exc:
                     logger.error(f"PySwip query error: {exc}")
 
@@ -164,7 +221,7 @@ class PrologEngineBridge:
                     "proof_tree": {
                         "type": "rule",
                         "label": "medical_rule_01: CARDIAC_ARREST_CPR",
-                        "details": "unconscious(true) ∧ breathing(none) ⇒ begin_cpr_and_call_emergency",
+                        "details": "unconscious(true) AND breathing(none) -> begin_cpr_and_call_emergency",
                         "children": [
                             {"type": "evidence", "label": "unconscious(true)"},
                             {"type": "evidence", "label": "breathing(none)"},
@@ -173,7 +230,70 @@ class PrologEngineBridge:
                         ]
                     }
                 }
-            # 2. Choking
+            # 2A. Infant Choking
+            if (fact_dict.get("symptom") == "choking" or fact_dict.get("choking") in ("true", "yes") or fact_dict.get("airway_pass") == "blocked") and fact_dict.get("patient_type") in ("infant", "baby") or fact_dict.get("age_group") == "infant" or fact_dict.get("age") == "infant":
+                return {
+                    "action": "perform_infant_choking_protocol",
+                    "severity": "critical",
+                    "step_by_step_instructions": [
+                        "Position infant face down along your forearm with head lower than chest, supporting the jaw.",
+                        "Deliver 5 firm but gentle back blows between shoulder blades with the heel of hand.",
+                        "Turn infant face up supporting head, deliver 5 two-finger chest thrusts.",
+                        "Repeat sequence; do not perform abdominal thrusts."
+                    ],
+                    "reasons": [
+                        "Infant (< 1 year) experiencing acute foreign body airway obstruction.",
+                        "Deliver 5 gentle back blows with the heel of hand between shoulder blades, then flip face-up and deliver 5 two-finger chest thrusts."
+                    ],
+                    "prohibited_actions": [
+                        "NEVER PERFORM ABDOMINAL THRUSTS (HEIMLICH) ON AN INFANT (high risk of fatal internal organ damage).",
+                        "Do not perform blind finger sweeps in infant airway.",
+                        "Do not shake the infant."
+                    ],
+                    "proof_tree": {
+                        "type": "rule",
+                        "label": "medical_rule_02a: INFANT_AIRWAY_OBSTRUCTION",
+                        "details": "choking(true) AND patient_type(infant) -> perform_infant_choking_protocol",
+                        "children": [
+                            {"type": "evidence", "label": "patient_type(infant)"},
+                            {"type": "deduction", "label": "Acute infant foreign body airway obstruction"},
+                            {"type": "safety_invariant", "label": "NEVER PERFORM ABDOMINAL THRUSTS ON INFANTS"}
+                        ]
+                    }
+                }
+            # 2B. Unconscious Choking Victim
+            if (fact_dict.get("symptom") == "choking" or fact_dict.get("choking") in ("true", "yes")) and fact_dict.get("unconscious") in ("true", "yes"):
+                return {
+                    "action": "choking_unconscious_begin_cpr_with_airway_check",
+                    "severity": "critical",
+                    "step_by_step_instructions": [
+                        "Lower patient carefully to a firm, flat surface.",
+                        "Call emergency dispatch (199/191) immediately.",
+                        "Begin chest compressions (30 compressions).",
+                        "Open the airway and look in the mouth; extract visible foreign object before attempting rescue breaths.",
+                        "Never perform blind finger sweeps."
+                    ],
+                    "reasons": [
+                        "Choking victim has lost consciousness due to acute severe hypoxia.",
+                        "Lower victim carefully to firm flat ground, call 199/191 immediately, and begin CPR (30 compressions, inspect mouth for visible dislodged foreign object before rescue breaths)."
+                    ],
+                    "prohibited_actions": [
+                        "Do not perform standing abdominal thrusts on an unconscious patient.",
+                        "Do not perform blind finger sweeps (only extract object if clearly visible and accessible)."
+                    ],
+                    "proof_tree": {
+                        "type": "rule",
+                        "label": "medical_rule_02b: UNCONSCIOUS_CHOKING_CPR",
+                        "details": "choking(true) AND unconscious(true) -> choking_unconscious_begin_cpr_with_airway_check",
+                        "children": [
+                            {"type": "evidence", "label": "choking(true)"},
+                            {"type": "evidence", "label": "unconscious(true)"},
+                            {"type": "deduction", "label": "Hypoxic arrest from airway obstruction"},
+                            {"type": "safety_invariant", "label": "No blind finger sweeps; perform CPR with visual check"}
+                        ]
+                    }
+                }
+            # 2C. Choking Complete (Adult / Child)
             if fact_dict.get("symptom") == "choking" or fact_dict.get("choking") in ("true", "yes") or fact_dict.get("airway_pass") == "blocked":
                 return {
                     "action": "perform_heimlich_thrusts",
@@ -195,12 +315,42 @@ class PrologEngineBridge:
                     ],
                     "proof_tree": {
                         "type": "rule",
-                        "label": "medical_rule_02: COMPLETE_AIRWAY_OBSTRUCTION",
-                        "details": "symptom(choking) ∨ airway_pass(blocked) ⇒ perform_heimlich_thrusts",
+                        "label": "medical_rule_02c: COMPLETE_AIRWAY_OBSTRUCTION",
+                        "details": "symptom(choking) OR airway_pass(blocked) -> perform_heimlich_thrusts",
                         "children": [
                             {"type": "evidence", "label": "airway_pass(blocked)"},
                             {"type": "deduction", "label": "Foreign body airway obstruction"},
                             {"type": "safety_invariant", "label": "No blind finger sweeps"}
+                        ]
+                    }
+                }
+            # 2D. Choking Partial / Mild
+            if (fact_dict.get("symptom") == "choking" or fact_dict.get("choking") in ("true", "yes")) and (fact_dict.get("airway_pass") in ("partial", "mild") or fact_dict.get("coughing") in ("forceful", "true", "yes")):
+                return {
+                    "action": "encourage_forceful_coughing_and_monitor",
+                    "severity": "high",
+                    "step_by_step_instructions": [
+                        "Encourage patient to cough forcefully.",
+                        "Remain with patient and observe breathing continuously.",
+                        "Do not interfere or deliver back blows while coughing is effective.",
+                        "Prepare for Heimlich if airway becomes completely obstructed."
+                    ],
+                    "reasons": [
+                        "Partial foreign body airway obstruction detected with intact coughing reflex and partial airflow.",
+                        "Encourage continuous forceful coughing to expel object spontaneously while monitoring closely for progression to complete obstruction."
+                    ],
+                    "prohibited_actions": [
+                        "Do not deliver back blows or abdominal thrusts while the victim is coughing forcefully.",
+                        "Do not give liquids or fluids while patient is attempting to clear airway."
+                    ],
+                    "proof_tree": {
+                        "type": "rule",
+                        "label": "medical_rule_02d: PARTIAL_AIRWAY_OBSTRUCTION",
+                        "details": "choking(true) AND airway_pass(partial) -> encourage_forceful_coughing_and_monitor",
+                        "children": [
+                            {"type": "evidence", "label": "airway_pass(partial)"},
+                            {"type": "deduction", "label": "Partial airway obstruction with maintained cough reflex"},
+                            {"type": "safety_invariant", "label": "Do not interfere while coughing is effective"}
                         ]
                     }
                 }
@@ -226,7 +376,7 @@ class PrologEngineBridge:
                     "proof_tree": {
                         "type": "rule",
                         "label": "medical_rule_03: ARTERIAL_HEMORRHAGE",
-                        "details": "bleeding(severe_pulsing) ⇒ apply_direct_pressure_and_tourniquet",
+                        "details": "bleeding(severe_pulsing) -> apply_direct_pressure_and_tourniquet",
                         "children": [
                             {"type": "evidence", "label": "bleeding(severe_pulsing)"},
                             {"type": "deduction", "label": "High-pressure arterial laceration"},
@@ -234,8 +384,71 @@ class PrologEngineBridge:
                         ]
                     }
                 }
-            # 4. Stroke (FAST)
-            if fact_dict.get("face_droop") in ("true", "yes") or fact_dict.get("arm_weakness") in ("true", "yes") or fact_dict.get("speech_difficulty") in ("true", "yes"):
+            # 4A. Stroke (Hyperacute Window)
+            is_stroke = fact_dict.get("face_droop") in ("true", "yes") or fact_dict.get("arm_weakness") in ("true", "yes") or fact_dict.get("speech_difficulty") in ("true", "yes") or fact_dict.get("symptom") == "stroke" or fact_dict.get("stroke") in ("true", "yes")
+            if is_stroke and (fact_dict.get("onset_time") in ("under_4_hours", "recent") or fact_dict.get("symptom_onset") == "under_3_hours" or fact_dict.get("onset_window") == "acute"):
+                return {
+                    "action": "activate_hyperacute_stroke_protocol",
+                    "severity": "critical",
+                    "step_by_step_instructions": [
+                        "Keep patient at rest with head elevated 30 degrees.",
+                        "Note and record the exact Last Known Well (LKW) time immediately.",
+                        "Notify emergency dispatch of suspected hyperacute stroke candidate for thrombolytic / EVT therapy.",
+                        "Keep NPO (nothing by mouth) — no water, food, or medications."
+                    ],
+                    "reasons": [
+                        "Acute ischemic stroke suspected within hyperacute thrombolytic (IV tPA/TNK) and endovascular thrombectomy therapeutic window.",
+                        "Record exact Last Known Well (LKW) time and request priority pre-hospital stroke alert transport to comprehensive stroke center."
+                    ],
+                    "prohibited_actions": [
+                        "NEVER ADMINISTER ASPIRIN, BLOOD THINNERS, FOOD, OR WATER PRIOR TO HOSPITAL CT SCAN.",
+                        "Do not attempt to rapidly lower elevated blood pressure without direct medical command."
+                    ],
+                    "proof_tree": {
+                        "type": "rule",
+                        "label": "medical_rule_04a: HYPERACUTE_STROKE_WINDOW",
+                        "details": "stroke_signs(positive) AND onset_time(under_4_hours) -> activate_hyperacute_stroke_protocol",
+                        "children": [
+                            {"type": "evidence", "label": "Positive FAST stroke signs"},
+                            {"type": "evidence", "label": "onset_time(under_4_hours)"},
+                            {"type": "deduction", "label": "Hyperacute ischemic stroke within reperfusion window"},
+                            {"type": "safety_invariant", "label": "Aspirin and oral intake strictly prohibited"}
+                        ]
+                    }
+                }
+            # 4B. Stroke (Airway / Mental Status Compromise)
+            if is_stroke and (fact_dict.get("unconscious") in ("true", "yes") or fact_dict.get("altered_mental_status") in ("true", "yes") or fact_dict.get("swallowing_difficulty") in ("true", "yes")):
+                return {
+                    "action": "position_in_recovery_and_protect_airway_stroke",
+                    "severity": "critical",
+                    "step_by_step_instructions": [
+                        "Place patient in lateral recovery position (paralyzed side up if possible).",
+                        "Ensure airway remains clear and open; suction or wipe oral secretions if needed.",
+                        "Call emergency dispatch (199/191) immediately reporting airway-compromised stroke.",
+                        "Do not give anything by mouth."
+                    ],
+                    "reasons": [
+                        "Severe acute stroke with impaired consciousness and loss of airway protective reflexes.",
+                        "Place patient in lateral recovery position with head elevated 30 degrees to maintain airway patency and prevent fatal aspiration."
+                    ],
+                    "prohibited_actions": [
+                        "Do not give any oral fluids, food, or aspirin.",
+                        "Do not leave patient supine (flat on back) due to high aspiration risk."
+                    ],
+                    "proof_tree": {
+                        "type": "rule",
+                        "label": "medical_rule_04b: STROKE_AIRWAY_COMPROMISE",
+                        "details": "stroke_signs(positive) AND airway_compromise -> position_in_recovery_and_protect_airway_stroke",
+                        "children": [
+                            {"type": "evidence", "label": "Positive FAST stroke signs"},
+                            {"type": "evidence", "label": "Altered mental status / swallowing difficulty"},
+                            {"type": "deduction", "label": "Severe acute stroke with airway vulnerability"},
+                            {"type": "safety_invariant", "label": "Position in lateral recovery; strictly NPO"}
+                        ]
+                    }
+                }
+            # 4C. Stroke (Standard FAST Dispatch)
+            if is_stroke:
                 return {
                     "action": "activate_stroke_emergency_dispatch",
                     "severity": "critical",
@@ -255,12 +468,41 @@ class PrologEngineBridge:
                     ],
                     "proof_tree": {
                         "type": "rule",
-                        "label": "medical_rule_04: STROKE_FAST_PROTOCOL",
-                        "details": "face_droop(true) ∨ arm_weakness(true) ∨ speech_difficulty(true) ⇒ activate_stroke_emergency_dispatch",
+                        "label": "medical_rule_04c: STROKE_FAST_PROTOCOL",
+                        "details": "face_droop(true) OR arm_weakness(true) OR speech_difficulty(true) -> activate_stroke_emergency_dispatch",
                         "children": [
                             {"type": "evidence", "label": "Positive FAST stroke signs"},
                             {"type": "deduction", "label": "Acute ischemic / hemorrhagic cerebrovascular event"},
                             {"type": "safety_invariant", "label": "Aspirin strictly prohibited prior to hospital CT"}
+                        ]
+                    }
+                }
+            # 4D. Transient Ischemic Attack (TIA)
+            if fact_dict.get("symptom") == "tia" or fact_dict.get("transient_ischemic_attack") in ("true", "yes") or fact_dict.get("stroke_symptoms") == "resolved":
+                return {
+                    "action": "urgent_stroke_center_evaluation_tia",
+                    "severity": "high",
+                    "step_by_step_instructions": [
+                        "Do not ignore symptoms even if resolved completely.",
+                        "Transport patient immediately to emergency department / stroke unit for urgent neuroimaging.",
+                        "Do not allow patient to operate a motor vehicle."
+                    ],
+                    "reasons": [
+                        "Transient Ischemic Attack (TIA) symptoms have temporarily resolved; represents critical warning indicator for imminent full-scale stroke (highest risk within 48 hours).",
+                        "Urgent emergency neurovascular evaluation and brain MRI/CT neuroimaging required."
+                    ],
+                    "prohibited_actions": [
+                        "Do not ignore or dismiss resolved symptoms as non-emergent.",
+                        "Do not allow patient to drive self to medical facility."
+                    ],
+                    "proof_tree": {
+                        "type": "rule",
+                        "label": "medical_rule_04d: TIA_URGENT_EVALUATION",
+                        "details": "symptom(tia) OR stroke_symptoms(resolved) -> urgent_stroke_center_evaluation_tia",
+                        "children": [
+                            {"type": "evidence", "label": "symptom(tia)"},
+                            {"type": "deduction", "label": "Transient ischemic attack with imminent stroke risk"},
+                            {"type": "safety_invariant", "label": "Urgent neurovascular evaluation mandatory"}
                         ]
                     }
                 }
@@ -286,7 +528,7 @@ class PrologEngineBridge:
                     "proof_tree": {
                         "type": "rule",
                         "label": "medical_rule_05: EXTENSIVE_THERMAL_BURN",
-                        "details": "burn_type(thermal) ∧ burn_area(large) ⇒ cool_water_rinse_and_sterile_cover",
+                        "details": "burn_type(thermal) AND burn_area(large) -> cool_water_rinse_and_sterile_cover",
                         "children": [
                             {"type": "evidence", "label": "burn_type(thermal)"},
                             {"type": "deduction", "label": "Major dermis thermal injury"},
@@ -309,7 +551,7 @@ class PrologEngineBridge:
                 "proof_tree": {
                     "type": "rule",
                     "label": "medical_rule_fallback: GENERAL_DISPATCH",
-                    "details": "unknown_state ⇒ call_emergency_services_immediately",
+                    "details": "unknown_state -> call_emergency_services_immediately",
                     "children": [{"type": "safety_invariant", "label": "Safety Fallback Activated"}]
                 }
             }
@@ -340,7 +582,7 @@ class PrologEngineBridge:
                     "proof_tree": {
                         "type": "rule",
                         "label": "hazard_rule_01: ELECTRICAL_FIRE",
-                        "details": "hazard(fire) ∧ fire_source(electrical) ⇒ isolate_main_power_and_use_co2_extinguisher",
+                        "details": "hazard(fire) AND fire_source(electrical) -> isolate_main_power_and_use_co2_extinguisher",
                         "children": [
                             {"type": "evidence", "label": "fire_source(electrical)"},
                             {"type": "deduction", "label": "Live electrical current hazard"},
@@ -370,7 +612,7 @@ class PrologEngineBridge:
                     "proof_tree": {
                         "type": "rule",
                         "label": "hazard_rule_02: GREASE_FIRE",
-                        "details": "hazard(fire) ∧ fire_source(cooking_oil) ⇒ cover_with_metal_lid_and_turn_off_burner",
+                        "details": "hazard(fire) AND fire_source(cooking_oil) -> cover_with_metal_lid_and_turn_off_burner",
                         "children": [
                             {"type": "evidence", "label": "fire_source(cooking_oil)"},
                             {"type": "deduction", "label": "High-temperature oil combustion (>300C)"},
@@ -400,7 +642,7 @@ class PrologEngineBridge:
                     "proof_tree": {
                         "type": "rule",
                         "label": "hazard_rule_03: INDOOR_GAS_LEAK",
-                        "details": "hazard(gas_leak) ∧ location(indoors) ⇒ evacuate_leave_doors_open_call_from_outside",
+                        "details": "hazard(gas_leak) AND location(indoors) -> evacuate_leave_doors_open_call_from_outside",
                         "children": [
                             {"type": "evidence", "label": "hazard(gas_leak)"},
                             {"type": "deduction", "label": "Explosive fuel-air vapor mixture"},
@@ -430,11 +672,164 @@ class PrologEngineBridge:
                     "proof_tree": {
                         "type": "rule",
                         "label": "hazard_rule_04: BLOCKED_EGRESS_FIRE",
-                        "details": "hazard(fire) ∧ exit_blocked(true) ⇒ seal_door_and_signal_from_window",
+                        "details": "hazard(fire) AND exit_blocked(true) -> seal_door_and_signal_from_window",
                         "children": [
                             {"type": "evidence", "label": "exit_blocked(true)"},
                             {"type": "deduction", "label": "Structural egress barrier"},
                             {"type": "safety_invariant", "label": "Do not break windows unless directed"}
+                        ]
+                    }
+                }
+            # 5A. Hazardous Chemical Spill (Flammable / Explosive)
+            is_chemical = fact_dict.get("hazard") == "chemical_spill" or fact_dict.get("chemical_leak") in ("true", "yes") or fact_dict.get("spill_type") == "toxic_gas"
+            if is_chemical and (fact_dict.get("chemical_type") in ("flammable", "fuel") or fact_dict.get("flammable_liquid") in ("true", "yes")):
+                return {
+                    "action": "eliminate_all_ignition_sources_and_isolate_perimeter",
+                    "severity": "critical",
+                    "step_by_step_instructions": [
+                        "Establish immediate 300-meter exclusion zone.",
+                        "Eliminate all ignition sources: turn off electrical equipment, engines, and open flames.",
+                        "Call Fire & HazMat dispatch (199/191) immediately.",
+                        "Deploy Class B alcohol-resistant foam blanket if trained HazMat responder."
+                    ],
+                    "reasons": [
+                        "Volatile flammable chemical liquid spill presents immediate ignition, deflagration, and BLEVE explosion risk.",
+                        "Establish 300-meter non-sparking exclusion perimeter, eliminate all ignition sources, and deploy HazMat Class B foam blanket."
+                    ],
+                    "prohibited_actions": [
+                        "NEVER OPERATE ELECTRICAL SWITCHES, RADIOS, OR VEHICLES WITHIN VAPOR PLUME RADIUS.",
+                        "Do not wash flammable chemical liquids into public storm drains or sewer systems.",
+                        "Do not use water streams directly on burning hydrocarbons without specialized foam."
+                    ],
+                    "proof_tree": {
+                        "type": "rule",
+                        "label": "hazard_rule_05a: FLAMMABLE_CHEMICAL_SPILL",
+                        "details": "hazard(chemical_spill) AND chemical_type(flammable) -> eliminate_all_ignition_sources_and_isolate_perimeter",
+                        "children": [
+                            {"type": "evidence", "label": "chemical_type(flammable)"},
+                            {"type": "deduction", "label": "Volatile hydrocarbon / flammable solvent spill"},
+                            {"type": "safety_invariant", "label": "NEVER OPERATE ELECTRICAL SWITCHES WITHIN VAPOR RADIUS"}
+                        ]
+                    }
+                }
+            # 5B. Hazardous Chemical Spill (Toxic Gas / Plume)
+            if is_chemical and (fact_dict.get("vapor_plume") == "visible" or fact_dict.get("wind_direction") == "toward_population" or fact_dict.get("fumes") == "toxic" or fact_dict.get("spill_type") == "toxic_vapor"):
+                return {
+                    "action": "evacuate_upwind_uphill_and_shelter_in_place_downwind",
+                    "severity": "critical",
+                    "step_by_step_instructions": [
+                        "Determine wind direction and immediately move perpendicular then upwind and uphill.",
+                        "Maintain at least 1,000 meters distance from vapor source.",
+                        "Alert downwind occupants to shelter in place and seal all exterior openings.",
+                        "Shut off HVAC ventilation systems immediately."
+                    ],
+                    "reasons": [
+                        "Airborne toxic chemical plume migration poses acute inhalation toxicity and systemic atmospheric contamination hazard.",
+                        "Evacuate immediately perpendicular then upwind and uphill to at least 1,000 meters; order downwind populations to shelter in place (seal doors/windows and shut off HVAC)."
+                    ],
+                    "prohibited_actions": [
+                        "Do not enter low-lying drainage ditches, culverts, or basements (dense chemical vapors pool in low areas).",
+                        "Do not walk into or drive through visible chemical vapors or gas clouds.",
+                        "Do not operate exterior air ventilation or air conditioning units downwind."
+                    ],
+                    "proof_tree": {
+                        "type": "rule",
+                        "label": "hazard_rule_05b: TOXIC_CHEMICAL_PLUME",
+                        "details": "hazard(chemical_spill) AND vapor_plume(visible) -> evacuate_upwind_uphill_and_shelter_in_place_downwind",
+                        "children": [
+                            {"type": "evidence", "label": "vapor_plume(visible)"},
+                            {"type": "deduction", "label": "Atmospheric toxic vapor dispersion"},
+                            {"type": "safety_invariant", "label": "Evacuate upwind/uphill; avoid low-lying basements"}
+                        ]
+                    }
+                }
+            # 5C. Hazardous Chemical Spill (Corrosive / Water-Reactive)
+            if is_chemical and (fact_dict.get("chemical_type") in ("corrosive", "acid", "caustic") or fact_dict.get("water_reactive") in ("true", "yes")):
+                return {
+                    "action": "isolate_corrosive_spill_and_prevent_water_reaction",
+                    "severity": "critical",
+                    "step_by_step_instructions": [
+                        "Isolate area and erect dry physical containment berms.",
+                        "Keep all water sources, hoses, and sprinkler runoff away from the spill.",
+                        "Locate Safety Data Sheet (SDS) / UN placard number from distance.",
+                        "Await HazMat chemical neutralization team."
+                    ],
+                    "reasons": [
+                        "Corrosive chemical or concentrated acid/alkali spill creates severe dermal chemical burn and violent hydration reaction hazard.",
+                        "Isolate spill area with chemical-resistant containment barriers, identify UN placard / Safety Data Sheet (SDS) from distance, and await certified HazMat neutralization."
+                    ],
+                    "prohibited_actions": [
+                        "NEVER POUR WATER ON WATER-REACTIVE CHEMICALS OR CONCENTRATED ACIDS (causes violent exothermic boiling and acid splatter).",
+                        "Do not touch spilled chemicals or contaminated packaging without level A/B HazMat suit.",
+                        "Do not inhale acidic or alkaline fuming vapors."
+                    ],
+                    "proof_tree": {
+                        "type": "rule",
+                        "label": "hazard_rule_05c: CORROSIVE_WATER_REACTIVE_SPILL",
+                        "details": "hazard(chemical_spill) AND chemical_type(corrosive) -> isolate_corrosive_spill_and_prevent_water_reaction",
+                        "children": [
+                            {"type": "evidence", "label": "chemical_type(corrosive)"},
+                            {"type": "deduction", "label": "Severe exothermic / acid-corrosion danger"},
+                            {"type": "safety_invariant", "label": "NEVER POUR WATER ON WATER-REACTIVE CHEMICALS"}
+                        ]
+                    }
+                }
+            # 5D. Hazardous Chemical Spill (General HazMat)
+            if is_chemical:
+                return {
+                    "action": "evacuate_upwind_and_call_hazmat",
+                    "severity": "critical",
+                    "step_by_step_instructions": [
+                        "Evacuate upwind and uphill to at least 500 meters.",
+                        "Call emergency dispatch (199/191) and report industrial chemical release.",
+                        "Keep bystanders out of the perimeter."
+                    ],
+                    "reasons": [
+                        "Toxic industrial chemical or corrosive gas release detected.",
+                        "Evacuate immediately in an upwind and uphill direction to at least 500 meters safety radius."
+                    ],
+                    "prohibited_actions": [
+                        "Do not walk through spilled liquids or vapor clouds.",
+                        "Do not attempt to contain chemical spills without certified HazMat PPE."
+                    ],
+                    "proof_tree": {
+                        "type": "rule",
+                        "label": "hazard_rule_05d: GENERAL_HAZMAT_SPILL",
+                        "details": "hazard(chemical_spill) -> evacuate_upwind_and_call_hazmat",
+                        "children": [
+                            {"type": "evidence", "label": "hazard(chemical_spill)"},
+                            {"type": "deduction", "label": "Industrial hazardous material release"},
+                            {"type": "safety_invariant", "label": "Evacuate upwind to 500m radius"}
+                        ]
+                    }
+                }
+            # 6. Wildfire / Brushfire
+            if fact_dict.get("hazard") == "wildfire" or fact_dict.get("wildfire") in ("true", "yes") or fact_dict.get("brushfire") in ("true", "yes"):
+                return {
+                    "action": "execute_wildfire_evacuation_order",
+                    "severity": "critical",
+                    "step_by_step_instructions": [
+                        "Evacuate immediately via designated primary egress routes.",
+                        "Turn on vehicle headlights and close vehicle air intake / HVAC vents.",
+                        "Wear cotton or wool long sleeves and N95 / particulate mask.",
+                        "Monitor emergency radio broadcasts."
+                    ],
+                    "reasons": [
+                        "Rapidly propagating wildfire front threatens structure.",
+                        "Evacuate immediately via designated primary egress routes, turn on headlights, and close vehicle air intake vents."
+                    ],
+                    "prohibited_actions": [
+                        "Do not delay evacuation to protect non-essential property.",
+                        "Do not shelter in combustible wooden structures if evacuation routes remain open."
+                    ],
+                    "proof_tree": {
+                        "type": "rule",
+                        "label": "hazard_rule_06: WILDFIRE_EVACUATION",
+                        "details": "hazard(wildfire) -> execute_wildfire_evacuation_order",
+                        "children": [
+                            {"type": "evidence", "label": "hazard(wildfire)"},
+                            {"type": "deduction", "label": "Rapid wildfire propagation front"},
+                            {"type": "safety_invariant", "label": "Do not delay evacuation for property"}
                         ]
                     }
                 }
@@ -452,7 +847,7 @@ class PrologEngineBridge:
                 "proof_tree": {
                     "type": "rule",
                     "label": "hazard_rule_fallback: EVACUATE_FIRE_DEPT",
-                    "details": "hazard(unknown) ⇒ evacuate_and_call_fire_department",
+                    "details": "hazard(unknown) -> evacuate_and_call_fire_department",
                     "children": [{"type": "safety_invariant", "label": "Fire Evacuation Invariant"}]
                 }
             }
@@ -483,7 +878,7 @@ class PrologEngineBridge:
                     "proof_tree": {
                         "type": "rule",
                         "label": "disaster_rule_01: RAPID_FLOOD_SINGLE_STORY",
-                        "details": "disaster(flood) ∧ water_rising(true) ∧ building(single_story) ⇒ evacuate_to_higher_ground_now",
+                        "details": "disaster(flood) AND water_rising(true) AND building(single_story) -> evacuate_to_higher_ground_now",
                         "children": [
                             {"type": "evidence", "label": "water_rising(true)"},
                             {"type": "deduction", "label": "Entrapment risk in single-story building"},
@@ -513,7 +908,7 @@ class PrologEngineBridge:
                     "proof_tree": {
                         "type": "rule",
                         "label": "disaster_rule_02: FLOOD_VERTICAL_EVACUATION",
-                        "details": "disaster(flood) ∧ water_rising(true) ∧ building(multi_story) ⇒ vertical_evacuation_to_upper_floors",
+                        "details": "disaster(flood) AND water_rising(true) AND building(multi_story) -> vertical_evacuation_to_upper_floors",
                         "children": [
                             {"type": "evidence", "label": "building(multi_story)"},
                             {"type": "deduction", "label": "Upper floors load-bearing and secure"},
@@ -543,7 +938,7 @@ class PrologEngineBridge:
                     "proof_tree": {
                         "type": "rule",
                         "label": "disaster_rule_03: ACTIVE_EARTHQUAKE",
-                        "details": "disaster(earthquake) ∧ shaking(active) ⇒ drop_cover_and_hold_on",
+                        "details": "disaster(earthquake) AND shaking(active) -> drop_cover_and_hold_on",
                         "children": [
                             {"type": "evidence", "label": "shaking(active)"},
                             {"type": "deduction", "label": "High-velocity seismic ground motion"},
@@ -573,7 +968,7 @@ class PrologEngineBridge:
                     "proof_tree": {
                         "type": "rule",
                         "label": "disaster_rule_04: POST_QUAKE_GAS_RUPTURE",
-                        "details": "disaster(earthquake) ∧ shaking(stopped) ∧ smell_gas(true) ⇒ evacuate_and_shut_main_gas_valve",
+                        "details": "disaster(earthquake) AND shaking(stopped) AND smell_gas(true) -> evacuate_and_shut_main_gas_valve",
                         "children": [
                             {"type": "evidence", "label": "smell_gas(true)"},
                             {"type": "deduction", "label": "Seismic gas pipe compromise"},
@@ -603,7 +998,7 @@ class PrologEngineBridge:
                     "proof_tree": {
                         "type": "rule",
                         "label": "disaster_rule_05: TSUNAMI_EARLY_WARNING",
-                        "details": "disaster(tsunami) ∨ coastal(true) ⇒ evacuate_inland_immediately",
+                        "details": "disaster(tsunami) OR coastal(true) -> evacuate_inland_immediately",
                         "children": [
                             {"type": "evidence", "label": "disaster(tsunami)"},
                             {"type": "deduction", "label": "High-velocity seismic sea wave train"},
@@ -625,7 +1020,7 @@ class PrologEngineBridge:
                 "proof_tree": {
                     "type": "rule",
                     "label": "disaster_rule_fallback: SEEK_SHELTER",
-                    "details": "disaster(unknown) ⇒ seek_safe_shelter_and_monitor_emergency_broadcasts",
+                    "details": "disaster(unknown) -> seek_safe_shelter_and_monitor_emergency_broadcasts",
                     "children": [{"type": "safety_invariant", "label": "Storm Shelter Protocol"}]
                 }
             }
@@ -656,7 +1051,7 @@ class PrologEngineBridge:
                     "proof_tree": {
                         "type": "rule",
                         "label": "road_rule_01: CRASH_CARDIAC_ARREST",
-                        "details": "unconscious(true) ∧ breathing(none) ⇒ begin_cpr_do_not_move_spine",
+                        "details": "unconscious(true) AND breathing(none) -> begin_cpr_do_not_move_spine",
                         "children": [
                             {"type": "evidence", "label": "unconscious(true)"},
                             {"type": "evidence", "label": "breathing(none)"},
@@ -687,7 +1082,7 @@ class PrologEngineBridge:
                     "proof_tree": {
                         "type": "rule",
                         "label": "road_rule_02: VEHICLE_FIRE_ENTRAPMENT",
-                        "details": "vehicle_fire(true) ∧ trapped(true) ⇒ call_rescue_and_maintain_safe_distance",
+                        "details": "vehicle_fire(true) AND trapped(true) -> call_rescue_and_maintain_safe_distance",
                         "children": [
                             {"type": "evidence", "label": "vehicle_fire(true)"},
                             {"type": "evidence", "label": "trapped(true)"},
@@ -718,7 +1113,7 @@ class PrologEngineBridge:
                     "proof_tree": {
                         "type": "rule",
                         "label": "road_rule_03: MASS_CASUALTY_START_TRIAGE",
-                        "details": "multiple_victims(true) ∨ mass_casualty(true) ⇒ triage_by_severity_and_call_mass_casualty_dispatch",
+                        "details": "multiple_victims(true) OR mass_casualty(true) -> triage_by_severity_and_call_mass_casualty_dispatch",
                         "children": [
                             {"type": "evidence", "label": "multiple_victims(true)"},
                             {"type": "deduction", "label": "Multi-victim incident exceeding immediate unit capacity"},
@@ -748,7 +1143,7 @@ class PrologEngineBridge:
                     "proof_tree": {
                         "type": "rule",
                         "label": "road_rule_04: TRAFFIC_SCENE_SAFETY",
-                        "details": "hazard(traffic) ∨ active_traffic(true) ⇒ establish_safety_perimeter_before_aid",
+                        "details": "hazard(traffic) OR active_traffic(true) -> establish_safety_perimeter_before_aid",
                         "children": [
                             {"type": "evidence", "label": "hazard(traffic)"},
                             {"type": "deduction", "label": "Secondary high-speed vehicle impact risk"},
@@ -770,7 +1165,7 @@ class PrologEngineBridge:
                 "proof_tree": {
                     "type": "rule",
                     "label": "road_rule_fallback: SCENE_SECURE",
-                    "details": "road_accident(general) ⇒ secure_scene_and_call_emergency_dispatch",
+                    "details": "road_accident(general) -> secure_scene_and_call_emergency_dispatch",
                     "children": [{"type": "safety_invariant", "label": "Road Accident Scene Security"}]
                 }
             }
@@ -800,7 +1195,7 @@ class PrologEngineBridge:
             "proof_tree": {
                 "type": "rule",
                 "label": "global_fallback_rule: SAFE_DEFAULT",
-                "details": "unknown_scenario ⇒ call_emergency_services_immediately",
+                "details": "unknown_scenario -> call_emergency_services_immediately",
                 "children": [{"type": "safety_invariant", "label": "Fail-Safe Default Invariant"}]
             }
         }

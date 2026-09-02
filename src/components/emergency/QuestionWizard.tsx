@@ -213,7 +213,11 @@ export const QuestionWizard: React.FC<QuestionWizardProps> = ({
       <div className="rounded-2xl border border-neutral-800 bg-neutral-900/95 p-5 shadow-xl">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <div>
+<<<<<<< HEAD
             <h3 className="text-base font-black text-white">Dynamic Emergency Questionnaire</h3>
+=======
+            <h3 className="text-base font-semibold text-white">Dynamic Emergency Questionnaire</h3>
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
             <p className="text-xs text-neutral-400">Select active crisis domain and observed clinical/scene signs</p>
           </div>
           <button
@@ -258,7 +262,11 @@ export const QuestionWizard: React.FC<QuestionWizardProps> = ({
         <div className="space-y-4 pt-2 border-t border-neutral-800/80">
           {currentDomain === 'medical' && (
             <div className="space-y-3">
+<<<<<<< HEAD
               <div className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Patient Responsiveness &amp; Vitals:</div>
+=======
+              <div className="text-xs font-bold text-neutral-400">Patient Responsiveness &amp; Vitals:</div>
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <button
                   onClick={() => handleToggleFact('unconscious', true)}
@@ -361,7 +369,11 @@ export const QuestionWizard: React.FC<QuestionWizardProps> = ({
 
           {currentDomain === 'fire_hazard' && (
             <div className="space-y-3">
+<<<<<<< HEAD
               <div className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Fire Type &amp; Fuel Source:</div>
+=======
+              <div className="text-xs font-bold text-neutral-400">Fire Type &amp; Fuel Source:</div>
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <button
                   onClick={() => {
@@ -428,7 +440,11 @@ export const QuestionWizard: React.FC<QuestionWizardProps> = ({
 
           {currentDomain === 'natural_disaster' && (
             <div className="space-y-3">
+<<<<<<< HEAD
               <div className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Disaster Environment:</div>
+=======
+              <div className="text-xs font-bold text-neutral-400">Disaster Environment:</div>
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <button
                   onClick={() => {
@@ -513,7 +529,11 @@ export const QuestionWizard: React.FC<QuestionWizardProps> = ({
 
           {currentDomain === 'road_accident' && (
             <div className="space-y-3">
+<<<<<<< HEAD
               <div className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Collision Factors:</div>
+=======
+              <div className="text-xs font-bold text-neutral-400">Collision Factors:</div>
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <button
                   onClick={() => {

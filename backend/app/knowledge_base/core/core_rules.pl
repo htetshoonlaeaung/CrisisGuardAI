@@ -4,11 +4,14 @@
 
 :- module(core_rules, [
     evaluate_emergency/6,
+<<<<<<< HEAD
     evaluate_composite_emergency/5,
     collect_domain_evaluations/2,
     resolve_priority_conflicts/5,
     action_tier/2,
     domain_precedence/2,
+=======
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
     priority_rank/2,
     higher_urgency/2
 ]).
@@ -18,11 +21,15 @@
 :- use_module('../domains/natural_disasters.pl').
 :- use_module('../domains/road_accidents.pl').
 
+<<<<<<< HEAD
 % =============================================================================
 % PRIORITY RANKINGS & ACTION TIERS
 % =============================================================================
 
 % Severity rankings: lower number = higher urgency
+=======
+% Priority ranks: lower number = higher urgency
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
 priority_rank(critical, 1).
 priority_rank(high, 2).
 priority_rank(moderate, 3).
@@ -34,6 +41,7 @@ higher_urgency(LevelA, LevelB) :-
     priority_rank(LevelB, RankB),
     RankA < RankB.
 
+<<<<<<< HEAD
 % Domain precedence for tie-breaking when severities and tiers match
 domain_precedence(fire_hazard, 1).
 domain_precedence(natural_disaster, 2).
@@ -106,6 +114,9 @@ action_tier(_Action, 5).
 % SINGLE-DOMAIN EMERGENCY DISPATCHER
 % =============================================================================
 
+=======
+% Master dispatcher routing by domain
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
 evaluate_emergency(medical, Facts, Action, Severity, Reasons, Prohibitions) :-
     medical_eval(Facts, Action, Severity, Reasons, Prohibitions), !.
 
@@ -118,6 +129,7 @@ evaluate_emergency(natural_disaster, Facts, Action, Severity, Reasons, Prohibiti
 evaluate_emergency(road_accident, Facts, Action, Severity, Reasons, Prohibitions) :-
     road_eval(Facts, Action, Severity, Reasons, Prohibitions), !.
 
+<<<<<<< HEAD
 evaluate_emergency(_Domain, _Facts, call_emergency_services_immediately, critical, Reasons, Prohibitions) :-
     Reasons = ['Uncertain emergency domain. Immediate contact with municipal emergency dispatch is required.'],
     Prohibitions = ['Do not delay contacting 199/191/192.'].
@@ -213,3 +225,9 @@ format_compound_reasons(TopDomain, PrimaryAction, SecondaryEvaluations, TopReaso
         format(atom(SecNote), 'Concurrent Threat (~w, Severity: ~w): Subordinated directive is ~w. Ensure all aggregated safety prohibitions are observed.', [SecDom, SecSev, SecAct])
     ), SecondaryNotes),
     append([[Header | TopReasons], SecondaryNotes], CombinedReasons).
+=======
+% Global safe fallback if domain is unknown or reasoning encounters an unhandled case
+evaluate_emergency(_Domain, _Facts, call_emergency_services_immediately, critical, Reasons, Prohibitions) :-
+    Reasons = ['Uncertain emergency domain. Immediate contact with municipal emergency dispatch is required.'],
+    Prohibitions = ['Do not delay contacting 199/191/192.'].
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9

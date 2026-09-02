@@ -16,6 +16,17 @@ export const translations = {
       english: 'English',
       myanmar: 'Myanmar',
     },
+<<<<<<< HEAD
+=======
+    welcome: {
+      heading: 'Clear Guidance When Every Second Matters',
+      supporting: 'Intelligent, explainable support for emergencies and disasters.',
+      preparing: 'Preparing your safety assistant...',
+      continue: 'Continue',
+      continueAria: 'Continue to login',
+      skip: 'Skip introduction',
+    },
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
     common: {
       close: 'Close',
       status: 'STATUS:',
@@ -229,6 +240,17 @@ export const translations = {
       english: 'အင်္ဂလိပ်',
       myanmar: 'မြန်မာ',
     },
+<<<<<<< HEAD
+=======
+    welcome: {
+      heading: 'စက္ကန့်တိုင်း အရေးကြီးချိန်တွင် ရှင်းလင်းသော လမ်းညွှန်မှု',
+      supporting: 'အရေးပေါ်အခြေအနေများနှင့် သဘာဝဘေးအန္တရာယ်များအတွက် နားလည်ရှင်းလင်းနိုင်သော အသိဉာဏ်ရှိ အကူအညီ။',
+      preparing: 'သင့်ဘေးကင်းရေးအကူစနစ်ကို ပြင်ဆင်နေပါသည်...',
+      continue: 'ဆက်သွားမည်',
+      continueAria: 'ဝင်ရောက်ရန် စာမျက်နှာသို့ ဆက်သွားမည်',
+      skip: 'ကျော်သွားမည်',
+    },
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
     common: {
       close: 'ပိတ်ရန်',
       status: 'အခြေအနေ:',

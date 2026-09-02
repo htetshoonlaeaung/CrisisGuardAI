@@ -3,6 +3,19 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
 
+<<<<<<< HEAD
+=======
+const viteMeta = import.meta as ImportMeta & { env?: { PROD?: boolean } };
+
+if ('serviceWorker' in navigator && viteMeta.env?.PROD) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js').catch((error) => {
+      console.warn('PWA service worker registration failed:', error);
+    });
+  });
+}
+
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
 // Ensure window.fetch is configurable with a setter in strict mode environments
 try {
   if (typeof window !== 'undefined') {

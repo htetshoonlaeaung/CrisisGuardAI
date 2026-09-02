@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { CrisisDomain, FactItem } from '../../types';
 import { QUICK_FACTS, QuickFactPreset } from '../../data/quickFacts';
 import { HapticButton } from '../ui/HapticButton';
+<<<<<<< HEAD
 import { useLanguage } from '../../context/LanguageContext';
 import {
   HeartPulse,
@@ -39,6 +40,10 @@ const PRESET_ICON_MAP: Record<string, React.ComponentType<{ className?: string }
   ShieldAlert,
   Siren,
 };
+=======
+import { useTheme } from '../../context/ThemeContext';
+import { useLanguage } from '../../context/LanguageContext';
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
 
 interface QuickFactButtonsProps {
   domain: CrisisDomain;
@@ -51,6 +56,10 @@ export const QuickFactButtons: React.FC<QuickFactButtonsProps> = ({
   activeFacts = [],
   onSelectPreset,
 }) => {
+<<<<<<< HEAD
+=======
+  const { isLight } = useTheme();
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
   const { t, td, tp, tpd } = useLanguage();
   const [clickedPresetId, setClickedPresetId] = useState<string | null>(null);
   const presets = QUICK_FACTS[domain] || [];
@@ -68,6 +77,7 @@ export const QuickFactButtons: React.FC<QuickFactButtonsProps> = ({
     );
   };
 
+<<<<<<< HEAD
   const getBadgeBg = (preset: QuickFactPreset, active: boolean) => {
     if (preset.expectedSeverity === 'critical') {
       return active
@@ -102,15 +112,30 @@ export const QuickFactButtons: React.FC<QuickFactButtonsProps> = ({
   return (
     <div id="quick-presets-panel" className="space-y-3">
       <div className="flex items-center justify-between text-[13px] font-mono font-bold uppercase tracking-wider text-slate-800">
+=======
+  return (
+    <div id="quick-presets-panel" className="space-y-2">
+      <div
+        className={`flex items-center justify-between text-[13px] font-mono font-bold ${
+          isLight ? 'text-amber-800' : 'text-[#FFAB00]'
+        }`}
+      >
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
         <div className="flex items-center">
           <span>{t('quickPresets.heading', { domain: td(domain) })}</span>
         </div>
       </div>
 
+<<<<<<< HEAD
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-3.5">
         {presets.map((preset) => {
           const active = isPresetActive(preset);
           const IconComp = PRESET_ICON_MAP[preset.icon] || HelpCircle;
+=======
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        {presets.map((preset) => {
+          const active = isPresetActive(preset);
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
           return (
             <HapticButton
               key={preset.id}
@@ -119,6 +144,7 @@ export const QuickFactButtons: React.FC<QuickFactButtonsProps> = ({
               variant="secondary"
               skeuomorphic={true}
               onClick={() => handlePresetClick(preset)}
+<<<<<<< HEAD
               innerClassName="items-start justify-start w-full h-full gap-3 sm:gap-3.5"
               className={`p-3 sm:p-3.5 text-left rounded-2xl group w-full transition-all border min-h-[88px] sm:min-h-[96px] cursor-pointer ${
                 active
@@ -166,10 +192,31 @@ export const QuickFactButtons: React.FC<QuickFactButtonsProps> = ({
                     active
                       ? 'text-blue-950 font-bold'
                       : 'text-slate-900 group-hover:text-blue-600'
+=======
+              className={`p-3 text-left rounded-xl group w-full justify-start items-start flex-col transition-all border min-h-[58px] ${
+                active
+                  ? 'skeuo-preset-active'
+                  : isLight
+                  ? 'bg-white hover:bg-amber-50/50 border-zinc-300 text-zinc-900 shadow-sm hover:border-amber-400'
+                  : 'bg-[#111111] hover:bg-[rgba(255,171,0,0.06)] border-[#2A2A2A] text-zinc-100 hover:border-[rgba(255,171,0,0.30)]'
+              }`}
+            >
+              <div className="flex items-center w-full">
+                <span
+                  className={`text-[14px] font-semibold whitespace-normal flex-1 text-left leading-[1.3] [word-break:normal] [overflow-wrap:normal] transition-colors ${
+                    active
+                      ? isLight
+                        ? 'text-amber-950'
+                        : 'text-[#FFAB00]'
+                      : isLight
+                      ? 'text-zinc-900 group-hover:text-amber-800'
+                      : 'text-zinc-100 group-hover:text-[#FFAB00]'
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
                   }`}
                 >
                   {tp(preset.id, preset.label)}
                 </span>
+<<<<<<< HEAD
                 <p
                   className={`text-xs sm:text-[11.5px] font-sans text-left line-clamp-2 w-full mt-1.5 leading-relaxed transition-colors ${
                     active
@@ -180,6 +227,22 @@ export const QuickFactButtons: React.FC<QuickFactButtonsProps> = ({
                   {tpd(preset.id, preset.description)}
                 </p>
               </div>
+=======
+              </div>
+              <p
+                className={`text-[11px] font-sans text-left line-clamp-2 w-full transition-colors ${
+                  active
+                    ? isLight
+                      ? 'text-amber-900/90 font-medium'
+                      : 'text-[#FFE066] font-medium'
+                    : isLight
+                    ? 'text-zinc-500 group-hover:text-zinc-800'
+                    : 'text-zinc-400 group-hover:text-zinc-300'
+                }`}
+              >
+                {tpd(preset.id, preset.description)}
+              </p>
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
             </HapticButton>
           );
         })}

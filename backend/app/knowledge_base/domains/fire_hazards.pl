@@ -1,7 +1,11 @@
 % backend/app/knowledge_base/domains/fire_hazards.pl
 % Fire and hazard emergency decision rules for CrisisGuard AI.
 % Covers: Electrical fire, Cooking oil/grease fire, Gas leak (indoors),
+<<<<<<< HEAD
 %         House fire (smoke/flames/blocked exits), Chemical spill, Wildfire.
+=======
+%         House fire (smoke/flames/blocked exits), Chemical spill.
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
 
 :- module(hazards_kb, [hazard_eval/5]).
 
@@ -9,7 +13,10 @@
 hazard_eval(Facts, isolate_main_power_and_use_co2_extinguisher, critical, Reasons, Prohibitions) :-
     ( member(hazard(fire), Facts) ; member(fire(true), Facts) ),
     member(fire_source(electrical), Facts),
+<<<<<<< HEAD
     !,
+=======
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
     Reasons = [
         'Live electrical current creates severe electrocution and arc flash hazard.',
         'Cut main circuit breaker power if accessible and use Class C / CO2 fire extinguisher.'
@@ -22,8 +29,12 @@ hazard_eval(Facts, isolate_main_power_and_use_co2_extinguisher, critical, Reason
 % 2. GREASE/COOKING OIL FIRE — STRICT: NEVER WATER
 hazard_eval(Facts, cover_with_metal_lid_and_turn_off_burner, critical, Reasons, Prohibitions) :-
     ( member(hazard(fire), Facts) ; member(fire(true), Facts) ),
+<<<<<<< HEAD
     ( member(fire_source(cooking_oil), Facts) ; member(fire_source(grease), Facts) ; member(fire_source(oil), Facts) ),
     !,
+=======
+    ( member(fire_source(cooking_oil), Facts) ; member(fire_source(grease), Facts) ),
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
     Reasons = [
         'High-temperature oil combustion (>300C).',
         'Smother the flames by sliding a metal lid or fire blanket over the pan and switch off heat source.'
@@ -37,7 +48,10 @@ hazard_eval(Facts, cover_with_metal_lid_and_turn_off_burner, critical, Reasons, 
 hazard_eval(Facts, evacuate_leave_doors_open_call_from_outside, critical, Reasons, Prohibitions) :-
     ( member(hazard(gas_leak), Facts) ; member(gas_leak(true), Facts) ; member(smell_gas(true), Facts) ),
     member(location(indoors), Facts),
+<<<<<<< HEAD
     !,
+=======
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
     Reasons = [
         'Accumulated flammable gas presents severe explosion hazard.',
         'Evacuate all occupants immediately, leave entry doors open for ventilation, and call emergency services from at least 100 meters outside.'
@@ -51,7 +65,10 @@ hazard_eval(Facts, evacuate_leave_doors_open_call_from_outside, critical, Reason
 hazard_eval(Facts, seal_door_and_signal_from_window, critical, Reasons, Prohibitions) :-
     ( member(hazard(fire), Facts) ; member(fire(true), Facts) ),
     member(exit_blocked(true), Facts),
+<<<<<<< HEAD
     !,
+=======
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
     Reasons = [
         'Primary egress blocked by heavy smoke or flames.',
         'Retreat to room with external window, seal door cracks with wet towels/clothing, and signal emergency crews from window.'
@@ -61,6 +78,7 @@ hazard_eval(Facts, seal_door_and_signal_from_window, critical, Reasons, Prohibit
         'Do not break windows unless instructed by firefighters (avoids feeding oxygen into backdraft).'
     ].
 
+<<<<<<< HEAD
 % 5A. HAZARDOUS CHEMICAL SPILL (FLAMMABLE / EXPLOSIVE VAPORS)
 hazard_eval(Facts, eliminate_all_ignition_sources_and_isolate_perimeter, critical, Reasons, Prohibitions) :-
     ( member(hazard(chemical_spill), Facts) ; member(chemical_leak(true), Facts) ),
@@ -133,6 +151,9 @@ hazard_eval(Facts, execute_wildfire_evacuation_order, critical, Reasons, Prohibi
     ].
 
 % 7. GENERAL FIRE / HAZARD FALLBACK
+=======
+% 5. GENERAL FIRE / HAZARD FALLBACK
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
 hazard_eval(_Facts, evacuate_and_call_fire_department, critical, Reasons, Prohibitions) :-
     Reasons = ['Active fire or hazardous materials condition. Immediate evacuation to safe perimeter required.'],
     Prohibitions = ['Do not re-enter burning or hazardous structures under any circumstances.'].

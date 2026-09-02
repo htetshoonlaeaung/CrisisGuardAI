@@ -1,5 +1,6 @@
 % backend/app/knowledge_base/core/xai_explainer.pl
 % Explainable AI (XAI) meta-interpreter for CrisisGuard AI.
+<<<<<<< HEAD
 % Generates deterministic, inspectable deduction trees and safety invariants for emergency transparency.
 
 :- module(xai_explainer, [
@@ -251,6 +252,16 @@ explain_composite_triage(Facts, PrimaryAction, Severity, CombinedProhibitions, P
 format_eval_evidence(eval(Domain, Action, Sev, _, _), evidence(active_hazard(Domain, Action, Sev))).
 
 % Meta-interpreter proof generator
+=======
+% Traces the Prolog proof tree for any evaluated goal and formats it
+% into a human-readable, JSON-friendly deduction structure.
+
+:- module(xai_explainer, [
+    generate_xai_proof/3,
+    prove/3
+]).
+
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
 generate_xai_proof(Goal, Facts, ProofTree) :-
     prove(Goal, Facts, ProofTree).
 

@@ -4,7 +4,10 @@
 
 :- module(scheduler_clpfd, [
     schedule_rescue_teams/4,
+<<<<<<< HEAD
     schedule_rescue_with_capacities/5,
+=======
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
     verify_resource_constraints/3
 ]).
 :- use_module(library(clpfd)).
@@ -16,6 +19,7 @@ schedule_rescue_teams(IncidentSeverities, TeamCapacities, Assignments, _MaxTime)
     length(TeamCapacities, NumTeams),
     NumTeams > 0,
     Assignments ins 1..NumTeams,
+<<<<<<< HEAD
     enforce_severity_matching(IncidentSeverities, Assignments, NumTeams),
     labeling([ff, bisect], Assignments), !.
 
@@ -52,6 +56,18 @@ enforce_team_capacity_limits(TeamId, NumTeams, Assignments, Demands, Capacities)
 is_team_assigned(TeamId, A, B) :-
     B in 0..1,
     B #<==> (A #= TeamId).
+=======
+    enforce_severity_matching(IncidentSeverities, Assignments),
+    labeling([ff, bisect], Assignments).
+
+% Critical incidents -> only teams 1-2 (critical paramedic response units)
+enforce_severity_matching([], []).
+enforce_severity_matching([critical|RestS], [TeamId|RestA]) :-
+    TeamId #=< 2,
+    enforce_severity_matching(RestS, RestA).
+enforce_severity_matching([_|RestS], [_|RestA]) :-
+    enforce_severity_matching(RestS, RestA).
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
 
 % Resource verification predicate
 verify_resource_constraints(Assignments, TeamCapacities, MaxLoad) :-

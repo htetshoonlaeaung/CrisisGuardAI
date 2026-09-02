@@ -1,12 +1,19 @@
 import React, { useState, useCallback, useRef } from 'react';
 
+<<<<<<< HEAD
 export type HapticButtonVariant = 'primary' | 'amber' | 'cyan' | 'blue' | 'secondary' | 'danger' | 'ghost' | 'icon' | 'tab';
+=======
+export type HapticButtonVariant = 'primary' | 'amber' | 'cyan' | 'secondary' | 'danger' | 'ghost' | 'icon' | 'tab';
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
 
 interface HapticButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
   variant?: HapticButtonVariant;
   className?: string;
+<<<<<<< HEAD
   innerClassName?: string;
+=======
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
   disabled?: boolean;
   ripple?: boolean;
   skeuomorphic?: boolean;
@@ -23,7 +30,10 @@ export const HapticButton: React.FC<HapticButtonProps> = ({
   onClick,
   variant = 'primary',
   className = '',
+<<<<<<< HEAD
   innerClassName,
+=======
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
   disabled = false,
   ripple = true,
   skeuomorphic = true,
@@ -73,6 +83,7 @@ export const HapticButton: React.FC<HapticButtonProps> = ({
     switch (variant) {
       case 'amber':
       case 'cyan':
+<<<<<<< HEAD
       case 'blue':
         return skeuomorphic
           ? 'skeuo-btn-blue font-bold text-white'
@@ -99,6 +110,33 @@ export const HapticButton: React.FC<HapticButtonProps> = ({
         return 'bg-transparent text-slate-500 hover:text-slate-900 border border-transparent';
       default:
         return 'bg-white text-slate-800 border border-slate-200';
+=======
+        return skeuomorphic
+          ? 'skeuo-btn-amber font-black text-zinc-950'
+          : 'bg-[#FFAB00] hover:bg-[#FFD000] text-zinc-950 font-bold border border-[#FFAB00] shadow-md shadow-[#FFAB00]/25';
+      case 'primary':
+        return skeuomorphic
+          ? 'skeuo-btn bg-[#181B20] hover:bg-[#20252C] text-zinc-100 font-semibold border border-zinc-700/80'
+          : 'bg-[#181B20] hover:bg-[#20252C] text-zinc-100 font-semibold border border-zinc-700/80 shadow-sm';
+      case 'secondary':
+        return skeuomorphic
+          ? 'skeuo-btn bg-[#111111] hover:bg-[#1A1A1A] text-zinc-200 hover:text-white font-medium border border-[#2A2A2A]'
+          : 'bg-[#090909] hover:bg-[#111111] text-zinc-300 hover:text-white font-medium border border-[#2A2A2A]';
+      case 'danger':
+        return skeuomorphic
+          ? 'skeuo-btn bg-red-950/80 hover:bg-red-900 text-red-200 font-bold border border-red-600/70 shadow-[0_0_12px_rgba(239,68,68,0.35)]'
+          : 'bg-[#EF4444] hover:bg-[#FF3B30] text-white font-bold border border-[#EF4444] shadow-md shadow-[#EF4444]/30';
+      case 'ghost':
+        return 'bg-transparent hover:bg-zinc-800/50 text-zinc-400 hover:text-zinc-100 border border-transparent';
+      case 'icon':
+        return skeuomorphic
+          ? 'skeuo-btn p-2 rounded-xl bg-[#111111] hover:bg-[#1A1A1A] text-zinc-400 hover:text-[#FFAB00] border border-[#2A2A2A]'
+          : 'p-2 rounded-xl bg-[#111111] hover:bg-[#1A1A1A] text-zinc-400 hover:text-[#FFAB00] border border-[#2A2A2A]';
+      case 'tab':
+        return 'bg-transparent text-zinc-400 hover:text-zinc-200 border border-transparent';
+      default:
+        return 'bg-[#181B20] text-zinc-100 border border-[#2A2A2A]';
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
     }
   };
 
@@ -111,10 +149,14 @@ export const HapticButton: React.FC<HapticButtonProps> = ({
       onPointerCancel={handlePointerCancel}
       onClick={onClick}
       disabled={disabled}
+<<<<<<< HEAD
       style={{
         transform: isPressed ? 'scale(0.93)' : undefined,
       }}
       className={`hbtn press-btn relative select-none cursor-pointer inline-flex items-center justify-center gap-2 transition-all duration-200 ease-spring disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none focus-visible:outline-2 focus-visible:outline-blue-600 ${
+=======
+      className={`hbtn select-none cursor-pointer inline-flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-[#FFAB00] ${
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
         isPressed ? 'is-pressed' : ''
       } ${getVariantStyles()} ${className}`}
       {...props}
@@ -133,7 +175,11 @@ export const HapticButton: React.FC<HapticButtonProps> = ({
           aria-hidden="true"
         />
       ))}
+<<<<<<< HEAD
       <span className={`relative z-10 flex pointer-events-none w-full ${innerClassName ?? 'items-center justify-center gap-2'}`}>
+=======
+      <span className="relative z-10 flex items-center justify-center gap-2 pointer-events-none w-full">
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
         {children}
       </span>
     </button>

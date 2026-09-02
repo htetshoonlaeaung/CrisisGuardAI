@@ -6,6 +6,7 @@ import { ProhibitionsList } from './ProhibitionsList';
 import { SeverityBadge } from './SeverityBadge';
 import { TTS } from '../../utils/textToSpeech';
 import { HapticButton } from '../ui/HapticButton';
+import { useTheme } from '../../context/ThemeContext';
 import { useLanguage } from '../../context/LanguageContext';
 import {
   Volume2,
@@ -32,6 +33,7 @@ export const ActionCard: React.FC<ActionCardProps> = ({
   onOpenMetronome,
   onOpenShelters,
 }) => {
+  const { isLight } = useTheme();
   const { t, tr, ta } = useLanguage();
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [checkedSteps, setCheckedSteps] = useState<Record<number, boolean>>({});
@@ -74,14 +76,32 @@ export const ActionCard: React.FC<ActionCardProps> = ({
   return (
     <div
       id="emergency-action-card"
-      className="rounded-2xl border border-slate-200 bg-white p-4 md:p-6 shadow-sm space-y-5 transition-all duration-300 text-slate-900"
+      className={`rounded-2xl border p-4 md:p-6 shadow-xl backdrop-blur-md space-y-5 transition-all duration-300 ${
+        isLight
+          ? result.severity === 'critical'
+            ? 'bg-white border-red-300 shadow-red-100/60 ring-1 ring-red-200'
+            : result.severity === 'high'
+            ? 'bg-white border-amber-300 shadow-amber-100/60'
+            : 'bg-white border-zinc-200 shadow-zinc-200/50'
+          : result.severity === 'critical'
+          ? 'bg-[#111111] border-[#EF4444]/60 shadow-black/90 ring-1 ring-[#EF4444]/40'
+          : result.severity === 'high'
+          ? 'bg-[#111111] border-amber-500/50 shadow-black/80 ring-1 ring-amber-500/30'
+          : 'bg-[#111111] border-[#2A2A2A] shadow-black/80'
+      }`}
     >
       {/* 1. Header with latency and severity */}
-      <div className="flex flex-wrap items-center justify-between gap-2.5 pb-3 border-b border-slate-200">
+      <div className={`flex flex-wrap items-center justify-between gap-2.5 pb-2 border-b ${isLight ? 'border-zinc-200' : 'border-[#2A2A2A]'}`}>
         <div className="flex items-center gap-2">
           <SeverityBadge severity={result.severity} size="md" />
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono border border-slate-200 bg-slate-100 text-slate-700 font-semibold">
-            <Clock className="w-3.5 h-3.5 text-slate-500" />
+          <div
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono border ${
+              isLight
+                ? 'bg-amber-50 border-amber-200 text-amber-900'
+                : 'bg-[rgba(255,171,0,0.10)] border-[rgba(255,171,0,0.25)] text-[#FFAB00]'
+            }`}
+          >
+            <Clock className={`w-3.5 h-3.5 ${isLight ? 'text-amber-700' : 'text-[#FFAB00]'}`} />
             <span>{t('action.logicInference', { ms: result.evaluation_latency_ms })}</span>
           </div>
         </div>
@@ -90,20 +110,17 @@ export const ActionCard: React.FC<ActionCardProps> = ({
         <div className="flex items-center gap-2">
           <HapticButton
             id="btn-tts-read-aloud"
-            variant="secondary"
-            skeuomorphic={false}
+            variant={isSpeaking ? (isLight ? 'primary' : 'amber') : 'secondary'}
             onClick={handleToggleSpeech}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold border ${
-              isSpeaking
-                ? 'bg-blue-600 text-white border-blue-600'
-                : 'bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300'
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold ${
+              isLight && !isSpeaking ? 'bg-zinc-100 border-zinc-300 text-zinc-800' : ''
             }`}
             title={t('action.readAloud')}
           >
             {isSpeaking ? (
-              <VolumeX className="w-4 h-4 text-white" />
+              <VolumeX className="w-4 h-4 text-zinc-950" />
             ) : (
-              <Volume2 className="w-4 h-4 text-slate-600" />
+              <Volume2 className={`w-4 h-4 ${isLight ? 'text-amber-700' : 'text-[#FFAB00]'}`} />
             )}
             <span>{isSpeaking ? t('action.stopSpeech') : t('action.readDirectives')}</span>
           </HapticButton>
@@ -111,12 +128,13 @@ export const ActionCard: React.FC<ActionCardProps> = ({
           <HapticButton
             id="btn-view-xai-proof"
             variant="secondary"
-            skeuomorphic={false}
             onClick={onOpenProofTree}
-            className="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300"
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold ${
+              isLight ? 'bg-zinc-100 border-zinc-300 text-amber-800' : 'text-[#FFAB00] hover:border-[rgba(255,171,0,0.40)]'
+            }`}
             title={t('action.inspectProofTitle')}
           >
-            <GitBranch className="w-4 h-4 text-slate-600" />
+            <GitBranch className={`w-4 h-4 ${isLight ? 'text-amber-700' : 'text-[#FFAB00]'}`} />
             <span className="hidden sm:inline">{t('action.inspectTree')}</span>
           </HapticButton>
         </div>
@@ -125,30 +143,37 @@ export const ActionCard: React.FC<ActionCardProps> = ({
       {/* 2. Action Headline banner */}
       <ActionHeadline action={result.action_headline} severity={result.severity} />
 
-      {/* 3. CPR Special Metronome Alert Banner if cardiac emergency */}
+      {/* 3. CPR Special Metronome Alert Banner if cardiac emergency (Red Alert System Preserved) */}
       {isCardiacOrArrest && onOpenMetronome && (
         <div
           id="cpr-metronome-launcher-banner"
-          className="rounded-xl border border-red-200 bg-red-50/80 ring-1 ring-red-200 p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs"
+          className={`rounded-xl border p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-md ${
+            isLight
+              ? 'bg-red-50 border-red-200 ring-1 ring-red-200'
+              : 'border-[#EF4444]/50 bg-[#1A1A1A] ring-1 ring-[#EF4444]/30'
+          }`}
         >
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full border border-red-300 bg-white flex items-center justify-center animate-cpr-pulse flex-shrink-0">
-              <HeartPulse className="w-5 h-5 text-red-600" />
+            <div
+              className={`w-10 h-10 rounded-full border flex items-center justify-center animate-cpr-pulse flex-shrink-0 ${
+                isLight ? 'bg-white border-red-300' : 'bg-[#090909] border-[#EF4444]'
+              }`}
+            >
+              <HeartPulse className="w-5 h-5 text-[#EF4444]" />
             </div>
             <div>
-              <div className="font-extrabold text-sm uppercase tracking-wide text-slate-950">
+              <div className={`font-black text-sm uppercase tracking-wide ${isLight ? 'text-zinc-950' : 'text-white'}`}>
                 {t('action.cprAvailable')}
               </div>
-              <div className="text-xs text-slate-600">
+              <div className={`text-xs ${isLight ? 'text-zinc-600' : 'text-zinc-300'}`}>
                 {t('action.cprDesc')}
               </div>
             </div>
           </div>
           <HapticButton
             variant="danger"
-            skeuomorphic={true}
             onClick={onOpenMetronome}
-            className="w-full sm:w-auto px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider whitespace-nowrap bg-red-600 hover:bg-red-700 text-white shadow-sm shadow-red-200"
+            className="w-full sm:w-auto px-4 py-2 rounded-lg text-xs whitespace-nowrap"
           >
             {t('action.launchCpr')}
           </HapticButton>
@@ -162,14 +187,18 @@ export const ActionCard: React.FC<ActionCardProps> = ({
       {result.step_by_step_instructions && result.step_by_step_instructions.length > 0 && (
         <div
           id="tactical-instructions-panel"
-          className="rounded-xl border border-slate-200 bg-slate-50 p-4 md:p-5 space-y-3"
+          className={`rounded-xl border p-4 md:p-5 space-y-3 ${
+            isLight ? 'bg-zinc-50 border-zinc-200' : 'border-[#2A2A2A] bg-[#090909]'
+          }`}
         >
-          <div className="flex items-center justify-between pb-2 border-b border-slate-200">
-            <h3 className="text-xs md:text-sm font-mono uppercase tracking-wider font-bold flex items-center gap-2 text-slate-900">
-              <CheckSquare className="w-4 h-4 text-blue-600" />
+          <div className={`flex items-center justify-between pb-2 border-b ${isLight ? 'border-zinc-200' : 'border-[#2A2A2A]'}`}>
+            <h3 className={`text-xs md:text-sm font-mono font-bold flex items-center gap-2 ${
+              isLight ? 'text-zinc-900' : 'text-zinc-200'
+            }`}>
+              <CheckSquare className={`w-4 h-4 ${isLight ? 'text-amber-700' : 'text-[#FFAB00]'}`} />
               <span>{t('action.protocol')}</span>
             </h3>
-            <span className="text-[11px] font-mono text-slate-500">
+            <span className={`text-[11px] font-mono ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>
               {t('action.tapSteps')}
             </span>
           </div>
@@ -183,19 +212,23 @@ export const ActionCard: React.FC<ActionCardProps> = ({
                   onClick={() => toggleStep(idx)}
                   className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all duration-150 active:scale-[0.99] ${
                     isChecked
-                      ? 'bg-emerald-50 border-emerald-300 text-slate-500 line-through opacity-80'
-                      : 'bg-white hover:bg-slate-100/80 border-slate-200 text-slate-800 shadow-2xs'
+                      ? isLight
+                        ? 'bg-emerald-50 border-emerald-300 text-zinc-500 line-through opacity-80'
+                        : 'bg-emerald-950/20 border-emerald-800/40 text-zinc-400 line-through opacity-80'
+                      : isLight
+                      ? 'bg-white hover:bg-zinc-100/80 border-zinc-200 text-zinc-800 shadow-xs'
+                      : 'bg-[#111111] hover:bg-[#1A1A1A] border-[#2A2A2A] text-zinc-100'
                   }`}
                 >
                   <button className="mt-0.5 flex-shrink-0 focus:outline-none cursor-pointer">
                     {isChecked ? (
-                      <CheckSquare className="w-4 h-4 text-emerald-600" />
+                      <CheckSquare className="w-4 h-4 text-emerald-500" />
                     ) : (
-                      <Square className="w-4 h-4 text-slate-400" />
+                      <Square className={`w-4 h-4 ${isLight ? 'text-amber-700' : 'text-[#FFAB00]'}`} />
                     )}
                   </button>
                   <div className="flex-1 text-xs md:text-sm leading-relaxed">
-                    <span className="font-mono font-bold mr-2 text-blue-600">
+                    <span className={`font-mono font-bold mr-2 ${isLight ? 'text-amber-700' : 'text-[#FFAB00]'}`}>
                       0{idx + 1}.
                     </span>
                     <span>{step}</span>
@@ -211,21 +244,26 @@ export const ActionCard: React.FC<ActionCardProps> = ({
       <ReasonsList reasons={translatedReasons} />
 
       {/* 7. Bottom Quick Action Triggers */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2 border-t border-slate-200">
+      <div className={`grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2 border-t ${isLight ? 'border-zinc-200' : 'border-[#2A2A2A]'}`}>
         {onOpenShelters && (
           <HapticButton
             variant="secondary"
-            skeuomorphic={false}
             onClick={onOpenShelters}
-            className="w-full py-2.5 px-4 rounded-xl text-xs md:text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300"
+            className={`w-full py-2.5 px-4 rounded-xl text-xs md:text-sm font-semibold ${
+              isLight ? 'bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border-zinc-300' : ''
+            }`}
           >
-            <MapPin className="w-4 h-4 text-blue-600" />
+            <MapPin className={`w-4 h-4 ${isLight ? 'text-amber-700' : 'text-[#FFAB00]'}`} />
             <span>{t('action.shelters')}</span>
           </HapticButton>
         )}
         <a
           href="tel:199"
-          className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-extrabold text-xs md:text-sm bg-red-600 hover:bg-red-700 text-white shadow-sm shadow-red-200 transition-all hbtn"
+          className={`flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-bold text-xs md:text-sm shadow-md transition-all hbtn ${
+            isLight
+              ? 'bg-[#EF4444] hover:bg-[#FF3B30] text-white border border-[#EF4444]'
+              : 'bg-[#EF4444]/20 hover:bg-[#EF4444]/30 text-[#EF4444] hover:text-white border border-[#EF4444]/40 hover:border-[#EF4444]/60'
+          }`}
         >
           <PhoneCall className="w-4 h-4" />
           <span>{t('action.callDispatcher')}</span>

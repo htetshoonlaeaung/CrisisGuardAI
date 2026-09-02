@@ -1,0 +1,211 @@
+/* src/components/emergency/OfflineIndicator.module.css */
+/* Styling for offline status indicator */
+
+.container {
+  position: fixed;
+  z-index: 9999;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.container.top-left {
+  top: 12px;
+  left: 12px;
+}
+
+.container.top-right {
+  top: 12px;
+  right: 12px;
+}
+
+.container.bottom-left {
+  bottom: 12px;
+  left: 12px;
+}
+
+.container.bottom-right {
+  bottom: 12px;
+  right: 12px;
+}
+
+.indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.indicator:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+.icon {
+  font-size: 16px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+}
+
+.panel {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  min-width: 280px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  padding: 12px;
+  animation: slideDown 0.2s ease;
+  z-index: 10000;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.status {
+  margin-bottom: 12px;
+  padding: 12px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.statusRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.statusRow:last-child {
+  margin-bottom: 0;
+}
+
+.statusRow .label {
+  font-weight: 600;
+  color: #666;
+}
+
+.statusRow .value {
+  color: #333;
+  font-weight: 500;
+}
+
+.errorText {
+  color: #d32f2f;
+  font-weight: 500;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.button {
+  padding: 8px 12px;
+  background: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.button:hover:not(:disabled) {
+  background: #1565c0;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
+}
+
+.button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.info {
+  padding: 8px 12px;
+  background: #e3f2fd;
+  border-left: 3px solid #1976d2;
+  border-radius: 4px;
+}
+
+.infoText {
+  margin: 0;
+  font-size: 11px;
+  color: #1565c0;
+  line-height: 1.4;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 480px) {
+  .container {
+    top: 8px !important;
+    right: 8px !important;
+    left: auto !important;
+    bottom: auto !important;
+  }
+
+  .panel {
+    position: fixed;
+    top: auto !important;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    border-radius: 12px 12px 0 0;
+    min-width: unset;
+    width: 100%;
+    max-height: 70vh;
+    overflow-y: auto;
+    animation: slideUp 0.3s ease;
+  }
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  .indicator {
+    margin: 0;
+  }
+}

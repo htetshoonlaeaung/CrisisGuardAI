@@ -87,7 +87,11 @@ export const ShelterLocator: React.FC = () => {
         {/* Filter Controls */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
           <div>
+<<<<<<< HEAD
             <label className="block text-xs font-bold text-neutral-400 mb-1.5 uppercase">Emergency Specialization</label>
+=======
+            <label className="block text-xs font-bold text-neutral-400 mb-1.5">Emergency Specialization</label>
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
             <select
               id="shelter-domain-filter"
               value={disasterFilter}
@@ -103,7 +107,11 @@ export const ShelterLocator: React.FC = () => {
           </div>
 
           <div>
+<<<<<<< HEAD
             <label className="block text-xs font-bold text-neutral-400 mb-1.5 uppercase">Search Radius: {radiusKm} km</label>
+=======
+            <label className="block text-xs font-bold text-neutral-400 mb-1.5">Search Radius: {radiusKm} km</label>
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
             <input
               type="range"
               min="5"
@@ -155,7 +163,11 @@ export const ShelterLocator: React.FC = () => {
                           {s.distance_km} km away
                         </span>
                       </div>
+<<<<<<< HEAD
                       <h3 className="text-base font-black text-white mt-1.5">{s.name}</h3>
+=======
+                      <h3 className="text-base font-semibold text-white mt-1.5">{s.name}</h3>
+>>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
                       <p className="text-xs text-neutral-400 flex items-center gap-1 mt-1">
                         <MapPin className="w-3.5 h-3.5 text-neutral-500 shrink-0" />
                         {s.address}

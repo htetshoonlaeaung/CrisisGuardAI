@@ -1,0 +1,19 @@
+{
+  "name": "CrisisGuard AI",
+  "short_name": "CrisisGuard",
+  "description": "Intelligent crisis decision support",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#082b5c",
+  "theme_color": "#082b5c",
+  "icons": [
+    {
+      "src": "/crisisguard-logo.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

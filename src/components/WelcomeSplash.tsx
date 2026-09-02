@@ -51,7 +51,7 @@ export const WelcomeSplash: React.FC<WelcomeSplashProps> = ({ onContinue }) => {
             <img
               src="/crisisguard-logo.png"
               alt="CrisisGuard AI"
-              className="crisisguard-welcome-logo"
+              className={`crisisguard-welcome-logo ${isReady ? '' : 'is-spinning'}`}
             />
           </div>
 

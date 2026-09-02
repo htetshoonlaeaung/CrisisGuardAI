@@ -102,9 +102,7 @@ html.light-theme ::-webkit-scrollbar-thumb:hover {
 
 .crisisguard-welcome-page {
   align-items: center;
-  background:
-    radial-gradient(circle at 50% 16%, rgba(59, 130, 246, 0.2), transparent 32rem),
-    linear-gradient(145deg, #0F2742 0%, #155E9A 58%, #0F2742 100%);
+  background: #082B5C;
   color: #FFFFFF;
   display: flex;
   isolation: isolate;
@@ -197,12 +195,15 @@ html.light-theme ::-webkit-scrollbar-thumb:hover {
 }
 
 .crisisguard-welcome-logo {
-  animation: crisisguard-welcome-logo-intro 1.2s ease-out 1;
   display: block;
   height: 78%;
   object-fit: contain;
   transform-origin: center;
   width: 78%;
+}
+
+.crisisguard-welcome-logo.is-spinning {
+  animation: crisisguard-welcome-logo-spin 5s linear forwards;
 }
 
 .crisisguard-welcome-wordmark {
@@ -349,15 +350,13 @@ html.light-theme ::-webkit-scrollbar-thumb:hover {
   max-width: 42rem;
 }
 
-@keyframes crisisguard-welcome-logo-intro {
+@keyframes crisisguard-welcome-logo-spin {
   from {
-    opacity: 0;
-    transform: rotate(-360deg) scale(0.85);
+    transform: rotate(0deg);
   }
 
   to {
-    opacity: 1;
-    transform: rotate(0deg) scale(1);
+    transform: rotate(360deg);
   }
 }
 
@@ -429,8 +428,7 @@ html.light-theme ::-webkit-scrollbar-thumb:hover {
     scroll-behavior: auto;
   }
 
-  .crisisguard-welcome-logo,
-  .crisisguard-welcome-progress span {
+  .crisisguard-welcome-logo.is-spinning {
     animation: none;
   }
 

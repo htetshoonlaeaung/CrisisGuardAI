@@ -100,6 +100,35 @@ html.light-theme ::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 0, 0, 0.35);
 }
 
+.crisisguard-logo-flip {
+  animation: crisisguard-logo-flip 1.5s ease-in-out;
+  backface-visibility: visible;
+  display: inline-block;
+  transform-origin: center;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.crisisguard-logo-flip--repeat {
+  animation: crisisguard-logo-flip 1.666s ease-in-out 3 forwards;
+}
+
+.crisisguard-logo-flip.is-paused {
+  animation: none;
+  transform: none;
+}
+
+.crisisguard-logo-flip.is-paused:hover,
+.crisisguard-logo-flip.is-paused:focus {
+  animation: crisisguard-logo-flip 1.5s ease-in-out;
+}
+
+.crisisguard-logo-flip:focus-visible {
+  border-radius: 9999px;
+  outline: 3px solid rgba(232, 243, 250, 0.9);
+  outline-offset: 3px;
+}
+
 .crisisguard-welcome-page {
   align-items: center;
   background: #082B5C;
@@ -198,12 +227,7 @@ html.light-theme ::-webkit-scrollbar-thumb:hover {
   display: block;
   height: 78%;
   object-fit: contain;
-  transform-origin: center;
   width: 78%;
-}
-
-.crisisguard-welcome-logo.is-spinning {
-  animation: crisisguard-welcome-logo-spin 5s linear forwards;
 }
 
 .crisisguard-welcome-wordmark {
@@ -350,13 +374,17 @@ html.light-theme ::-webkit-scrollbar-thumb:hover {
   max-width: 42rem;
 }
 
-@keyframes crisisguard-welcome-logo-spin {
+@keyframes crisisguard-logo-flip {
   from {
-    transform: rotate(0deg);
+    transform: perspective(700px) rotateY(0deg);
+  }
+
+  50% {
+    transform: perspective(700px) rotateY(180deg);
   }
 
   to {
-    transform: rotate(360deg);
+    transform: perspective(700px) rotateY(360deg);
   }
 }
 
@@ -428,8 +456,9 @@ html.light-theme ::-webkit-scrollbar-thumb:hover {
     scroll-behavior: auto;
   }
 
-  .crisisguard-welcome-logo.is-spinning {
-    animation: none;
+  .crisisguard-logo-flip {
+    animation: none !important;
+    transform: none !important;
   }
 
   .crisisguard-welcome-actions,

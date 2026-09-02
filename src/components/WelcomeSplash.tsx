@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { CrisisGuardLogo } from './CrisisGuardLogo';
 
 interface WelcomeSplashProps {
   onContinue: () => void;
@@ -48,10 +49,11 @@ export const WelcomeSplash: React.FC<WelcomeSplashProps> = ({ onContinue }) => {
 
         <div className="crisisguard-welcome-brand" aria-label="CrisisGuard AI">
           <div className="crisisguard-welcome-logo-shell">
-            <img
-              src="/crisisguard-logo.png"
+            <CrisisGuardLogo
               alt="CrisisGuard AI"
-              className={`crisisguard-welcome-logo ${isReady ? '' : 'is-spinning'}`}
+              active={!isReady}
+              repeatWhileActive
+              className="crisisguard-welcome-logo"
             />
           </div>
 

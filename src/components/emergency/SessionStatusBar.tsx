@@ -4,6 +4,7 @@ import { SeverityBadge } from './SeverityBadge';
 import { useTheme } from '../../context/ThemeContext';
 import { HapticButton } from '../ui/HapticButton';
 import { useLanguage } from '../../context/LanguageContext';
+import { CrisisGuardLogo } from '../CrisisGuardLogo';
 import {
   Sparkles,
   PhoneCall,
@@ -146,10 +147,8 @@ export const SessionStatusBar: React.FC<SessionStatusBarProps> = ({
 
           <div className="flex min-w-0 items-center gap-2" aria-label="CrisisGuard AI">
             <div className="relative h-10 w-[39px] flex-shrink-0 overflow-hidden sm:h-11 sm:w-[43px] md:h-12 md:w-[47px]">
-              <img
-                src="/crisisguard-logo.png"
-                alt=""
-                aria-hidden="true"
+              <CrisisGuardLogo
+                alt="CrisisGuard AI logo"
                 className="h-full w-auto max-w-none object-contain object-left"
               />
             </div>

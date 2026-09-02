@@ -1,6 +1,7 @@
 import React from 'react';
 import { PhoneCall, Radio, AlertTriangle } from 'lucide-react';
 import { CrisisDomain } from '../../types';
+import { CrisisGuardLogo } from '../CrisisGuardLogo';
 
 interface HeaderProps {
   currentDomain: CrisisDomain;
@@ -57,8 +58,7 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Main Header Branding & Nav */}
       <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center">
-          <img
-            src="/crisisguard-logo.png"
+          <CrisisGuardLogo
             alt="CrisisGuard AI"
             className="h-10 w-auto max-w-[170px] object-contain sm:h-11 sm:max-w-[220px] md:h-12"
           />

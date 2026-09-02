@@ -21,6 +21,7 @@ import { SeverityBadge } from './SeverityBadge';
 import { HapticButton } from '../ui/HapticButton';
 import { useTheme } from '../../context/ThemeContext';
 import { useLanguage } from '../../context/LanguageContext';
+import { CrisisGuardLogo } from '../CrisisGuardLogo';
 
 interface CollapsibleSidebarProps {
   activeView: 'triage' | 'shelters' | 'scheduler' | 'audit' | 'status';
@@ -92,18 +93,15 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
         >
           <div className={`flex min-w-0 flex-col items-start overflow-hidden ${isCollapsed ? 'lg:items-center' : ''}`}>
             {isCollapsed ? (
-              <img
-                src="/crisisguard-logo.png"
+              <CrisisGuardLogo
                 alt="CrisisGuard AI"
                 className="h-11 w-auto max-w-[54px] object-contain object-left"
               />
             ) : (
               <div className="flex min-w-0 items-center gap-2.5 whitespace-nowrap" aria-label="CrisisGuard AI">
                 <div className="relative h-12 w-[47px] flex-shrink-0 overflow-hidden">
-                  <img
-                    src="/crisisguard-logo.png"
-                    alt=""
-                    aria-hidden="true"
+                  <CrisisGuardLogo
+                    alt="CrisisGuard AI logo"
                     className="h-full w-auto max-w-none object-contain object-left"
                   />
                 </div>

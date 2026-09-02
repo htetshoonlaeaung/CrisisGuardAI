@@ -134,7 +134,7 @@ export const offlineDbHelpers = {
   },
 
   async getPendingSyncItems(): Promise<SyncQueueItem[]> {
-    return await db.syncQueue.where('synced').equals(false).toArray();
+    return await db.syncQueue.filter(item => !item.synced).toArray();
   },
 
   async markAsSynced(id: number): Promise<void> {
@@ -170,5 +170,3 @@ export const offlineDbHelpers = {
   }
 };
 
-// Export types
-export type { OfflineSession, OfflineAuditTrail, CachedShelter, SyncQueueItem };

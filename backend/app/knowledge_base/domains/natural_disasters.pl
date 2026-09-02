@@ -1,11 +1,7 @@
 % backend/app/knowledge_base/domains/natural_disasters.pl
 % Natural disaster emergency decision rules for CrisisGuard AI.
 % Covers: Flood (rising water, single/multi-story), Earthquake (active shaking, post-quake gas leak),
-<<<<<<< HEAD
 %         Cyclone/Hurricane, Tsunami, Landslide.
-=======
-%         Cyclone, Tsunami, Landslide.
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
 
 :- module(disasters_kb, [disaster_eval/5]).
 
@@ -14,10 +10,7 @@ disaster_eval(Facts, evacuate_to_higher_ground_now, critical, Reasons, Prohibiti
     ( member(disaster(flood), Facts) ; member(flood(true), Facts) ),
     member(water_rising(true), Facts),
     member(building(single_story), Facts),
-<<<<<<< HEAD
     !,
-=======
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
     Reasons = [
         'Rapidly rising floodwaters in single-story structure create severe entrapment and drowning risk.',
         'Evacuate immediately on foot to elevated ground or designated high-altitude emergency shelter.'
@@ -32,10 +25,7 @@ disaster_eval(Facts, vertical_evacuation_to_upper_floors, high, Reasons, Prohibi
     ( member(disaster(flood), Facts) ; member(flood(true), Facts) ),
     member(water_rising(true), Facts),
     ( member(building(multi_story), Facts) ; member(building(high_rise), Facts) ),
-<<<<<<< HEAD
     !,
-=======
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
     Reasons = [
         'Floodwaters rising on ground level; upper structural floors remain dry and load-bearing.',
         'Move occupants, emergency supplies, and communications gear to second floor or roof access.'
@@ -49,10 +39,7 @@ disaster_eval(Facts, vertical_evacuation_to_upper_floors, high, Reasons, Prohibi
 disaster_eval(Facts, drop_cover_and_hold_on, critical, Reasons, Prohibitions) :-
     ( member(disaster(earthquake), Facts) ; member(earthquake(true), Facts) ),
     member(shaking(active), Facts),
-<<<<<<< HEAD
     !,
-=======
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
     Reasons = [
         'Violent ground motion and risk of non-structural falling debris.',
         'Drop to hands and knees, take cover under a sturdy desk or table, and hold on until shaking stops.'
@@ -67,10 +54,7 @@ disaster_eval(Facts, evacuate_and_shut_main_gas_valve, critical, Reasons, Prohib
     ( member(disaster(earthquake), Facts) ; member(earthquake(true), Facts) ),
     member(shaking(stopped), Facts),
     member(smell_gas(true), Facts),
-<<<<<<< HEAD
     !,
-=======
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
     Reasons = [
         'Post-earthquake gas pipe rupture detected.',
         'Shut off exterior master gas valve if safe to do so and evacuate immediately to open area.'
@@ -84,10 +68,7 @@ disaster_eval(Facts, evacuate_and_shut_main_gas_valve, critical, Reasons, Prohib
 disaster_eval(Facts, evacuate_inland_immediately, critical, Reasons, Prohibitions) :-
     ( member(disaster(tsunami), Facts) ; member(tsunami(true), Facts) ),
     ( member(coastal(true), Facts) ; member(proximity(coastal), Facts) ),
-<<<<<<< HEAD
     !,
-=======
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
     Reasons = [
         'High-velocity tsunami wave train imminent following seismic event.',
         'Move immediately at least 2 miles inland or to high ground at least 100 feet above sea level.'
@@ -97,7 +78,6 @@ disaster_eval(Facts, evacuate_inland_immediately, critical, Reasons, Prohibition
         'Do not wait for visual confirmation before beginning evacuation.'
     ].
 
-<<<<<<< HEAD
 % 6. CYCLONE / HURRICANE LANDFALL — Interior safe room
 disaster_eval(Facts, shelter_in_interior_windowless_room, critical, Reasons, Prohibitions) :-
     ( member(disaster(cyclone), Facts) ; member(disaster(hurricane), Facts) ; member(cyclone(true), Facts) ),
@@ -126,9 +106,6 @@ disaster_eval(Facts, evacuate_perpendicular_to_landslide_path, critical, Reasons
     ].
 
 % 8. GENERAL DISASTER FALLBACK
-=======
-% 6. GENERAL DISASTER FALLBACK
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
 disaster_eval(_Facts, seek_safe_shelter_and_monitor_emergency_broadcasts, high, Reasons, Prohibitions) :-
     Reasons = ['Natural disaster conditions detected. Seek certified storm/emergency shelter and monitor civil defense radio.'],
     Prohibitions = ['Do not travel on compromised bridges, coastal highways, or steep hillsides.'].

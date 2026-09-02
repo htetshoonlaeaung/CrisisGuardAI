@@ -15,6 +15,9 @@ import { DispatchScheduler } from './components/emergency/DispatchScheduler';
 import { AuditTrailPanel } from './components/emergency/AuditTrailPanel';
 import { StatusScreen } from './components/emergency/StatusScreen';
 import { ExplanationDrawer } from './components/emergency/ExplanationDrawer';
+import OfflineIndicator from './components/emergency/OfflineIndicator';
+import { offlineEvaluator } from './services/offlineEvaluator';
+import { offlineDataService } from './services/offlineDataService';
 
 const WELCOME_SESSION_KEY = 'crisisguard_welcome_completed';
 
@@ -66,18 +69,110 @@ function AppContent() {
     return typeof window !== 'undefined' ? window.innerWidth < 1024 : true;
   });
 
-  // Automatic initial evaluation on load
+  // Automatic initial evaluation on load with offline IndexedDB fallback
   const runEvaluation = async (domainToUse = domain, factsToUse = facts) => {
     setIsEvaluating(true);
     try {
+      // 1. Online attempt with FastAPI backend
       const res = await api.evaluateCrisis({
         session_token: sessionToken,
         domain: domainToUse,
         submitted_facts: factsToUse,
       });
       setLatestResult(res);
+
+      // Cache session and audit trail in IndexedDB asynchronously
+      offlineDataService.saveSession(sessionToken, domainToUse, factsToUse, res.severity).catch(console.error);
+      offlineDataService.saveAuditTrail(
+        sessionToken,
+        domainToUse,
+        res.action_headline,
+        res.severity,
+        res.reasons,
+        res.prohibited_actions,
+        factsToUse,
+        res.evaluation_latency_ms
+      ).catch(console.error);
     } catch (err) {
-      console.error('Evaluation error:', err);
+      console.warn('[OfflineFallback] Online evaluation unavailable, evaluating locally via IndexedDB:', err);
+      // 2. Offline evaluation fallback via client-side rule engine
+      const offlineResult = offlineEvaluator.evaluate(factsToUse);
+      if (offlineResult) {
+        const fallbackRes: EvaluateCrisisResponse = {
+          session_token: sessionToken,
+          domain: domainToUse,
+          severity: offlineResult.severity,
+          action_headline: offlineResult.action_headline,
+          step_by_step_instructions: offlineResult.step_by_step_instructions,
+          reasons: [
+            ...offlineResult.reasons,
+            'Evaluated locally on-device via IndexedDB offline rule engine.'
+          ],
+          prohibited_actions: offlineResult.prohibited_actions,
+          evaluation_latency_ms: offlineResult.evaluation_latency_ms || 2,
+          timestamp: new Date().toISOString(),
+          proof_tree: {
+            type: 'rule',
+            label: `offline_rule: ${offlineResult.action_headline}`,
+            details: `offline edge evaluation for ${domainToUse}`,
+            children: factsToUse.map((f) => ({ type: 'evidence', label: `${f.key}(${f.value})` }))
+          }
+        };
+        setLatestResult(fallbackRes);
+        // Persist session and audit trail in IndexedDB
+        await offlineDataService.saveSession(sessionToken, domainToUse, factsToUse, offlineResult.severity);
+        await offlineDataService.saveAuditTrail(
+          sessionToken,
+          domainToUse,
+          offlineResult.action_headline,
+          offlineResult.severity,
+          fallbackRes.reasons,
+          offlineResult.prohibited_actions,
+          factsToUse,
+          offlineResult.evaluation_latency_ms || 2
+        );
+      } else {
+        // Safe global fallback if no specific rule matched
+        const fallbackRes: EvaluateCrisisResponse = {
+          session_token: sessionToken,
+          domain: domainToUse,
+          severity: 'critical',
+          action_headline: 'call_emergency_services_immediately',
+          step_by_step_instructions: [
+            'Call 911 / 199 / 191 municipal emergency dispatch immediately',
+            'Provide exact location coordinates and visible landmarks',
+            'Do not leave victim unattended or enter hazardous areas'
+          ],
+          reasons: [
+            'Offline mode: Uncertain input pattern. Immediate municipal dispatch recommended.',
+            'First aid guidance persisted locally to IndexedDB.'
+          ],
+          prohibited_actions: [
+            'Do not administer prescription medications without physician guidance.',
+            'Do not enter hazardous areas.'
+          ],
+          evaluation_latency_ms: 2,
+          timestamp: new Date().toISOString(),
+          proof_tree: {
+            type: 'rule',
+            label: 'offline_fallback: SAFE_DEFAULT',
+            details: 'offline emergency safety invariant',
+            children: [{ type: 'safety_invariant', label: 'Fail-Safe Default Invariant' }]
+          }
+        };
+        setLatestResult(fallbackRes);
+        await offlineDataService.saveSession(sessionToken, domainToUse, factsToUse, 'critical');
+        await offlineDataService.saveAuditTrail(
+          sessionToken,
+          domainToUse,
+          'call_emergency_services_immediately',
+          'critical',
+          fallbackRes.reasons,
+          fallbackRes.prohibited_actions,
+          factsToUse,
+          2
+        );
+      }
     } finally {
       setIsEvaluating(false);
     }
@@ -289,6 +384,9 @@ function AppContent() {
             </span>
           </div>
         </footer>
+
+        {/* 5. OFFLINE INDEXEDDB STATUS BADGE & SYNC CONTROLS */}
+        <OfflineIndicator position="bottom-right" />
       </div>
     </div>
   );

@@ -51,5 +51,53 @@ export const api = {
     });
     if (!res.ok) throw new Error(`Failed to solve dispatch: ${res.statusText}`);
     return res.json();
+  },
+
+  async createSession(payload: { domain: string; facts?: any[] }): Promise<{ session_token: string; domain: string; created_at: string }> {
+    const res = await fetch('/api/v1/sessions/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ domain: payload.domain })
+    });
+    if (!res.ok) throw new Error(`Failed to create session: ${res.statusText}`);
+    return res.json();
+  },
+
+  async updateSession(token: string, payload: { facts?: any[]; current_severity?: string }): Promise<{ session_token: string }> {
+    const res = await fetch(`/api/v1/sessions/${token}/facts`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload.facts || [])
+    });
+    if (!res.ok) throw new Error(`Failed to update session facts: ${res.statusText}`);
+    return res.json();
+  },
+
+  async saveAudit(payload: any): Promise<{ audit_id?: number; success: boolean }> {
+    const res = await fetch('/api/v1/sync/batch', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        items: [{
+          client_id: `audit_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+          type: 'audit',
+          data: payload
+        }]
+      })
+    });
+    if (!res.ok) return { success: false };
+    const data = await res.json();
+    return { success: true, audit_id: data.results?.[0]?.server_id };
+  },
+
+  async syncBatch(items: any[]): Promise<any> {
+    const res = await fetch('/api/v1/sync/batch', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items })
+    });
+    if (!res.ok) throw new Error(`Sync batch failed: ${res.statusText}`);
+    return res.json();
   }
 };
+

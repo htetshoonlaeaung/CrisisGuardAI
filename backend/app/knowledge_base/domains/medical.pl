@@ -1,12 +1,8 @@
 % backend/app/knowledge_base/domains/medical.pl
 % Medical emergency decision rules for CrisisGuard AI.
 % Covers: Cardiac Arrest (CPR), Choking (Heimlich), Arterial Bleeding,
-<<<<<<< HEAD
 %         Stroke (FAST protocol), Severe Thermal/Chemical Burns,
 %         Anaphylactic Shock, Opioid/Toxin Overdose, Hypothermia.
-=======
-%         Stroke (FAST protocol), Severe Burns, Poisoning.
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
 
 :- module(medical_kb, [medical_eval/5]).
 
@@ -14,10 +10,7 @@
 medical_eval(Facts, begin_cpr_and_call_emergency, critical, Reasons, Prohibitions) :-
     member(unconscious(true), Facts),
     member(breathing(none), Facts),
-<<<<<<< HEAD
     !,
-=======
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
     Reasons = [
         'Victim is unconscious and unresponsive with absent respiration.',
         'Immediate chest compressions (100-120 BPM) required.',
@@ -29,7 +22,6 @@ medical_eval(Facts, begin_cpr_and_call_emergency, critical, Reasons, Prohibition
         'Do not leave victim unattended.'
     ].
 
-<<<<<<< HEAD
 % 2A. CHOKING (INFANT) — Back blows + Chest thrusts (NEVER Heimlich)
 medical_eval(Facts, perform_infant_choking_protocol, critical, Reasons, Prohibitions) :-
     ( member(symptom(choking), Facts) ; member(choking(true), Facts) ; member(airway_pass(blocked), Facts) ),
@@ -64,12 +56,6 @@ medical_eval(Facts, perform_heimlich_thrusts, critical, Reasons, Prohibitions) :
     ( member(symptom(choking), Facts) ; member(choking(true), Facts) ),
     member(airway_pass(blocked), Facts),
     !,
-=======
-% 2. CHOKING — blocked airway -> Heimlich
-medical_eval(Facts, perform_heimlich_thrusts, critical, Reasons, Prohibitions) :-
-    ( member(symptom(choking), Facts) ; member(choking(true), Facts) ),
-    member(airway_pass(blocked), Facts),
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
     Reasons = [
         'Complete airway obstruction detected.',
         'Deliver 5 sharp back blows between shoulder blades followed by 5 abdominal thrusts (Heimlich maneuver).'
@@ -79,7 +65,6 @@ medical_eval(Facts, perform_heimlich_thrusts, critical, Reasons, Prohibitions) :
         'Do not offer water or fluids while victim is choking.'
     ].
 
-<<<<<<< HEAD
 % 2D. CHOKING (PARTIAL OBSTRUCTION / MILD) — Encourage coughing
 medical_eval(Facts, encourage_forceful_coughing_and_monitor, high, Reasons, Prohibitions) :-
     ( member(symptom(choking), Facts) ; member(choking(true), Facts) ),
@@ -129,11 +114,6 @@ medical_eval(Facts, monitor_tourniquet_time_and_prevent_shock, high, Reasons, Pr
 medical_eval(Facts, apply_direct_pressure_and_tourniquet, critical, Reasons, Prohibitions) :-
     ( member(bleeding(severe_pulsing), Facts) ; member(bleeding(arterial), Facts) ; member(bleeding(severe), Facts) ),
     !,
-=======
-% 3. ARTERIAL BLEEDING — severe pulsing bleeding -> Tourniquet / Direct Pressure
-medical_eval(Facts, apply_direct_pressure_and_tourniquet, critical, Reasons, Prohibitions) :-
-    member(bleeding(severe_pulsing), Facts),
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
     Reasons = [
         'Pulsing or spurting blood indicates arterial laceration and life-threatening hemorrhage.',
         'Apply firm, continuous direct pressure with sterile gauze and apply a tourniquet 2-3 inches proximal to injury.'
@@ -143,7 +123,6 @@ medical_eval(Facts, apply_direct_pressure_and_tourniquet, critical, Reasons, Pro
         'Do not place tourniquet directly over a joint (elbow/knee).'
     ].
 
-<<<<<<< HEAD
 % 4A. STROKE (HYPERACUTE / KNOWN ONSET WINDOW) — Emergency Dispatch & Record LKW
 medical_eval(Facts, activate_hyperacute_stroke_protocol, critical, Reasons, Prohibitions) :-
     ( member(face_droop(true), Facts) ; member(arm_weakness(true), Facts) ; member(speech_difficulty(true), Facts) ; member(symptom(stroke), Facts) ; member(stroke(true), Facts) ),
@@ -176,11 +155,6 @@ medical_eval(Facts, position_in_recovery_and_protect_airway_stroke, critical, Re
 medical_eval(Facts, activate_stroke_emergency_dispatch, critical, Reasons, Prohibitions) :-
     ( member(face_droop(true), Facts) ; member(arm_weakness(true), Facts) ; member(speech_difficulty(true), Facts) ; member(symptom(stroke), Facts) ; member(stroke(true), Facts) ),
     !,
-=======
-% 4. STROKE — FAST symptoms -> Immediate transport
-medical_eval(Facts, activate_stroke_emergency_dispatch, critical, Reasons, Prohibitions) :-
-    ( member(face_droop(true), Facts) ; member(arm_weakness(true), Facts) ; member(speech_difficulty(true), Facts) ),
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
     Reasons = [
         'Positive F.A.S.T. stroke indicators observed (facial droop, arm weakness, or slurred speech).',
         'Time-critical brain ischemia suspected; immediate emergency transport to comprehensive stroke center required.'
@@ -190,7 +164,6 @@ medical_eval(Facts, activate_stroke_emergency_dispatch, critical, Reasons, Prohi
         'Do not allow patient to drive or walk unaided.'
     ].
 
-<<<<<<< HEAD
 % 4D. TRANSIENT ISCHEMIC ATTACK (TIA) — Urgent Neurovascular Evaluation
 medical_eval(Facts, urgent_stroke_center_evaluation_tia, high, Reasons, Prohibitions) :-
     ( member(symptom(tia), Facts) ; member(transient_ischemic_attack(true), Facts) ; member(stroke_symptoms(resolved), Facts) ),
@@ -236,12 +209,6 @@ medical_eval(Facts, cool_water_rinse_and_sterile_cover, high, Reasons, Prohibiti
     member(burn_type(thermal), Facts),
     ( member(burn_area(large), Facts) ; member(burn_area(major), Facts) ),
     !,
-=======
-% 5. SEVERE BURNS — Thermal large area
-medical_eval(Facts, cool_water_rinse_and_sterile_cover, high, Reasons, Prohibitions) :-
-    member(burn_type(thermal), Facts),
-    member(burn_area(large), Facts),
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
     Reasons = [
         'Extensive thermal burn injury detected.',
         'Cool the burn immediately under gentle cool running water for 10-20 minutes and cover with sterile dry dressing.'
@@ -251,7 +218,6 @@ medical_eval(Facts, cool_water_rinse_and_sterile_cover, high, Reasons, Prohibiti
         'Do not break intact blisters.'
     ].
 
-<<<<<<< HEAD
 % 8. OPIOID / TOXIN OVERDOSE — unresponsive + bradypnea -> Naloxone
 medical_eval(Facts, administer_naloxone_and_rescue_breathing, critical, Reasons, Prohibitions) :-
     ( member(substance(opioid), Facts) ; member(toxin(overdose), Facts) ),
@@ -281,9 +247,3 @@ is_elapsed_ge_2(Facts) :-
     ( number(Val) -> Val >= 2
     ; atom(Val) -> ( atom_number(Val, Num) -> Num >= 2 ; ( Val == '>=2' ; Val == two_or_more ) )
     ).
-=======
-% 6. GENERAL MEDICAL FALLBACK
-medical_eval(_Facts, call_emergency_services_immediately, critical, Reasons, Prohibitions) :-
-    Reasons = ['Uncertain or high-risk medical condition. Immediate dispatch of paramedic services recommended.'],
-    Prohibitions = ['Do not administer prescription medications without direct medical dispatch guidance.'].
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9

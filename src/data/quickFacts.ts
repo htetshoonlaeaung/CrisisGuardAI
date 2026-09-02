@@ -14,11 +14,7 @@ export const QUICK_FACTS: Record<CrisisDomain, QuickFactPreset[]> = {
     {
       id: 'med_cardiac',
       label: 'Cardiac Arrest',
-<<<<<<< HEAD
-      icon: 'HeartPulse',
-=======
       icon: '🫀',
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
       description: 'Unconscious + absent/agonal breathing',
       facts: [
         { key: 'unconscious', value: 'true' },
@@ -29,11 +25,7 @@ export const QUICK_FACTS: Record<CrisisDomain, QuickFactPreset[]> = {
     {
       id: 'med_arterial',
       label: 'Arterial Bleeding',
-<<<<<<< HEAD
-      icon: 'Droplet',
-=======
       icon: '🩸',
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
       description: 'Severe pulsing / pooling hemorrhage',
       facts: [{ key: 'bleeding', value: 'severe_pulsing' }],
       expectedSeverity: 'critical',
@@ -41,11 +33,7 @@ export const QUICK_FACTS: Record<CrisisDomain, QuickFactPreset[]> = {
     {
       id: 'med_choking',
       label: 'Choking / Blocked Airway',
-<<<<<<< HEAD
-      icon: 'Wind',
-=======
       icon: '😮‍💨',
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
       description: 'Unable to speak, cough, or breathe',
       facts: [
         { key: 'symptom', value: 'choking' },
@@ -56,11 +44,7 @@ export const QUICK_FACTS: Record<CrisisDomain, QuickFactPreset[]> = {
     {
       id: 'med_stroke',
       label: 'Stroke (F.A.S.T.)',
-<<<<<<< HEAD
-      icon: 'Brain',
-=======
       icon: '🧠',
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
       description: 'Facial droop, arm drift, speech slurred',
       facts: [
         { key: 'face_droop', value: 'true' },
@@ -71,11 +55,7 @@ export const QUICK_FACTS: Record<CrisisDomain, QuickFactPreset[]> = {
     {
       id: 'med_burns',
       label: 'Severe Burns',
-<<<<<<< HEAD
-      icon: 'Flame',
-=======
       icon: '🔥',
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
       description: 'Extensive thermal or chemical burn',
       facts: [
         { key: 'burn_type', value: 'thermal' },
@@ -86,11 +66,7 @@ export const QUICK_FACTS: Record<CrisisDomain, QuickFactPreset[]> = {
     {
       id: 'med_poison',
       label: 'Poisoning / Toxic Ingestion',
-<<<<<<< HEAD
-      icon: 'FlaskConical',
-=======
       icon: '🧪',
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
       description: 'Harmful chemical or substance ingestion',
       facts: [
         { key: 'toxic_substance', value: 'true' },
@@ -104,11 +80,7 @@ export const QUICK_FACTS: Record<CrisisDomain, QuickFactPreset[]> = {
     {
       id: 'fire_electrical',
       label: 'Electrical Fire',
-<<<<<<< HEAD
-      icon: 'Zap',
-=======
       icon: '⚡',
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
       description: 'Appliance/breaker fire — never use water',
       facts: [
         { key: 'hazard', value: 'fire' },
@@ -119,11 +91,7 @@ export const QUICK_FACTS: Record<CrisisDomain, QuickFactPreset[]> = {
     {
       id: 'fire_grease',
       label: 'Grease / Oil Cooktop Fire',
-<<<<<<< HEAD
-      icon: 'Flame',
-=======
       icon: '🍳',
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
       description: 'Pan fire on stove — steam explosion risk',
       facts: [
         { key: 'hazard', value: 'fire' },
@@ -134,11 +102,7 @@ export const QUICK_FACTS: Record<CrisisDomain, QuickFactPreset[]> = {
     {
       id: 'fire_gas_leak',
       label: 'Indoor Gas Leak',
-<<<<<<< HEAD
-      icon: 'Gauge',
-=======
       icon: '💨',
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
       description: 'Rotten egg smell — explosion hazard',
       facts: [
         { key: 'hazard', value: 'gas_leak' },
@@ -149,11 +113,7 @@ export const QUICK_FACTS: Record<CrisisDomain, QuickFactPreset[]> = {
     {
       id: 'fire_trapped',
       label: 'Structure Fire (Trapped)',
-<<<<<<< HEAD
-      icon: 'DoorClosed',
-=======
       icon: '🚪',
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
       description: 'Heavy smoke, primary exits blocked',
       facts: [
         { key: 'hazard', value: 'fire' },
@@ -167,11 +127,7 @@ export const QUICK_FACTS: Record<CrisisDomain, QuickFactPreset[]> = {
     {
       id: 'dis_flood_1floor',
       label: 'Flash Flood (Single Floor)',
-<<<<<<< HEAD
-      icon: 'Waves',
-=======
       icon: '🌊',
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
       description: 'Water rising rapidly on ground floor',
       facts: [
         { key: 'disaster', value: 'flood' },
@@ -183,11 +139,7 @@ export const QUICK_FACTS: Record<CrisisDomain, QuickFactPreset[]> = {
     {
       id: 'dis_earthquake_active',
       label: 'Active Earthquake Shaking',
-<<<<<<< HEAD
-      icon: 'Activity',
-=======
       icon: '🌍',
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
       description: 'Severe seismic tremor in progress',
       facts: [
         { key: 'disaster', value: 'earthquake' },
@@ -198,11 +150,7 @@ export const QUICK_FACTS: Record<CrisisDomain, QuickFactPreset[]> = {
     {
       id: 'dis_tsunami',
       label: 'Tsunami Warning / Surge',
-<<<<<<< HEAD
-      icon: 'Waves',
-=======
       icon: '🌊',
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
       description: 'Coastal water receding / inland surge threat',
       facts: [
         { key: 'disaster', value: 'tsunami' },
@@ -213,11 +161,7 @@ export const QUICK_FACTS: Record<CrisisDomain, QuickFactPreset[]> = {
     {
       id: 'dis_quake_gas',
       label: 'Post-Quake Gas Leak',
-<<<<<<< HEAD
-      icon: 'AlertTriangle',
-=======
       icon: '⚠️',
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
       description: 'Structural shift with strong gas odor',
       facts: [
         { key: 'disaster', value: 'earthquake' },
@@ -231,11 +175,7 @@ export const QUICK_FACTS: Record<CrisisDomain, QuickFactPreset[]> = {
     {
       id: 'road_unconscious',
       label: 'Unconscious Crash Victim',
-<<<<<<< HEAD
-      icon: 'Car',
-=======
       icon: '🚗',
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
       description: 'Non-responsive victim with potential spinal injury',
       facts: [
         { key: 'unconscious', value: 'true' },
@@ -246,11 +186,7 @@ export const QUICK_FACTS: Record<CrisisDomain, QuickFactPreset[]> = {
     {
       id: 'road_fire_trapped',
       label: 'Vehicle Fire (Entrapped)',
-<<<<<<< HEAD
-      icon: 'Flame',
-=======
       icon: '🔥',
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
       description: 'Burning vehicle cabin with trapped passenger',
       facts: [
         { key: 'vehicle_fire', value: 'true' },
@@ -261,11 +197,7 @@ export const QUICK_FACTS: Record<CrisisDomain, QuickFactPreset[]> = {
     {
       id: 'road_traffic_hazard',
       label: 'Highway Active Traffic Crash',
-<<<<<<< HEAD
-      icon: 'ShieldAlert',
-=======
       icon: '⚠️',
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
       description: 'High-speed roadway collision hazard',
       facts: [{ key: 'traffic_active', value: 'true' }],
       expectedSeverity: 'high',
@@ -273,11 +205,7 @@ export const QUICK_FACTS: Record<CrisisDomain, QuickFactPreset[]> = {
     {
       id: 'road_mci',
       label: 'Multi-Casualty Incident (MCI)',
-<<<<<<< HEAD
-      icon: 'Siren',
-=======
       icon: '🚑',
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
       description: 'Multiple injured victims needing START triage',
       facts: [{ key: 'casualties', value: 'multiple' }],
       expectedSeverity: 'high',

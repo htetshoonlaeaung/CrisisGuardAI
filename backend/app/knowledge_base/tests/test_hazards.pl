@@ -4,7 +4,6 @@
 % recommended for electrical or grease fires.
 
 :- begin_tests(hazards_tests).
-<<<<<<< HEAD
 :- use_module('../domains/fire_hazards.pl').
 
 test(electrical_fire_never_recommends_water) :-
@@ -60,12 +59,5 @@ test(unknown_hazard_fallback) :-
     Action == evacuate_and_call_fire_department,
     Severity == critical,
     member('Do not re-enter burning or hazardous structures under any circumstances.', Prohibitions).
-=======
-:- use_module('../domains/fire_hazards').
-
-% TODO: test(electrical_fire_never_recommends_water)
-% TODO: test(grease_fire_never_recommends_water)
-% TODO: test(gas_leak_prohibits_switches)
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
 
 :- end_tests(hazards_tests).

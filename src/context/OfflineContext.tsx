@@ -86,7 +86,7 @@ export const OfflineProvider: React.FC<OfflineProviderProps> = ({ children }) =>
     setSyncError(null);
 
     try {
-      const pendingItems = await db.syncQueue.where('synced').equals(false).toArray();
+      const pendingItems = await db.syncQueue.filter(item => !item.synced).toArray();
       
       if (pendingItems.length === 0) {
         setSyncStatus('idle');

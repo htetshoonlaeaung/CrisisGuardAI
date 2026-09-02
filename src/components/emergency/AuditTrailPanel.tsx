@@ -4,24 +4,16 @@ import { api } from '../../services/api';
 import { SeverityBadge } from './SeverityBadge';
 import { humanizeAction } from '../../utils/humanizeAction';
 import { HapticButton } from '../ui/HapticButton';
-<<<<<<< HEAD
-import { useLanguage } from '../../context/LanguageContext';
-import { History, Clock, Search, RefreshCw, AlertOctagon, Check } from 'lucide-react';
-=======
 import { useTheme } from '../../context/ThemeContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { History, Clock, Search, RefreshCw, AlertOctagon } from 'lucide-react';
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
 
 interface AuditTrailPanelProps {
   sessionToken?: string;
 }
 
 export const AuditTrailPanel: React.FC<AuditTrailPanelProps> = ({ sessionToken }) => {
-<<<<<<< HEAD
-=======
   const { isLight } = useTheme();
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
   const { t, td, tr, ta, language } = useLanguage();
   const [audits, setAudits] = useState<TriageAuditTrail[]>([]);
   const [loading, setLoading] = useState(true);
@@ -59,20 +51,6 @@ export const AuditTrailPanel: React.FC<AuditTrailPanelProps> = ({ sessionToken }
   });
 
   return (
-<<<<<<< HEAD
-    <div id="audit-trail-panel" className="space-y-4 text-slate-900">
-      {/* Header */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-4 md:p-6 shadow-sm space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <div className="flex items-center gap-2">
-              <History className="w-5 h-5 text-blue-600" />
-              <h2 className="text-lg md:text-xl font-extrabold tracking-tight text-slate-950">
-                {t('audit.title')}
-              </h2>
-            </div>
-            <p className="text-xs mt-0.5 text-slate-600">
-=======
     <div id="audit-trail-panel" className="space-y-4">
       {/* Header */}
       <div
@@ -89,23 +67,16 @@ export const AuditTrailPanel: React.FC<AuditTrailPanelProps> = ({ sessionToken }
               </h2>
             </div>
             <p className={`text-xs mt-0.5 ${isLight ? 'text-zinc-600' : 'text-zinc-400'}`}>
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
               {t('audit.desc')}
             </p>
           </div>
 
           <HapticButton
             variant="secondary"
-<<<<<<< HEAD
-            skeuomorphic={false}
-            onClick={fetchAudits}
-            className="p-2.5 rounded-xl text-xs font-semibold self-start sm:self-auto bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-800"
-=======
             onClick={fetchAudits}
             className={`p-2.5 rounded-xl text-xs font-semibold self-start sm:self-auto ${
               isLight ? 'bg-zinc-100 border-zinc-300 text-zinc-800' : 'text-[#FFAB00]'
             }`}
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
           >
             <RefreshCw className="w-3.5 h-3.5" />
             <span>{t('audit.refresh')}</span>
@@ -114,38 +85,23 @@ export const AuditTrailPanel: React.FC<AuditTrailPanelProps> = ({ sessionToken }
 
         {/* Search Filter */}
         <div className="relative">
-<<<<<<< HEAD
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-=======
           <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
           <input
             type="text"
             placeholder={t('audit.search')}
             value={filterQuery}
             onChange={(e) => setFilterQuery(e.target.value)}
-<<<<<<< HEAD
-            className="w-full border border-slate-300 bg-white text-xs md:text-sm rounded-xl pl-10 pr-4 py-2.5 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-600 font-sans shadow-2xs"
-=======
             className={`w-full border text-xs md:text-sm rounded-xl pl-10 pr-4 py-2.5 focus:outline-none font-sans ${
               isLight
                 ? 'bg-zinc-50 border-zinc-300 text-zinc-900 placeholder:text-zinc-400 focus:border-amber-600'
                 : 'bg-[#090909] border-[#2A2A2A] text-zinc-200 focus:border-[#FFAB00]'
             }`}
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
           />
         </div>
       </div>
 
       {/* Audit Entries List */}
       {loading ? (
-<<<<<<< HEAD
-        <div className="p-12 text-center text-xs font-mono rounded-2xl border border-slate-200 bg-white text-slate-500 shadow-sm">
-          {t('audit.loading')}
-        </div>
-      ) : filteredAudits.length === 0 ? (
-        <div className="p-12 text-center text-xs font-mono rounded-2xl border border-slate-200 bg-white text-slate-500 shadow-sm">
-=======
         <div
           className={`p-12 text-center text-xs font-mono rounded-2xl border ${
             isLight ? 'border-zinc-200 bg-white text-zinc-500' : 'border-[#2A2A2A] bg-[#111111] text-zinc-500'
@@ -159,7 +115,6 @@ export const AuditTrailPanel: React.FC<AuditTrailPanelProps> = ({ sessionToken }
             isLight ? 'border-zinc-200 bg-white text-zinc-500' : 'border-[#2A2A2A] bg-[#111111] text-zinc-500'
           }`}
         >
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
           {t('audit.empty')}
         </div>
       ) : (
@@ -168,30 +123,15 @@ export const AuditTrailPanel: React.FC<AuditTrailPanelProps> = ({ sessionToken }
             <div
               key={item.id}
               id={`audit-entry-${item.id}`}
-<<<<<<< HEAD
-              className="rounded-2xl border border-slate-200 bg-white hover:border-blue-300 p-4 md:p-5 shadow-sm space-y-3 transition-all"
-=======
               className={`rounded-2xl border p-4 md:p-5 shadow-lg space-y-3 transition-all ${
                 isLight
                   ? 'bg-white border-zinc-200 text-zinc-900 hover:border-amber-500 shadow-zinc-200/50'
                   : 'border-[#2A2A2A] bg-[#111111] hover:border-[#FFAB00]/50'
               }`}
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
             >
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-<<<<<<< HEAD
-                    <span className="text-xs font-mono text-slate-400">#{item.id}</span>
-                    <span className="text-xs font-mono uppercase px-2 py-0.5 rounded border bg-blue-50 border-blue-200 text-blue-900 font-bold">
-                      {td(item.domain)}
-                    </span>
-                    <span className="text-xs font-mono text-slate-500">
-                      {new Date(item.created_at).toLocaleTimeString()}
-                    </span>
-                  </div>
-                  <h3 className="font-extrabold text-base md:text-lg text-slate-950">
-=======
                     <span className="text-xs font-mono text-zinc-400">#{item.id}</span>
                     <span
                       className={`text-xs font-mono uppercase px-2 py-0.5 rounded border ${
@@ -207,17 +147,12 @@ export const AuditTrailPanel: React.FC<AuditTrailPanelProps> = ({ sessionToken }
                     </span>
                   </div>
                   <h3 className={`font-extrabold text-base md:text-lg ${isLight ? 'text-zinc-950' : 'text-white'}`}>
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
                     {language === 'my' ? ta(item.recommended_action) : humanizeAction(item.recommended_action)}
                   </h3>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <SeverityBadge severity={item.severity} size="sm" />
-<<<<<<< HEAD
-                  <span className="inline-flex items-center gap-1 text-xs font-mono px-2 py-1 rounded border bg-slate-100 border-slate-200 text-slate-700 shadow-2xs">
-                    <Clock className="w-3 h-3 text-slate-500" />
-=======
                   <span
                     className={`inline-flex items-center gap-1 text-xs font-mono px-2 py-1 rounded border ${
                       isLight
@@ -226,7 +161,6 @@ export const AuditTrailPanel: React.FC<AuditTrailPanelProps> = ({ sessionToken }
                     }`}
                   >
                     <Clock className="w-3 h-3" />
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
                     <span>{item.evaluation_latency_ms}ms</span>
                   </span>
                 </div>
@@ -234,14 +168,6 @@ export const AuditTrailPanel: React.FC<AuditTrailPanelProps> = ({ sessionToken }
 
               {/* Facts Snapshot */}
               {item.facts_snapshot && item.facts_snapshot.length > 0 && (
-<<<<<<< HEAD
-                <div className="p-2.5 rounded-xl border border-slate-200 bg-slate-50 flex flex-wrap items-center gap-1.5 shadow-2xs">
-                  <span className="text-[11px] font-mono mr-1 text-slate-500">{t('audit.facts')}</span>
-                  {item.facts_snapshot.map((f, i) => (
-                    <span
-                      key={i}
-                      className="text-[11px] font-mono px-2 py-0.5 rounded border bg-white border-slate-300 text-slate-800 font-semibold shadow-2xs"
-=======
                 <div
                   className={`p-2.5 rounded-xl border flex flex-wrap items-center gap-1.5 ${
                     isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-[#090909] border-[#2A2A2A]'
@@ -256,7 +182,6 @@ export const AuditTrailPanel: React.FC<AuditTrailPanelProps> = ({ sessionToken }
                           ? 'bg-white border-zinc-300 text-zinc-800 font-semibold'
                           : 'bg-[#1A1A1A] border-[#2A2A2A] text-zinc-200'
                       }`}
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
                     >
                       {f.key}={String(f.value)}
                     </span>
@@ -267,24 +192,13 @@ export const AuditTrailPanel: React.FC<AuditTrailPanelProps> = ({ sessionToken }
               {/* Reasons */}
               <div className="space-y-1 font-sans">
                 {item.reasons.slice(0, 2).map((r, i) => (
-<<<<<<< HEAD
-                  <div key={i} className="text-xs flex items-start gap-2 text-slate-700">
-                    <Check className="w-3.5 h-3.5 text-blue-600 mt-0.5 flex-shrink-0" />
-=======
                   <div key={i} className={`text-xs flex items-start gap-2 ${isLight ? 'text-zinc-700' : 'text-zinc-300'}`}>
                     <span className={`font-bold ${isLight ? 'text-amber-700' : 'text-[#FFAB00]'}`}>✓</span>
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
                     <span>{tr(item.recommended_action, 'reasons', i, r)}</span>
                   </div>
                 ))}
               </div>
 
-<<<<<<< HEAD
-              {/* Prohibitions */}
-              {item.prohibited_actions && item.prohibited_actions.length > 0 && (
-                <div className="text-xs p-2.5 rounded-lg flex items-start gap-2 border bg-red-50 border-red-200 text-red-900 shadow-2xs">
-                  <AlertOctagon className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
-=======
               {/* Prohibitions (Warnings strictly for real critical constraints) */}
               {item.prohibited_actions && item.prohibited_actions.length > 0 && (
                 <div className={`text-xs p-2.5 rounded-lg flex items-start gap-2 border ${
@@ -293,7 +207,6 @@ export const AuditTrailPanel: React.FC<AuditTrailPanelProps> = ({ sessionToken }
                     : 'text-[#EF4444] bg-[#EF4444]/10 border-[#EF4444]/30'
                 }`}>
                   <AlertOctagon className="w-4 h-4 text-[#EF4444] flex-shrink-0 mt-0.5" />
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
                   <span>
                     <strong>{t('audit.strict')}</strong> {tr(item.recommended_action, 'prohibitions', 0, item.prohibited_actions[0])}
                   </span>

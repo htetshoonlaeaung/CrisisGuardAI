@@ -1,11 +1,8 @@
 # backend/app/prolog/engine.py
 # Thread-safe PySwip bridge to embedded SWI-Prolog runtime with deterministic symbolic fallback.
 
-<<<<<<< HEAD
 import os
 import sys
-=======
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
 import threading
 import logging
 from pathlib import Path
@@ -40,7 +37,6 @@ class PrologEngineBridge:
         self._init_engine()
         self._initialized = True
 
-<<<<<<< HEAD
     @staticmethod
     def _setup_windows_swipl_paths():
         """
@@ -89,17 +85,12 @@ class PrologEngineBridge:
                 logger.info(f"SWI-Prolog configured at {home_dir}")
                 break
 
-=======
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
     def _init_engine(self):
         """
         Initializes the PySwip Prolog instance and consults core & domain .pl rulebases.
         """
         try:
-<<<<<<< HEAD
             self._setup_windows_swipl_paths()
-=======
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
             from pyswip import Prolog
             self.prolog = Prolog()
             self._load_knowledge_base()
@@ -156,11 +147,8 @@ class PrologEngineBridge:
             return "road_accident"
         if d in ("med", "medical", "first_aid"):
             return "medical"
-<<<<<<< HEAD
         if d in ("composite", "cross_domain", "multi_hazard", "compound", "all"):
             return "composite"
-=======
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
         return d
 
     def evaluate_crisis(self, domain: str, facts: List[Any]) -> Dict[str, Any]:
@@ -177,7 +165,6 @@ class PrologEngineBridge:
                 try:
                     results = list(self.prolog.query(query_str))
                     if results:
-<<<<<<< HEAD
                         parsed = PrologResultParser.parse_triage_result(results[0])
                         symbolic_meta = self._evaluate_symbolic(clean_domain, facts)
                         if not parsed.get("step_by_step_instructions"):
@@ -185,9 +172,6 @@ class PrologEngineBridge:
                         if not parsed.get("proof_tree"):
                             parsed["proof_tree"] = symbolic_meta.get("proof_tree", {})
                         return parsed
-=======
-                        return PrologResultParser.parse_triage_result(results[0])
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
                 except Exception as exc:
                     logger.error(f"PySwip query error: {exc}")
 
@@ -239,11 +223,7 @@ class PrologEngineBridge:
                     "proof_tree": {
                         "type": "rule",
                         "label": "medical_rule_01: CARDIAC_ARREST_CPR",
-<<<<<<< HEAD
                         "details": "unconscious(true) AND breathing(none) -> begin_cpr_and_call_emergency",
-=======
-                        "details": "unconscious(true) ∧ breathing(none) ⇒ begin_cpr_and_call_emergency",
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
                         "children": [
                             {"type": "evidence", "label": "unconscious(true)"},
                             {"type": "evidence", "label": "breathing(none)"},
@@ -252,7 +232,6 @@ class PrologEngineBridge:
                         ]
                     }
                 }
-<<<<<<< HEAD
             # 2A. Infant Choking
             if (fact_dict.get("symptom") == "choking" or fact_dict.get("choking") in ("true", "yes") or fact_dict.get("airway_pass") == "blocked") and fact_dict.get("patient_type") in ("infant", "baby") or fact_dict.get("age_group") == "infant" or fact_dict.get("age") == "infant":
                 return {
@@ -317,9 +296,6 @@ class PrologEngineBridge:
                     }
                 }
             # 2C. Choking Complete (Adult / Child)
-=======
-            # 2. Choking
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
             if fact_dict.get("symptom") == "choking" or fact_dict.get("choking") in ("true", "yes") or fact_dict.get("airway_pass") == "blocked":
                 return {
                     "action": "perform_heimlich_thrusts",
@@ -341,13 +317,8 @@ class PrologEngineBridge:
                     ],
                     "proof_tree": {
                         "type": "rule",
-<<<<<<< HEAD
                         "label": "medical_rule_02c: COMPLETE_AIRWAY_OBSTRUCTION",
                         "details": "symptom(choking) OR airway_pass(blocked) -> perform_heimlich_thrusts",
-=======
-                        "label": "medical_rule_02: COMPLETE_AIRWAY_OBSTRUCTION",
-                        "details": "symptom(choking) ∨ airway_pass(blocked) ⇒ perform_heimlich_thrusts",
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
                         "children": [
                             {"type": "evidence", "label": "airway_pass(blocked)"},
                             {"type": "deduction", "label": "Foreign body airway obstruction"},
@@ -355,7 +326,6 @@ class PrologEngineBridge:
                         ]
                     }
                 }
-<<<<<<< HEAD
             # 2D. Choking Partial / Mild
             if (fact_dict.get("symptom") == "choking" or fact_dict.get("choking") in ("true", "yes")) and (fact_dict.get("airway_pass") in ("partial", "mild") or fact_dict.get("coughing") in ("forceful", "true", "yes")):
                 return {
@@ -467,10 +437,6 @@ class PrologEngineBridge:
 
             # 3C. Arterial Bleeding (Initial Hemorrhage)
             if is_arterial_bleed:
-=======
-            # 3. Arterial Bleeding
-            if fact_dict.get("bleeding") in ("severe_pulsing", "arterial", "severe", "pulsing"):
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
                 return {
                     "action": "apply_direct_pressure_and_tourniquet",
                     "severity": "critical",
@@ -490,13 +456,8 @@ class PrologEngineBridge:
                     ],
                     "proof_tree": {
                         "type": "rule",
-<<<<<<< HEAD
                         "label": "medical_rule_03c: ARTERIAL_HEMORRHAGE",
                         "details": "bleeding(severe_pulsing) -> apply_direct_pressure_and_tourniquet",
-=======
-                        "label": "medical_rule_03: ARTERIAL_HEMORRHAGE",
-                        "details": "bleeding(severe_pulsing) ⇒ apply_direct_pressure_and_tourniquet",
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
                         "children": [
                             {"type": "evidence", "label": "bleeding(severe_pulsing)"},
                             {"type": "deduction", "label": "High-pressure arterial laceration"},
@@ -504,7 +465,6 @@ class PrologEngineBridge:
                         ]
                     }
                 }
-<<<<<<< HEAD
             # 4A. Stroke (Hyperacute Window)
             is_stroke = fact_dict.get("face_droop") in ("true", "yes") or fact_dict.get("arm_weakness") in ("true", "yes") or fact_dict.get("speech_difficulty") in ("true", "yes") or fact_dict.get("symptom") == "stroke" or fact_dict.get("stroke") in ("true", "yes")
             if is_stroke and (fact_dict.get("onset_time") in ("under_4_hours", "recent") or fact_dict.get("symptom_onset") == "under_3_hours" or fact_dict.get("onset_window") == "acute"):
@@ -570,10 +530,6 @@ class PrologEngineBridge:
                 }
             # 4C. Stroke (Standard FAST Dispatch)
             if is_stroke:
-=======
-            # 4. Stroke (FAST)
-            if fact_dict.get("face_droop") in ("true", "yes") or fact_dict.get("arm_weakness") in ("true", "yes") or fact_dict.get("speech_difficulty") in ("true", "yes"):
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
                 return {
                     "action": "activate_stroke_emergency_dispatch",
                     "severity": "critical",
@@ -593,13 +549,8 @@ class PrologEngineBridge:
                     ],
                     "proof_tree": {
                         "type": "rule",
-<<<<<<< HEAD
                         "label": "medical_rule_04c: STROKE_FAST_PROTOCOL",
                         "details": "face_droop(true) OR arm_weakness(true) OR speech_difficulty(true) -> activate_stroke_emergency_dispatch",
-=======
-                        "label": "medical_rule_04: STROKE_FAST_PROTOCOL",
-                        "details": "face_droop(true) ∨ arm_weakness(true) ∨ speech_difficulty(true) ⇒ activate_stroke_emergency_dispatch",
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
                         "children": [
                             {"type": "evidence", "label": "Positive FAST stroke signs"},
                             {"type": "deduction", "label": "Acute ischemic / hemorrhagic cerebrovascular event"},
@@ -607,7 +558,6 @@ class PrologEngineBridge:
                         ]
                     }
                 }
-<<<<<<< HEAD
             # 4D. Transient Ischemic Attack (TIA)
             if fact_dict.get("symptom") == "tia" or fact_dict.get("transient_ischemic_attack") in ("true", "yes") or fact_dict.get("stroke_symptoms") == "resolved":
                 return {
@@ -637,8 +587,6 @@ class PrologEngineBridge:
                         ]
                     }
                 }
-=======
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
             # 5. Severe Burns
             if fact_dict.get("burn_type") == "thermal" and fact_dict.get("burn_area") in ("large", "major", "extensive"):
                 return {
@@ -661,11 +609,7 @@ class PrologEngineBridge:
                     "proof_tree": {
                         "type": "rule",
                         "label": "medical_rule_05: EXTENSIVE_THERMAL_BURN",
-<<<<<<< HEAD
                         "details": "burn_type(thermal) AND burn_area(large) -> cool_water_rinse_and_sterile_cover",
-=======
-                        "details": "burn_type(thermal) ∧ burn_area(large) ⇒ cool_water_rinse_and_sterile_cover",
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
                         "children": [
                             {"type": "evidence", "label": "burn_type(thermal)"},
                             {"type": "deduction", "label": "Major dermis thermal injury"},
@@ -688,11 +632,7 @@ class PrologEngineBridge:
                 "proof_tree": {
                     "type": "rule",
                     "label": "medical_rule_fallback: GENERAL_DISPATCH",
-<<<<<<< HEAD
                     "details": "unknown_state -> call_emergency_services_immediately",
-=======
-                    "details": "unknown_state ⇒ call_emergency_services_immediately",
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
                     "children": [{"type": "safety_invariant", "label": "Safety Fallback Activated"}]
                 }
             }
@@ -723,11 +663,7 @@ class PrologEngineBridge:
                     "proof_tree": {
                         "type": "rule",
                         "label": "hazard_rule_01: ELECTRICAL_FIRE",
-<<<<<<< HEAD
                         "details": "hazard(fire) AND fire_source(electrical) -> isolate_main_power_and_use_co2_extinguisher",
-=======
-                        "details": "hazard(fire) ∧ fire_source(electrical) ⇒ isolate_main_power_and_use_co2_extinguisher",
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
                         "children": [
                             {"type": "evidence", "label": "fire_source(electrical)"},
                             {"type": "deduction", "label": "Live electrical current hazard"},
@@ -757,11 +693,7 @@ class PrologEngineBridge:
                     "proof_tree": {
                         "type": "rule",
                         "label": "hazard_rule_02: GREASE_FIRE",
-<<<<<<< HEAD
                         "details": "hazard(fire) AND fire_source(cooking_oil) -> cover_with_metal_lid_and_turn_off_burner",
-=======
-                        "details": "hazard(fire) ∧ fire_source(cooking_oil) ⇒ cover_with_metal_lid_and_turn_off_burner",
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
                         "children": [
                             {"type": "evidence", "label": "fire_source(cooking_oil)"},
                             {"type": "deduction", "label": "High-temperature oil combustion (>300C)"},
@@ -791,11 +723,7 @@ class PrologEngineBridge:
                     "proof_tree": {
                         "type": "rule",
                         "label": "hazard_rule_03: INDOOR_GAS_LEAK",
-<<<<<<< HEAD
                         "details": "hazard(gas_leak) AND location(indoors) -> evacuate_leave_doors_open_call_from_outside",
-=======
-                        "details": "hazard(gas_leak) ∧ location(indoors) ⇒ evacuate_leave_doors_open_call_from_outside",
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
                         "children": [
                             {"type": "evidence", "label": "hazard(gas_leak)"},
                             {"type": "deduction", "label": "Explosive fuel-air vapor mixture"},
@@ -825,11 +753,7 @@ class PrologEngineBridge:
                     "proof_tree": {
                         "type": "rule",
                         "label": "hazard_rule_04: BLOCKED_EGRESS_FIRE",
-<<<<<<< HEAD
                         "details": "hazard(fire) AND exit_blocked(true) -> seal_door_and_signal_from_window",
-=======
-                        "details": "hazard(fire) ∧ exit_blocked(true) ⇒ seal_door_and_signal_from_window",
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
                         "children": [
                             {"type": "evidence", "label": "exit_blocked(true)"},
                             {"type": "deduction", "label": "Structural egress barrier"},
@@ -837,7 +761,6 @@ class PrologEngineBridge:
                         ]
                     }
                 }
-<<<<<<< HEAD
             # 5A. Hazardous Chemical Spill (Flammable / Explosive)
             is_chemical = fact_dict.get("hazard") == "chemical_spill" or fact_dict.get("chemical_leak") in ("true", "yes") or fact_dict.get("spill_type") == "toxic_gas"
             if is_chemical and (fact_dict.get("chemical_type") in ("flammable", "fuel") or fact_dict.get("flammable_liquid") in ("true", "yes")):
@@ -991,8 +914,6 @@ class PrologEngineBridge:
                         ]
                     }
                 }
-=======
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
 
             return {
                 "action": "evacuate_and_call_fire_department",
@@ -1007,11 +928,7 @@ class PrologEngineBridge:
                 "proof_tree": {
                     "type": "rule",
                     "label": "hazard_rule_fallback: EVACUATE_FIRE_DEPT",
-<<<<<<< HEAD
                     "details": "hazard(unknown) -> evacuate_and_call_fire_department",
-=======
-                    "details": "hazard(unknown) ⇒ evacuate_and_call_fire_department",
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
                     "children": [{"type": "safety_invariant", "label": "Fire Evacuation Invariant"}]
                 }
             }
@@ -1042,11 +959,7 @@ class PrologEngineBridge:
                     "proof_tree": {
                         "type": "rule",
                         "label": "disaster_rule_01: RAPID_FLOOD_SINGLE_STORY",
-<<<<<<< HEAD
                         "details": "disaster(flood) AND water_rising(true) AND building(single_story) -> evacuate_to_higher_ground_now",
-=======
-                        "details": "disaster(flood) ∧ water_rising(true) ∧ building(single_story) ⇒ evacuate_to_higher_ground_now",
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
                         "children": [
                             {"type": "evidence", "label": "water_rising(true)"},
                             {"type": "deduction", "label": "Entrapment risk in single-story building"},
@@ -1076,11 +989,7 @@ class PrologEngineBridge:
                     "proof_tree": {
                         "type": "rule",
                         "label": "disaster_rule_02: FLOOD_VERTICAL_EVACUATION",
-<<<<<<< HEAD
                         "details": "disaster(flood) AND water_rising(true) AND building(multi_story) -> vertical_evacuation_to_upper_floors",
-=======
-                        "details": "disaster(flood) ∧ water_rising(true) ∧ building(multi_story) ⇒ vertical_evacuation_to_upper_floors",
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
                         "children": [
                             {"type": "evidence", "label": "building(multi_story)"},
                             {"type": "deduction", "label": "Upper floors load-bearing and secure"},
@@ -1110,11 +1019,7 @@ class PrologEngineBridge:
                     "proof_tree": {
                         "type": "rule",
                         "label": "disaster_rule_03: ACTIVE_EARTHQUAKE",
-<<<<<<< HEAD
                         "details": "disaster(earthquake) AND shaking(active) -> drop_cover_and_hold_on",
-=======
-                        "details": "disaster(earthquake) ∧ shaking(active) ⇒ drop_cover_and_hold_on",
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
                         "children": [
                             {"type": "evidence", "label": "shaking(active)"},
                             {"type": "deduction", "label": "High-velocity seismic ground motion"},
@@ -1144,11 +1049,7 @@ class PrologEngineBridge:
                     "proof_tree": {
                         "type": "rule",
                         "label": "disaster_rule_04: POST_QUAKE_GAS_RUPTURE",
-<<<<<<< HEAD
                         "details": "disaster(earthquake) AND shaking(stopped) AND smell_gas(true) -> evacuate_and_shut_main_gas_valve",
-=======
-                        "details": "disaster(earthquake) ∧ shaking(stopped) ∧ smell_gas(true) ⇒ evacuate_and_shut_main_gas_valve",
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
                         "children": [
                             {"type": "evidence", "label": "smell_gas(true)"},
                             {"type": "deduction", "label": "Seismic gas pipe compromise"},
@@ -1178,11 +1079,7 @@ class PrologEngineBridge:
                     "proof_tree": {
                         "type": "rule",
                         "label": "disaster_rule_05: TSUNAMI_EARLY_WARNING",
-<<<<<<< HEAD
                         "details": "disaster(tsunami) OR coastal(true) -> evacuate_inland_immediately",
-=======
-                        "details": "disaster(tsunami) ∨ coastal(true) ⇒ evacuate_inland_immediately",
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
                         "children": [
                             {"type": "evidence", "label": "disaster(tsunami)"},
                             {"type": "deduction", "label": "High-velocity seismic sea wave train"},
@@ -1204,11 +1101,7 @@ class PrologEngineBridge:
                 "proof_tree": {
                     "type": "rule",
                     "label": "disaster_rule_fallback: SEEK_SHELTER",
-<<<<<<< HEAD
                     "details": "disaster(unknown) -> seek_safe_shelter_and_monitor_emergency_broadcasts",
-=======
-                    "details": "disaster(unknown) ⇒ seek_safe_shelter_and_monitor_emergency_broadcasts",
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
                     "children": [{"type": "safety_invariant", "label": "Storm Shelter Protocol"}]
                 }
             }
@@ -1239,11 +1132,7 @@ class PrologEngineBridge:
                     "proof_tree": {
                         "type": "rule",
                         "label": "road_rule_01: CRASH_CARDIAC_ARREST",
-<<<<<<< HEAD
                         "details": "unconscious(true) AND breathing(none) -> begin_cpr_do_not_move_spine",
-=======
-                        "details": "unconscious(true) ∧ breathing(none) ⇒ begin_cpr_do_not_move_spine",
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
                         "children": [
                             {"type": "evidence", "label": "unconscious(true)"},
                             {"type": "evidence", "label": "breathing(none)"},
@@ -1274,11 +1163,7 @@ class PrologEngineBridge:
                     "proof_tree": {
                         "type": "rule",
                         "label": "road_rule_02: VEHICLE_FIRE_ENTRAPMENT",
-<<<<<<< HEAD
                         "details": "vehicle_fire(true) AND trapped(true) -> call_rescue_and_maintain_safe_distance",
-=======
-                        "details": "vehicle_fire(true) ∧ trapped(true) ⇒ call_rescue_and_maintain_safe_distance",
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
                         "children": [
                             {"type": "evidence", "label": "vehicle_fire(true)"},
                             {"type": "evidence", "label": "trapped(true)"},
@@ -1309,11 +1194,7 @@ class PrologEngineBridge:
                     "proof_tree": {
                         "type": "rule",
                         "label": "road_rule_03: MASS_CASUALTY_START_TRIAGE",
-<<<<<<< HEAD
                         "details": "multiple_victims(true) OR mass_casualty(true) -> triage_by_severity_and_call_mass_casualty_dispatch",
-=======
-                        "details": "multiple_victims(true) ∨ mass_casualty(true) ⇒ triage_by_severity_and_call_mass_casualty_dispatch",
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
                         "children": [
                             {"type": "evidence", "label": "multiple_victims(true)"},
                             {"type": "deduction", "label": "Multi-victim incident exceeding immediate unit capacity"},
@@ -1343,11 +1224,7 @@ class PrologEngineBridge:
                     "proof_tree": {
                         "type": "rule",
                         "label": "road_rule_04: TRAFFIC_SCENE_SAFETY",
-<<<<<<< HEAD
                         "details": "hazard(traffic) OR active_traffic(true) -> establish_safety_perimeter_before_aid",
-=======
-                        "details": "hazard(traffic) ∨ active_traffic(true) ⇒ establish_safety_perimeter_before_aid",
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
                         "children": [
                             {"type": "evidence", "label": "hazard(traffic)"},
                             {"type": "deduction", "label": "Secondary high-speed vehicle impact risk"},
@@ -1369,16 +1246,11 @@ class PrologEngineBridge:
                 "proof_tree": {
                     "type": "rule",
                     "label": "road_rule_fallback: SCENE_SECURE",
-<<<<<<< HEAD
                     "details": "road_accident(general) -> secure_scene_and_call_emergency_dispatch",
-=======
-                    "details": "road_accident(general) ⇒ secure_scene_and_call_emergency_dispatch",
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
                     "children": [{"type": "safety_invariant", "label": "Road Accident Scene Security"}]
                 }
             }
 
-<<<<<<< HEAD
         # ==============================================================
         # DOMAIN: COMPOSITE / CROSS-DOMAIN CASCADING CRISIS
         # ==============================================================
@@ -1494,8 +1366,6 @@ class PrologEngineBridge:
                 }
             }
 
-=======
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
         return self._safe_fallback()
 
     def _safe_fallback(self, reason: str = "") -> Dict[str, Any]:
@@ -1521,11 +1391,7 @@ class PrologEngineBridge:
             "proof_tree": {
                 "type": "rule",
                 "label": "global_fallback_rule: SAFE_DEFAULT",
-<<<<<<< HEAD
                 "details": "unknown_scenario -> call_emergency_services_immediately",
-=======
-                "details": "unknown_scenario ⇒ call_emergency_services_immediately",
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
                 "children": [{"type": "safety_invariant", "label": "Fail-Safe Default Invariant"}]
             }
         }

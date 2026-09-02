@@ -4,7 +4,6 @@
 % that safety prohibitions are always present in critical outcomes.
 
 :- begin_tests(medical_tests).
-<<<<<<< HEAD
 :- use_module('../domains/medical.pl').
 
 test(cardiac_arrest_triggers_cpr) :-
@@ -116,13 +115,5 @@ test(unknown_medical_fallback) :-
     once(medical_eval([symptom(unknown_case)], Action, Severity, _Reasons, _Prohibitions)),
     Action == call_emergency_services_immediately,
     Severity == critical.
-=======
-:- use_module('../domains/medical').
-
-% TODO: test(cardiac_arrest_triggers_cpr)
-% TODO: test(stroke_fast_dispatches_correctly)
-% TODO: test(stroke_prohibits_aspirin)
-% TODO: test(bleeding_triggers_tourniquet)
->>>>>>> 1f78cff6a42a99d4ddfd96b4b6bd6f6380d68fa9
 
 :- end_tests(medical_tests).

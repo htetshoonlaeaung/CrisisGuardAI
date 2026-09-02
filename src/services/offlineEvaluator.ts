@@ -170,6 +170,40 @@ class OfflineEvaluator {
     return null;
   }
 
+  // RULE 5: Stroke (F.A.S.T.)
+  private evaluateStroke(facts: FactItem[]): OfflineEvaluationResult | null {
+    const faceDroop = this.parseFactValue(this.getFact(facts, 'face_droop'));
+    const armWeakness = this.parseFactValue(this.getFact(facts, 'arm_weakness'));
+    const speechDiff = this.parseFactValue(this.getFact(facts, 'speech_difficulty'));
+
+    if (faceDroop || armWeakness || speechDiff) {
+      return {
+        severity: 'critical',
+        action_headline: 'activate_stroke_emergency_dispatch',
+        step_by_step_instructions: [
+          'Call 911 / emergency services immediately for acute stroke transfer',
+          'Note the exact time symptoms first started',
+          'Keep patient in comfortable seated or slightly elevated position',
+          'Do NOT give patient anything to eat or drink',
+          'Monitor breathing and level of consciousness continuously',
+          'Prepare for paramedic handover at entrance',
+        ],
+        reasons: [
+          'Positive F.A.S.T. stroke indicators observed (facial droop, arm weakness, or slurred speech)',
+          'Time-critical brain ischemia suspected; immediate transport to comprehensive stroke center required',
+        ],
+        prohibited_actions: [
+          'Do NOT administer aspirin or blood thinners without hospital CT scan',
+          'Do NOT allow patient to drive or walk unaided',
+          'Do NOT give water, food, or oral medications (choking risk)',
+        ],
+        evaluation_latency_ms: Date.now() - this.startTime,
+        offline_mode: true,
+      };
+    }
+    return null;
+  }
+
   // RULE 6: Anaphylaxis
   private evaluateAnaphylaxis(facts: FactItem[]): OfflineEvaluationResult | null {
     const allergy = this.parseFactValue(this.getFact(facts, 'allergic_reaction'));

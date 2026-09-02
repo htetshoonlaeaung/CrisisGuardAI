@@ -64,7 +64,7 @@ hazard_eval(Facts, seal_door_and_signal_from_window, critical, Reasons, Prohibit
 % 5A. HAZARDOUS CHEMICAL SPILL (FLAMMABLE / EXPLOSIVE VAPORS)
 hazard_eval(Facts, eliminate_all_ignition_sources_and_isolate_perimeter, critical, Reasons, Prohibitions) :-
     ( member(hazard(chemical_spill), Facts) ; member(chemical_leak(true), Facts) ),
-    ( member(chemical_type(flammable), Facts) ; member(chemical_type(fuel), Facts) ; member(flammable_liquid(true), Facts) ),
+    ( member(chemical_type(flammable), Facts) ; member(chemical_type(flammable_vapor), Facts) ; member(chemical_type(fuel), Facts) ; member(chemical_type(explosive), Facts) ; member(flammable_liquid(true), Facts) ),
     !,
     Reasons = [
         'Volatile flammable chemical liquid spill presents immediate ignition, deflagration, and BLEVE explosion risk.',

@@ -5,6 +5,8 @@
 :- module(xai_explainer, [
     generate_xai_proof/3,
     explain_triage/5,
+    explain_composite_triage/5,
+    explain_composite_triage/4,
     prove/3
 ]).
 
@@ -207,6 +209,16 @@ explain_triage(fire_hazard, _Facts, Action, critical, ProofTree) :-
         ['Hazardous materials spill detected requiring certified HazMat containment']
     ).
 
+explain_triage(composite, _Facts, Action, Severity, ProofTree) :-
+    !,
+    ProofTree = proof_tree(
+        'composite_rule_cross_domain: MULTI_HAZARD_CONFLICT_ARBITRATION',
+        Action,
+        [evidence(compound_emergency(true))],
+        'Compound Incident Command: Immediate environmental and explosive hazards preempt localized care; all domain safety invariants enforced',
+        ['Cascading cross-domain hazards reconciled by urgency hierarchy', severity(Severity)]
+    ).
+
 explain_triage(Domain, _Facts, Action, Severity, ProofTree) :-
     ProofTree = proof_tree(
         'symbolic_rule_general',
@@ -215,6 +227,28 @@ explain_triage(Domain, _Facts, Action, Severity, ProofTree) :-
         'Standard Life-Safety Invariant Enforced',
         ['Deterministic rule evaluation completed', severity(Severity)]
     ).
+
+% Explains compound / multi-hazard conflict resolution from collected evaluations
+explain_composite_triage(Evaluations, PrimaryAction, Severity, ProofTree) :-
+    maplist(format_eval_evidence, Evaluations, Evidences),
+    ProofTree = proof_tree(
+        'composite_rule_cross_domain: MULTI_HAZARD_CONFLICT_ARBITRATION',
+        PrimaryAction,
+        Evidences,
+        'Hierarchical incident command priority: Life-safety environmental and explosive threats preempt localized procedures; all active prohibitions aggregated',
+        ['Cross-domain cascading emergency evaluated', severity(Severity), primary_action(PrimaryAction)]
+    ).
+
+explain_composite_triage(Facts, PrimaryAction, Severity, CombinedProhibitions, ProofTree) :-
+    ProofTree = proof_tree(
+        'composite_rule_cross_domain: MULTI_HAZARD_CONFLICT_ARBITRATION',
+        PrimaryAction,
+        [evidence(compound_emergency(true)), evidence(facts(Facts))],
+        'Compound Incident Command: Catastrophic environmental/blast threat evacuation takes precedence; all domain safety invariants enforced',
+        ['Cascading cross-domain hazards reconciled by urgency hierarchy', severity(Severity), aggregated_prohibitions(CombinedProhibitions)]
+    ).
+
+format_eval_evidence(eval(Domain, Action, Sev, _, _), evidence(active_hazard(Domain, Action, Sev))).
 
 % Meta-interpreter proof generator
 generate_xai_proof(Goal, Facts, ProofTree) :-

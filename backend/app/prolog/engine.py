@@ -147,6 +147,8 @@ class PrologEngineBridge:
             return "road_accident"
         if d in ("med", "medical", "first_aid"):
             return "medical"
+        if d in ("composite", "cross_domain", "multi_hazard", "compound", "all"):
+            return "composite"
         return d
 
     def evaluate_crisis(self, domain: str, facts: List[Any]) -> Dict[str, Any]:
@@ -1246,6 +1248,121 @@ class PrologEngineBridge:
                     "label": "road_rule_fallback: SCENE_SECURE",
                     "details": "road_accident(general) -> secure_scene_and_call_emergency_dispatch",
                     "children": [{"type": "safety_invariant", "label": "Road Accident Scene Security"}]
+                }
+            }
+
+        # ==============================================================
+        # DOMAIN: COMPOSITE / CROSS-DOMAIN CASCADING CRISIS
+        # ==============================================================
+        if clean_domain == "composite":
+            evaluations = []
+            for d in ("fire_hazard", "natural_disaster", "medical", "road_accident"):
+                res = self._evaluate_symbolic(d, facts)
+                act = res.get("action")
+                if act not in (
+                    "call_emergency_services_immediately",
+                    "evacuate_and_call_fire_department",
+                    "seek_safe_shelter_and_monitor_emergency_broadcasts",
+                    "secure_scene_and_call_emergency_dispatch"
+                ):
+                    evaluations.append((d, res))
+
+            if not evaluations:
+                return self._safe_fallback("No specific cross-domain rules matched.")
+
+            tier_map = {
+                # Tier 1
+                "evacuate_leave_doors_open_call_from_outside": 1,
+                "eliminate_all_ignition_sources_and_isolate_perimeter": 1,
+                "evacuate_upwind_uphill_and_shelter_in_place_downwind": 1,
+                "isolate_corrosive_spill_and_prevent_water_reaction": 1,
+                "evacuate_upwind_and_call_hazmat": 1,
+                "seal_door_and_signal_from_window": 1,
+                "execute_wildfire_evacuation_order": 1,
+                "evacuate_and_shut_main_gas_valve": 1,
+                "evacuate_inland_immediately": 1,
+                "escape_submerged_vehicle_immediately": 1,
+                "call_rescue_and_maintain_safe_distance": 1,
+                "isolate_tanker_hazard_perimeter": 1,
+                "evacuate_to_higher_ground_now": 1,
+                "evacuate_perpendicular_to_landslide_path": 1,
+                # Tier 2
+                "begin_cpr_and_call_emergency": 2,
+                "begin_cpr_do_not_move_spine": 2,
+                "perform_infant_choking_protocol": 2,
+                "choking_unconscious_begin_cpr_with_airway_check": 2,
+                "perform_heimlich_thrusts": 2,
+                "apply_second_proximal_tourniquet": 2,
+                "apply_direct_pressure_and_tourniquet": 2,
+                "administer_epinephrine_auto_injector": 2,
+                "activate_hyperacute_stroke_protocol": 2,
+                "position_in_recovery_and_protect_airway_stroke": 2,
+                "copius_water_flush_chemical_burn": 2,
+                "administer_naloxone_and_rescue_breathing": 2,
+                "triage_by_severity_and_call_mass_casualty_dispatch": 2,
+                # Tier 3
+                "isolate_main_power_and_use_co2_extinguisher": 3,
+                "cover_with_metal_lid_and_turn_off_burner": 3,
+                "vertical_evacuation_to_upper_floors": 3,
+                # Tier 4
+                "drop_cover_and_hold_on": 4,
+                "shelter_in_interior_windowless_room": 4,
+                "establish_safety_perimeter_before_aid": 4,
+                "encourage_forceful_coughing_and_monitor": 4,
+                "cool_water_rinse_and_sterile_cover": 4,
+                "urgent_stroke_center_evaluation_tia": 4,
+                "monitor_tourniquet_time_and_prevent_shock": 4,
+                "activate_stroke_emergency_dispatch": 4,
+            }
+            dom_precedence = {"fire_hazard": 1, "natural_disaster": 2, "medical": 3, "road_accident": 4}
+            sev_rank = {"critical": 1, "high": 2, "moderate": 3, "low": 4, "informational": 5}
+
+            def eval_sort_key(item):
+                dom, res = item
+                act = res.get("action", "")
+                tier = tier_map.get(act, 5)
+                sev = sev_rank.get(res.get("severity", "critical"), 5)
+                d_rank = dom_precedence.get(dom, 5)
+                return (tier, sev, d_rank)
+
+            sorted_evals = sorted(evaluations, key=eval_sort_key)
+            top_dom, top_res = sorted_evals[0]
+
+            all_prohibs = []
+            for _, res in sorted_evals:
+                for p in res.get("prohibited_actions", []):
+                    if p not in all_prohibs:
+                        all_prohibs.append(p)
+
+            combined_reasons = []
+            if len(sorted_evals) > 1:
+                combined_reasons.append(
+                    f"COMPOUND EMERGENCY RESOLUTION: Multiple hazard domains active ({len(sorted_evals)-1} secondary threats identified). "
+                    f"Primary action ({top_res.get('action')} from {top_dom}) prioritized according to life-safety hierarchy."
+                )
+            combined_reasons.extend(top_res.get("reasons", []))
+            for dom, res in sorted_evals[1:]:
+                combined_reasons.append(
+                    f"Concurrent Threat ({dom}, Severity: {res.get('severity')}): Subordinated directive is {res.get('action')}. "
+                    f"Ensure all aggregated safety prohibitions are observed."
+                )
+
+            severities = [res.get("severity") for _, res in sorted_evals]
+            combined_sev = "critical" if "critical" in severities else ("high" if "high" in severities else "moderate")
+
+            return {
+                "action": top_res.get("action"),
+                "severity": combined_sev,
+                "step_by_step_instructions": top_res.get("step_by_step_instructions", []),
+                "reasons": combined_reasons,
+                "prohibited_actions": all_prohibs,
+                "proof_tree": {
+                    "type": "rule",
+                    "label": "composite_rule_cross_domain: MULTI_HAZARD_CONFLICT_ARBITRATION",
+                    "details": f"Compound crisis -> {top_res.get('action')}",
+                    "children": [
+                        {"type": "evidence", "label": f"{d}:{r.get('action')}"} for d, r in sorted_evals
+                    ] + [{"type": "safety_invariant", "label": "All Domain Invariants Aggregated"}]
                 }
             }
 

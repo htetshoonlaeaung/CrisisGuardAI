@@ -4,6 +4,7 @@ import { api } from './services/api';
 import { QuickFactPreset } from './data/quickFacts';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
+import { WelcomeSplash } from './components/WelcomeSplash';
 import { CollapsibleSidebar } from './components/emergency/CollapsibleSidebar';
 import { SessionStatusBar } from './components/emergency/SessionStatusBar';
 import { FactInputPanel } from './components/emergency/FactInputPanel';
@@ -14,6 +15,28 @@ import { DispatchScheduler } from './components/emergency/DispatchScheduler';
 import { AuditTrailPanel } from './components/emergency/AuditTrailPanel';
 import { StatusScreen } from './components/emergency/StatusScreen';
 import { ExplanationDrawer } from './components/emergency/ExplanationDrawer';
+
+const WELCOME_SESSION_KEY = 'crisisguard_welcome_completed';
+
+function hasCompletedWelcome(): boolean {
+  try {
+    return sessionStorage.getItem(WELCOME_SESSION_KEY) === 'true';
+  } catch {
+    return false;
+  }
+}
+
+function storeWelcomeCompletion() {
+  try {
+    sessionStorage.setItem(WELCOME_SESSION_KEY, 'true');
+  } catch {
+    // If sessionStorage is unavailable, navigation should still work.
+  }
+}
+
+function getCurrentPath(): string {
+  return typeof window === 'undefined' ? '/' : window.location.pathname;
+}
 
 function AppContent() {
   const { themeMode, isLight } = useTheme();
@@ -272,10 +295,43 @@ function AppContent() {
 }
 
 export function App() {
+  const [path, setPath] = useState(getCurrentPath);
+  const [welcomeComplete, setWelcomeComplete] = useState(hasCompletedWelcome);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      setPath(getCurrentPath());
+      setWelcomeComplete(hasCompletedWelcome());
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  useEffect(() => {
+    if (path === '/' && welcomeComplete) {
+      window.history.replaceState(null, '', '/login');
+      setPath('/login');
+    }
+  }, [path, welcomeComplete]);
+
+  const navigateToLogin = () => {
+    storeWelcomeCompletion();
+    setWelcomeComplete(true);
+    window.history.pushState(null, '', '/login');
+    setPath('/login');
+  };
+
+  const shouldShowWelcome = path === '/' && !welcomeComplete;
+
   return (
     <ThemeProvider>
       <LanguageProvider>
-        <AppContent />
+        {shouldShowWelcome ? (
+          <WelcomeSplash onContinue={navigateToLogin} />
+        ) : (
+          <AppContent />
+        )}
       </LanguageProvider>
     </ThemeProvider>
   );

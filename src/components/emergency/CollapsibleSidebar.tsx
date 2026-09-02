@@ -11,7 +11,6 @@ import {
   ChevronRight,
   Sun,
   Moon,
-  AlertTriangle,
   Copy,
   Check,
   X
@@ -105,7 +104,7 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
                     className="h-full w-auto max-w-none object-contain object-left"
                   />
                 </div>
-                <div className="flex items-baseline text-[20px] font-bold leading-none">
+                <div className="flex items-baseline text-[20px] font-black leading-none">
                   <span className="text-[#0B2F63]">CrisisGuard</span>
                   <span className="text-[#EF233C]">AI</span>
                 </div>
@@ -315,7 +314,7 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
           )}
           <div
             className={`${
-              isCollapsed ? 'flex flex-col gap-1' : 'grid grid-cols-3 gap-1'
+              isCollapsed ? 'flex flex-col gap-1' : 'grid grid-cols-2 gap-1'
             } p-1 rounded-xl border ${
               isLight ? 'bg-zinc-200/80 border-zinc-300' : 'bg-[#111111] border-[#2A2A2A]'
             }`}
@@ -343,16 +342,6 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
               title={t('common.lightMode')}
             >
               <Sun className="w-3.5 h-3.5" />
-            </HapticButton>
-            <HapticButton
-              variant={themeMode === 'alert' ? 'danger' : 'ghost'}
-              onClick={() => setThemeMode('alert')}
-              className={`py-1.5 ${isCollapsed ? 'w-full px-0' : ''} rounded-lg text-xs ${
-                themeMode === 'alert' ? 'font-bold shadow' : isLight ? 'text-zinc-600' : 'text-zinc-400'
-              }`}
-              title={t('common.alertMode')}
-            >
-              <AlertTriangle className="w-3.5 h-3.5" />
             </HapticButton>
           </div>
         </div>

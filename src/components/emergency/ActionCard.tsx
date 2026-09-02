@@ -162,7 +162,7 @@ export const ActionCard: React.FC<ActionCardProps> = ({
               <HeartPulse className="w-5 h-5 text-[#EF4444]" />
             </div>
             <div>
-              <div className={`font-extrabold text-sm uppercase tracking-wide ${isLight ? 'text-zinc-950' : 'text-white'}`}>
+              <div className={`font-black text-sm uppercase tracking-wide ${isLight ? 'text-zinc-950' : 'text-white'}`}>
                 {t('action.cprAvailable')}
               </div>
               <div className={`text-xs ${isLight ? 'text-zinc-600' : 'text-zinc-300'}`}>
@@ -173,7 +173,7 @@ export const ActionCard: React.FC<ActionCardProps> = ({
           <HapticButton
             variant="danger"
             onClick={onOpenMetronome}
-            className="w-full sm:w-auto px-4 py-2 rounded-lg text-xs uppercase tracking-wider whitespace-nowrap"
+            className="w-full sm:w-auto px-4 py-2 rounded-lg text-xs whitespace-nowrap"
           >
             {t('action.launchCpr')}
           </HapticButton>
@@ -192,7 +192,7 @@ export const ActionCard: React.FC<ActionCardProps> = ({
           }`}
         >
           <div className={`flex items-center justify-between pb-2 border-b ${isLight ? 'border-zinc-200' : 'border-[#2A2A2A]'}`}>
-            <h3 className={`text-xs md:text-sm font-mono uppercase tracking-wider font-bold flex items-center gap-2 ${
+            <h3 className={`text-xs md:text-sm font-mono font-bold flex items-center gap-2 ${
               isLight ? 'text-zinc-900' : 'text-zinc-200'
             }`}>
               <CheckSquare className={`w-4 h-4 ${isLight ? 'text-amber-700' : 'text-[#FFAB00]'}`} />

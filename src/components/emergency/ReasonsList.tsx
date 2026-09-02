@@ -21,7 +21,7 @@ export const ReasonsList: React.FC<ReasonsListProps> = ({ reasons }) => {
     >
       <div className={`flex items-center gap-2 pb-2 border-b ${isLight ? 'border-cyan-200' : 'border-zinc-800'}`}>
         <Sparkles className={`w-4 h-4 ${isLight ? 'text-cyan-700 fill-cyan-700' : 'text-[#8FE7F4] fill-[#8FE7F4]'}`} />
-        <h3 className={`text-xs md:text-sm font-mono uppercase tracking-wider font-bold ${isLight ? 'text-cyan-950' : 'text-zinc-200'}`}>
+        <h3 className={`text-xs md:text-sm font-mono font-bold ${isLight ? 'text-cyan-950' : 'text-zinc-200'}`}>
           {t('lists.reasoning')}
         </h3>
       </div>

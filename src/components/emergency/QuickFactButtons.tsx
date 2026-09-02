@@ -37,7 +37,7 @@ export const QuickFactButtons: React.FC<QuickFactButtonsProps> = ({
   return (
     <div id="quick-presets-panel" className="space-y-2">
       <div
-        className={`flex items-center justify-between text-[13px] font-mono font-bold uppercase tracking-wider ${
+        className={`flex items-center justify-between text-[13px] font-mono font-bold ${
           isLight ? 'text-amber-800' : 'text-[#FFAB00]'
         }`}
       >

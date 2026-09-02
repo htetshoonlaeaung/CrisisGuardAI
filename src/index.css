@@ -50,14 +50,14 @@
   body {
     background-color: #090909;
     color: #F5F5F5;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-family: Inter, "Noto Sans Myanmar", system-ui, -apple-system,
+      BlinkMacSystemFont, "Segoe UI", sans-serif;
     overflow-x: hidden;
     user-select: auto;
     transition: background-color 0.25s ease, color 0.25s ease;
   }
 
   html.myanmar-lang body {
-    font-family: 'Noto Sans Myanmar', 'Myanmar Text', 'Padauk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     line-height: 1.65;
   }
 
@@ -98,6 +98,51 @@ html.light-theme ::-webkit-scrollbar-thumb {
 }
 html.light-theme ::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 0, 0, 0.35);
+}
+
+/* Shared interface typography: one family, differentiated hierarchy. */
+.font-sans,
+.font-mono {
+  font-family: Inter, "Noto Sans Myanmar", system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+}
+
+.font-normal {
+  font-weight: 400 !important;
+}
+
+.font-medium {
+  font-weight: 500 !important;
+}
+
+.font-semibold,
+.font-bold {
+  font-weight: 600 !important;
+}
+
+.font-extrabold {
+  font-weight: 600 !important;
+}
+
+.font-black {
+  font-weight: 700 !important;
+}
+
+h1,
+h2 {
+  font-weight: 700 !important;
+}
+
+.tracking-wide {
+  letter-spacing: 0.02em !important;
+}
+
+.tracking-wider {
+  letter-spacing: 0.04em !important;
+}
+
+.tracking-widest {
+  letter-spacing: 0.06em !important;
 }
 
 .crisisguard-logo-flip {

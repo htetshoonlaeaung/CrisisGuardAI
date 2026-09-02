@@ -21,7 +21,7 @@ export const ProhibitionsList: React.FC<ProhibitionsListProps> = ({ prohibitions
     >
       <div className={`flex items-center gap-2 pb-2 border-b ${isLight ? 'border-red-200' : 'border-zinc-800'}`}>
         <ShieldAlert className="w-4 h-4 text-red-600" />
-        <h3 className="text-xs md:text-sm font-mono uppercase tracking-wider font-extrabold text-red-600">
+        <h3 className="text-xs md:text-sm font-mono uppercase tracking-wider font-black text-red-600">
           {t('lists.prohibitions')}
         </h3>
       </div>

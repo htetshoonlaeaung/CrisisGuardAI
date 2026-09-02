@@ -85,7 +85,7 @@ export const AuditHistory: React.FC = () => {
               </div>
 
               <div>
-                <h4 className="text-sm font-black text-white uppercase tracking-tight">
+                <h4 className="text-sm font-semibold text-white">
                   {audit.recommended_action.replace(/_/g, ' ')}
                 </h4>
               </div>

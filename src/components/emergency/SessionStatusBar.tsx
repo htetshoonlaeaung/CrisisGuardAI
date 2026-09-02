@@ -12,7 +12,6 @@ import {
   Check,
   Sun,
   Moon,
-  AlertTriangle,
   Sidebar
 } from 'lucide-react';
 
@@ -241,17 +240,6 @@ export const SessionStatusBar: React.FC<SessionStatusBarProps> = ({
               title={t('common.lightMode')}
             >
               <Sun className="w-3.5 h-3.5" />
-            </HapticButton>
-            <HapticButton
-              variant={themeMode === 'alert' ? 'danger' : 'ghost'}
-              skeuomorphic={false}
-              onClick={() => setThemeMode('alert')}
-              className={`p-1 sm:p-1.5 rounded-lg text-xs transition-colors ${
-                themeMode === 'alert' ? 'font-bold shadow' : isLight ? 'text-zinc-600' : 'text-zinc-400 hover:text-zinc-200'
-              }`}
-              title={t('common.alertMode')}
-            >
-              <AlertTriangle className="w-3.5 h-3.5" />
             </HapticButton>
           </div>
 

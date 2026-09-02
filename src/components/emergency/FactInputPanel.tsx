@@ -75,7 +75,7 @@ export const FactInputPanel: React.FC<FactInputPanelProps> = ({
       <div>
         <div className="flex items-center justify-between mb-2.5">
           <label
-            className={`text-[13px] font-mono uppercase tracking-wider font-bold flex items-center gap-1.5 ${
+            className={`text-[13px] font-mono font-bold flex items-center gap-1.5 ${
               isLight ? 'text-zinc-600' : 'text-zinc-400'
             }`}
           >
@@ -120,7 +120,7 @@ export const FactInputPanel: React.FC<FactInputPanelProps> = ({
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <label
-            className={`text-xs font-mono uppercase tracking-wider font-semibold flex items-center gap-1.5 ${
+            className={`text-xs font-mono font-semibold flex items-center gap-1.5 ${
               isLight ? 'text-zinc-700' : 'text-zinc-300'
             }`}
           >
@@ -198,7 +198,7 @@ export const FactInputPanel: React.FC<FactInputPanelProps> = ({
         className={`space-y-2 pt-2 border-t ${isLight ? 'border-zinc-200' : 'border-[#2A2A2A]'}`}
       >
         <label
-          className={`text-xs font-mono uppercase tracking-wider font-semibold block ${
+          className={`text-xs font-mono font-semibold block ${
             isLight ? 'text-zinc-600' : 'text-zinc-400'
           }`}
         >

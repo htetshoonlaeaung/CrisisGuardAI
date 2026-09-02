@@ -60,10 +60,10 @@ export const SessionStatusBar: React.FC<SessionStatusBarProps> = ({
             : 'bg-[#111111] border-[#2A2A2A] text-zinc-300'
         }`}
       >
-        <div className="flex items-center gap-2 min-w-0">
+        <div className="flex min-w-0 flex-1 items-center gap-2">
           {/* Grounding Badge (Amber/Gold system) */}
           <div
-            className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] tracking-wide font-mono font-bold shadow-xs whitespace-nowrap truncate ${
+            className={`inline-flex max-w-[52vw] items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] tracking-wide font-mono font-bold shadow-xs whitespace-nowrap truncate sm:max-w-none ${
               isLight
                 ? 'bg-amber-100/80 border border-amber-300 text-amber-900'
                 : 'bg-[rgba(255,171,0,0.12)] border border-[rgba(255,171,0,0.30)] text-[#FFAB00]'
@@ -117,14 +117,14 @@ export const SessionStatusBar: React.FC<SessionStatusBarProps> = ({
       </div>
 
       {/* 2. Main Header bar with Sidebar Toggle & Adaptive Mobile Spacing */}
-      <div
-        className={`px-3 sm:px-4 py-2 flex items-center justify-between gap-2 transition-colors duration-200 ${
+        <div
+          className={`min-w-0 px-3 sm:px-4 py-2 flex items-center justify-between gap-2 transition-colors duration-200 ${
           isLight
             ? 'bg-[#082B5C] text-white'
             : 'bg-[#082B5C] text-white'
         }`}
       >
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+        <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
           {/* Haptic Sidebar Toggle Button */}
           <HapticButton
             id="header-sidebar-toggle-btn"
@@ -145,13 +145,13 @@ export const SessionStatusBar: React.FC<SessionStatusBarProps> = ({
           </HapticButton>
 
           <div className="flex min-w-0 items-center gap-2" aria-label="CrisisGuard AI">
-            <div className="relative h-10 w-[39px] flex-shrink-0 overflow-hidden sm:h-11 sm:w-[43px] md:h-12 md:w-[47px]">
+            <div className="relative h-8 w-[31px] flex-shrink-0 overflow-hidden sm:h-11 sm:w-[43px] md:h-12 md:w-[47px]">
               <CrisisGuardLogo
                 alt="CrisisGuard AI logo"
                 className="h-full w-auto max-w-none object-contain object-left"
               />
             </div>
-            <div className="flex min-w-0 items-baseline gap-2 text-[28px] font-black leading-none">
+            <div className="flex min-w-0 items-baseline gap-1 sm:gap-2 text-[20px] sm:text-[28px] font-black leading-none">
               <span className="truncate text-[#FFFFFF]">CrisisGuard</span>
               <span className="text-[#EA002C]">AI</span>
             </div>
@@ -159,7 +159,7 @@ export const SessionStatusBar: React.FC<SessionStatusBarProps> = ({
         </div>
 
         {/* Right side controls: Compact theme toggles + Responsive Severity Pill */}
-        <div className="flex items-center gap-1.5 sm:gap-2.5 flex-shrink-0">
+        <div className="flex flex-shrink-0 items-center gap-1 sm:gap-2.5">
           {evaluationLatencyMs !== undefined && (
             <span
               className={`hidden md:inline-flex items-center gap-1 text-xs font-mono px-2 py-0.5 rounded-lg border ${

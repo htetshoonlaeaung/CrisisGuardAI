@@ -1,4 +1,4 @@
-const CACHE_NAME = 'crisisguard-app-shell-v1';
+const CACHE_NAME = 'crisisguard-app-shell-v2';
 const APP_SHELL = ['/', '/index.html', '/manifest.webmanifest', '/crisisguard-logo.png'];
 
 self.addEventListener('install', (event) => {

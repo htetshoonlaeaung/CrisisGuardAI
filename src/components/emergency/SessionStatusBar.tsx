@@ -22,6 +22,7 @@ interface SessionStatusBarProps {
   evaluationLatencyMs?: number;
   isSidebarCollapsed: boolean;
   onToggleSidebar: () => void;
+  accountMenu?: React.ReactNode;
 }
 
 export const SessionStatusBar: React.FC<SessionStatusBarProps> = ({
@@ -30,6 +31,7 @@ export const SessionStatusBar: React.FC<SessionStatusBarProps> = ({
   domain,
   isSidebarCollapsed,
   onToggleSidebar,
+  accountMenu,
 }) => {
   const { themeMode, setThemeMode, isLight } = useTheme();
   const { language, setLanguage, languageNames, t } = useLanguage();
@@ -196,6 +198,7 @@ export const SessionStatusBar: React.FC<SessionStatusBarProps> = ({
           <div className="flex-shrink-0">
             <SeverityBadge severity={currentSeverity} size="sm" />
           </div>
+          {accountMenu}
         </div>
       </div>
     </header>

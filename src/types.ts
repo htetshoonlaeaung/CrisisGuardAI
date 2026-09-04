@@ -34,6 +34,18 @@ export interface EvaluateCrisisResponse {
   timestamp: string;
 }
 
+export interface UserProfile {
+  id: string;
+  full_name: string;
+  email: string;
+  created_at: string;
+}
+
+export interface AuthResponse {
+  user: UserProfile;
+  csrf_token?: string;
+}
+
 export interface EmergencySession {
   id: string;
   session_token: string;
@@ -43,6 +55,10 @@ export interface EmergencySession {
   facts: FactItem[];
   created_at: string;
   updated_at: string;
+  user_id?: string;
+  guest_session_id?: string;
+  status?: 'in_progress' | 'completed';
+  audit_trail?: TriageAuditTrail[];
 }
 
 export interface TriageAuditTrail {
@@ -54,8 +70,11 @@ export interface TriageAuditTrail {
   reasons: string[];
   prohibited_actions: string[];
   facts_snapshot: FactItem[];
+  step_by_step_instructions?: string[];
   evaluation_latency_ms: number;
   created_at: string;
+  user_id?: string;
+  guest_session_id?: string;
 }
 
 export interface EmergencyShelter {

@@ -4,7 +4,20 @@ import { api } from './services/api';
 import { QuickFactPreset } from './data/quickFacts';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { WelcomeSplash } from './components/WelcomeSplash';
+import {
+  ChangePasswordPage,
+  AccountOnlyInvitation,
+  ForgotPasswordPage,
+  HistoryDetailPage,
+  HistoryPage,
+  LoginPage,
+  ProfilePage,
+  RegisterPage,
+  ResetPasswordPage,
+} from './components/account/AccountPages';
+import { ProfileMenu } from './components/account/ProfileMenu';
 import { EmergencySelectionScreen } from './components/emergency/EmergencySelectionScreen';
 import { CollapsibleSidebar } from './components/emergency/CollapsibleSidebar';
 import { SessionStatusBar } from './components/emergency/SessionStatusBar';
@@ -24,6 +37,9 @@ import { HapticButton } from './components/ui/HapticButton';
 import { getDomainTheme } from './utils/domainTheme';
 
 const WELCOME_SESSION_KEY = 'crisisguard_welcome_completed';
+const CONSULTATION_SESSION_KEY = 'crisisguard_consultation_token';
+const PUBLIC_AUTH_PATHS = ['/login', '/register', '/forgot-password', '/reset-password'];
+const ACCOUNT_ONLY_PATHS = ['/profile', '/history', '/change-password'];
 
 function hasCompletedWelcome(): boolean {
   try {
@@ -45,15 +61,16 @@ function getCurrentPath(): string {
   return typeof window === 'undefined' ? '/' : window.location.pathname;
 }
 
-function AppContent() {
+function AppContent({ onNavigate }: { onNavigate: (path: string) => void }) {
   const { themeMode, isLight } = useTheme();
   const { t, isMyanmar } = useLanguage();
+  const { user } = useAuth();
 
-  const [sessionToken] = useState<string>(() => {
-    const saved = localStorage.getItem('crisisguard_token');
+  const [sessionToken, setSessionToken] = useState<string>(() => {
+    const saved = sessionStorage.getItem(CONSULTATION_SESSION_KEY);
     if (saved) return saved;
     const fresh = `sess_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
-    localStorage.setItem('crisisguard_token', fresh);
+    sessionStorage.setItem(CONSULTATION_SESSION_KEY, fresh);
     return fresh;
   });
 
@@ -65,6 +82,13 @@ function AppContent() {
   const [showMetronome, setShowMetronome] = useState(false);
   const [showProofDrawer, setShowProofDrawer] = useState(false);
   const [copiedSession, setCopiedSession] = useState(false);
+
+  useEffect(() => {
+    if (user) return;
+    api.ensureGuestSession().catch((error) => {
+      console.warn('Guest session initialization failed:', error);
+    });
+  }, [user]);
 
   // Left taskbar state: collapsed vs expanded
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
@@ -89,17 +113,19 @@ function AppContent() {
       setLatestResult(res);
 
       // Cache session and audit trail in IndexedDB asynchronously
-      offlineDataService.saveSession(sessionToken, domainToUse, factsToUse, res.severity).catch(console.error);
-      offlineDataService.saveAuditTrail(
-        sessionToken,
-        domainToUse,
-        res.action_headline,
-        res.severity,
-        res.reasons,
-        res.prohibited_actions,
-        factsToUse,
-        res.evaluation_latency_ms
-      ).catch(console.error);
+      if (user) {
+        offlineDataService.saveSession(sessionToken, domainToUse, factsToUse, res.severity).catch(console.error);
+        offlineDataService.saveAuditTrail(
+          sessionToken,
+          domainToUse,
+          res.action_headline,
+          res.severity,
+          res.reasons,
+          res.prohibited_actions,
+          factsToUse,
+          res.evaluation_latency_ms
+        ).catch(console.error);
+      }
     } catch (err) {
       console.warn('[OfflineFallback] Online evaluation unavailable, evaluating locally via IndexedDB:', err);
       // 2. Offline evaluation fallback via client-side rule engine
@@ -126,18 +152,19 @@ function AppContent() {
           }
         };
         setLatestResult(fallbackRes);
-        // Persist session and audit trail in IndexedDB
-        await offlineDataService.saveSession(sessionToken, domainToUse, factsToUse, offlineResult.severity);
-        await offlineDataService.saveAuditTrail(
-          sessionToken,
-          domainToUse,
-          offlineResult.action_headline,
-          offlineResult.severity,
-          fallbackRes.reasons,
-          offlineResult.prohibited_actions,
-          factsToUse,
-          offlineResult.evaluation_latency_ms || 2
-        );
+        if (user) {
+          await offlineDataService.saveSession(sessionToken, domainToUse, factsToUse, offlineResult.severity);
+          await offlineDataService.saveAuditTrail(
+            sessionToken,
+            domainToUse,
+            offlineResult.action_headline,
+            offlineResult.severity,
+            fallbackRes.reasons,
+            offlineResult.prohibited_actions,
+            factsToUse,
+            offlineResult.evaluation_latency_ms || 2
+          );
+        }
       } else {
         // Safe global fallback if no specific rule matched
         const fallbackRes: EvaluateCrisisResponse = {
@@ -168,17 +195,19 @@ function AppContent() {
           }
         };
         setLatestResult(fallbackRes);
-        await offlineDataService.saveSession(sessionToken, domainToUse, factsToUse, 'critical');
-        await offlineDataService.saveAuditTrail(
-          sessionToken,
-          domainToUse,
-          'call_emergency_services_immediately',
-          'critical',
-          fallbackRes.reasons,
-          fallbackRes.prohibited_actions,
-          factsToUse,
-          2
-        );
+        if (user) {
+          await offlineDataService.saveSession(sessionToken, domainToUse, factsToUse, 'critical');
+          await offlineDataService.saveAuditTrail(
+            sessionToken,
+            domainToUse,
+            'call_emergency_services_immediately',
+            'critical',
+            fallbackRes.reasons,
+            fallbackRes.prohibited_actions,
+            factsToUse,
+            2
+          );
+        }
       }
     } finally {
       setIsEvaluating(false);
@@ -230,7 +259,17 @@ function AppContent() {
     setLatestResult(null);
   };
 
-  const handleSelectDomain = (newDomain: CrisisDomain) => {
+  const handleSelectDomain = async (newDomain: CrisisDomain) => {
+    try {
+      const session = await api.createSession({ domain: newDomain });
+      setSessionToken(session.session_token);
+      sessionStorage.setItem(CONSULTATION_SESSION_KEY, session.session_token);
+    } catch (error) {
+      console.warn('Unable to pre-create consultation session:', error);
+      const fresh = `sess_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+      setSessionToken(fresh);
+      sessionStorage.setItem(CONSULTATION_SESSION_KEY, fresh);
+    }
     setDomain(newDomain);
     setFacts([]);
     setLatestResult(null);
@@ -274,7 +313,12 @@ function AppContent() {
   };
 
   if (!domain) {
-    return <EmergencySelectionScreen onSelectDomain={handleSelectDomain} />;
+    return (
+      <EmergencySelectionScreen
+        onSelectDomain={handleSelectDomain}
+        accountMenu={<ProfileMenu onNavigate={onNavigate} />}
+      />
+    );
   }
 
   const domainTheme = getDomainTheme(domain);
@@ -317,6 +361,7 @@ function AppContent() {
           onChangeView={setActiveView}
           isSidebarCollapsed={isSidebarCollapsed}
           onToggleSidebar={() => setIsSidebarCollapsed((prev) => !prev)}
+          accountMenu={<ProfileMenu onNavigate={onNavigate} />}
         />
 
         {/* MAIN BODY AREA */}
@@ -525,8 +570,8 @@ export function App() {
 
   useEffect(() => {
     if (path === '/' && welcomeComplete) {
-      window.history.replaceState(null, '', '/login');
-      setPath('/login');
+      window.history.replaceState(null, '', '/app');
+      setPath('/app');
     }
   }, [path, welcomeComplete]);
 
@@ -542,14 +587,96 @@ export function App() {
   return (
     <ThemeProvider>
       <LanguageProvider>
-        {shouldShowWelcome ? (
-          <WelcomeSplash onContinue={navigateToLogin} />
-        ) : (
-          <AppContent />
-        )}
+        <AuthProvider>
+          {shouldShowWelcome ? (
+            <WelcomeSplash
+              onEmergencyHelp={() => {
+                storeWelcomeCompletion();
+                setWelcomeComplete(true);
+                window.history.pushState(null, '', '/app');
+                setPath('/app');
+              }}
+              onLogin={navigateToLogin}
+              onRegister={() => {
+                storeWelcomeCompletion();
+                setWelcomeComplete(true);
+                window.history.pushState(null, '', '/register');
+                setPath('/register');
+              }}
+            />
+          ) : (
+            <RoutedApp path={path} setPath={setPath} setWelcomeComplete={setWelcomeComplete} />
+          )}
+        </AuthProvider>
       </LanguageProvider>
     </ThemeProvider>
   );
 }
 
 export default App;
+
+function RoutedApp({
+  path,
+  setPath,
+  setWelcomeComplete,
+}: {
+  path: string;
+  setPath: (path: string) => void;
+  setWelcomeComplete: (complete: boolean) => void;
+}) {
+  const { user, loading } = useAuth();
+  const params = new URLSearchParams(window.location.search);
+
+  const navigate = (nextPath: string) => {
+    storeWelcomeCompletion();
+    setWelcomeComplete(true);
+    window.history.pushState(null, '', nextPath);
+    setPath(nextPath);
+  };
+
+  useEffect(() => {
+    if (path === '/' && hasCompletedWelcome()) {
+      navigate('/app');
+    }
+  }, [path]);
+
+  useEffect(() => {
+    if (loading) return;
+    if (user && (path === '/login' || path === '/register' || path === '/')) {
+      window.history.replaceState(null, '', '/app');
+      setPath('/app');
+    }
+  }, [loading, path, setPath, user]);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#090909] text-sm font-bold text-zinc-300">
+        Loading account...
+      </div>
+    );
+  }
+
+  if (!user) {
+    if (path === '/register') return <RegisterPage onNavigate={navigate} />;
+    if (path === '/forgot-password') return <ForgotPasswordPage onNavigate={navigate} />;
+    if (path === '/reset-password') return <ResetPasswordPage token={params.get('token') || ''} onNavigate={navigate} />;
+    if (path === '/login') return <LoginPage onNavigate={navigate} />;
+    if (ACCOUNT_ONLY_PATHS.some((accountPath) => path === accountPath || path.startsWith(`${accountPath}/`))) {
+      return <AccountOnlyInvitation onNavigate={navigate} />;
+    }
+    return <AppContent onNavigate={navigate} />;
+  }
+
+  if (path === '/login' || path === '/register' || path === '/') {
+    return null;
+  }
+
+  if (path === '/profile') return <ProfilePage onNavigate={navigate} />;
+  if (path === '/history') return <HistoryPage onNavigate={navigate} />;
+  if (path.startsWith('/history/')) {
+    return <HistoryDetailPage token={decodeURIComponent(path.replace('/history/', ''))} onNavigate={navigate} />;
+  }
+  if (path === '/change-password') return <ChangePasswordPage onNavigate={navigate} />;
+
+  return <AppContent onNavigate={navigate} />;
+}

@@ -9,10 +9,12 @@ import { HapticButton } from '../ui/HapticButton';
 
 interface EmergencySelectionScreenProps {
   onSelectDomain: (domain: CrisisDomain) => void;
+  accountMenu?: React.ReactNode;
 }
 
 export const EmergencySelectionScreen: React.FC<EmergencySelectionScreenProps> = ({
   onSelectDomain,
+  accountMenu,
 }) => {
   const { t, td, language, setLanguage, languageNames, isMyanmar } = useLanguage();
   const { themeMode, setThemeMode, isLight } = useTheme();
@@ -112,6 +114,7 @@ export const EmergencySelectionScreen: React.FC<EmergencySelectionScreenProps> =
                 <Sun className="h-4 w-4" />
               </HapticButton>
             </div>
+            {accountMenu}
           </div>
         </div>
       </header>

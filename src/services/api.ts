@@ -1,34 +1,132 @@
-import { EvaluateCrisisRequest, EvaluateCrisisResponse, EmergencySession, TriageAuditTrail, EmergencyShelter, IncidentItem, RescueTeam, DispatchResponse } from '../types';
+import {
+  AuthResponse,
+  DispatchResponse,
+  EmergencySession,
+  EmergencyShelter,
+  EvaluateCrisisRequest,
+  EvaluateCrisisResponse,
+  IncidentItem,
+  RescueTeam,
+  TriageAuditTrail,
+  UserProfile,
+} from '../types';
+
+function getCookie(name: string): string {
+  const match = document.cookie
+    .split('; ')
+    .find((row) => row.startsWith(`${name}=`));
+  return match ? decodeURIComponent(match.split('=').slice(1).join('=')) : '';
+}
+
+async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
+  const method = options.method || 'GET';
+  const headers = new Headers(options.headers);
+  if (!headers.has('Content-Type') && options.body) headers.set('Content-Type', 'application/json');
+  if (!['GET', 'HEAD', 'OPTIONS'].includes(method.toUpperCase())) {
+    const csrf = getCookie('cg_csrf');
+    if (csrf) headers.set('X-CSRF-Token', csrf);
+  }
+
+  const res = await fetch(url, {
+    ...options,
+    method,
+    headers,
+    credentials: 'include',
+    cache: 'no-store',
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(data.error || data.detail || res.statusText || 'Request failed');
+  }
+  return data as T;
+}
 
 export const api = {
-  async evaluateCrisis(payload: EvaluateCrisisRequest): Promise<EvaluateCrisisResponse> {
-    const res = await fetch('/api/v1/crisis/evaluate', {
+  async register(payload: { full_name: string; email: string; password: string; confirm_password: string }): Promise<AuthResponse> {
+    return request<AuthResponse>('/api/v1/auth/register', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
-    if (!res.ok) {
-      throw new Error(`Crisis evaluation failed: ${res.statusText}`);
-    }
-    return res.json();
+  },
+
+  async login(payload: { email: string; password: string }): Promise<AuthResponse> {
+    return request<AuthResponse>('/api/v1/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  async logout(): Promise<{ success: boolean }> {
+    return request<{ success: boolean }>('/api/v1/auth/logout', { method: 'POST' });
+  },
+
+  async me(): Promise<AuthResponse> {
+    return request<AuthResponse>('/api/v1/auth/me');
+  },
+
+  async ensureGuestSession(): Promise<{ guest: boolean; expires_at: string; message: string }> {
+    return request<{ guest: boolean; expires_at: string; message: string }>('/api/v1/guest/session');
+  },
+
+  async updateProfile(payload: { full_name: string }): Promise<{ user: UserProfile }> {
+    return request<{ user: UserProfile }>('/api/v1/profile', {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  async changePassword(payload: { current_password: string; new_password: string; confirm_new_password: string }): Promise<{ success: boolean; message: string }> {
+    return request<{ success: boolean; message: string }>('/api/v1/auth/change-password', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  async forgotPassword(email: string): Promise<{ message: string; delivery_configured: boolean }> {
+    return request<{ message: string; delivery_configured: boolean }>('/api/v1/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+  },
+
+  async resetPassword(payload: { token: string; password: string; confirm_password: string }): Promise<{ success: boolean; message: string }> {
+    return request<{ success: boolean; message: string }>('/api/v1/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  async evaluateCrisis(payload: EvaluateCrisisRequest): Promise<EvaluateCrisisResponse> {
+    if (!getCookie('cg_csrf')) await this.ensureGuestSession();
+    return request<EvaluateCrisisResponse>('/api/v1/crisis/evaluate', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
   },
 
   async getSession(token: string): Promise<EmergencySession> {
-    const res = await fetch(`/api/v1/sessions/${token}`);
-    if (!res.ok) throw new Error(`Failed to fetch session: ${res.statusText}`);
-    return res.json();
+    return request<EmergencySession>(`/api/v1/sessions/${token}`);
   },
 
   async getSessionAudit(token: string): Promise<TriageAuditTrail[]> {
-    const res = await fetch(`/api/v1/sessions/${token}/audit`);
-    if (!res.ok) throw new Error(`Failed to fetch audit: ${res.statusText}`);
-    return res.json();
+    return request<TriageAuditTrail[]>(`/api/v1/sessions/${token}/audit`);
   },
 
   async getAllAudits(): Promise<TriageAuditTrail[]> {
-    const res = await fetch('/api/v1/audit/all');
-    if (!res.ok) throw new Error(`Failed to fetch all audits: ${res.statusText}`);
-    return res.json();
+    return request<TriageAuditTrail[]>('/api/v1/audit/all');
+  },
+
+  async getHistory(params: { domain?: string; limit?: number; offset?: number } = {}): Promise<{ items: EmergencySession[]; total: number }> {
+    const search = new URLSearchParams();
+    if (params.domain && params.domain !== 'all') search.set('domain', params.domain);
+    if (params.limit) search.set('limit', String(params.limit));
+    if (params.offset) search.set('offset', String(params.offset));
+    const query = search.toString();
+    return request<{ items: EmergencySession[]; total: number }>(`/api/v1/history${query ? `?${query}` : ''}`);
+  },
+
+  async getHistoryDetail(token: string): Promise<EmergencySession> {
+    return request<EmergencySession>(`/api/v1/history/${token}`);
   },
 
   async getNearbyShelters(lat: number, lon: number, radiusKm: number = 50, disasterType?: string): Promise<{ total_found: number; shelters: EmergencyShelter[] }> {
@@ -36,68 +134,57 @@ export const api = {
       lat: lat.toString(),
       lon: lon.toString(),
       radius_km: radiusKm.toString(),
-      ...(disasterType ? { disaster_type: disasterType } : {})
+      ...(disasterType ? { disaster_type: disasterType } : {}),
     });
-    const res = await fetch(`/api/v1/shelters/nearby?${params.toString()}`);
-    if (!res.ok) throw new Error(`Failed to fetch shelters: ${res.statusText}`);
-    return res.json();
+    return request<{ total_found: number; shelters: EmergencyShelter[] }>(`/api/v1/shelters/nearby?${params.toString()}`);
   },
 
   async solveDispatch(incidents: IncidentItem[], teams: RescueTeam[]): Promise<DispatchResponse> {
-    const res = await fetch('/api/v1/scheduler/dispatch', {
+    if (!getCookie('cg_csrf')) await this.ensureGuestSession();
+    return request<DispatchResponse>('/api/v1/scheduler/dispatch', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ incidents, teams })
+      body: JSON.stringify({ incidents, teams }),
     });
-    if (!res.ok) throw new Error(`Failed to solve dispatch: ${res.statusText}`);
-    return res.json();
   },
 
-  async createSession(payload: { domain: string; facts?: any[] }): Promise<{ session_token: string; domain: string; created_at: string }> {
-    const res = await fetch('/api/v1/sessions/create', {
+  async createSession(payload: { domain: string; facts?: any[] }): Promise<EmergencySession> {
+    if (!getCookie('cg_csrf')) await this.ensureGuestSession();
+    return request<EmergencySession>('/api/v1/sessions/create', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ domain: payload.domain })
+      body: JSON.stringify({ domain: payload.domain }),
     });
-    if (!res.ok) throw new Error(`Failed to create session: ${res.statusText}`);
-    return res.json();
   },
 
   async updateSession(token: string, payload: { facts?: any[]; current_severity?: string }): Promise<{ session_token: string }> {
-    const res = await fetch(`/api/v1/sessions/${token}/facts`, {
+    if (!getCookie('cg_csrf')) await this.ensureGuestSession();
+    return request<{ session_token: string }>(`/api/v1/sessions/${token}/facts`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload.facts || [])
+      body: JSON.stringify({ facts: payload.facts || [] }),
     });
-    if (!res.ok) throw new Error(`Failed to update session facts: ${res.statusText}`);
-    return res.json();
   },
 
   async saveAudit(payload: any): Promise<{ audit_id?: number; success: boolean }> {
-    const res = await fetch('/api/v1/sync/batch', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        items: [{
-          client_id: `audit_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
-          type: 'audit',
-          data: payload
-        }]
-      })
-    });
-    if (!res.ok) return { success: false };
-    const data = await res.json();
-    return { success: true, audit_id: data.results?.[0]?.server_id };
+    try {
+      await request('/api/v1/sync/batch', {
+        method: 'POST',
+        body: JSON.stringify({
+          items: [{
+            client_id: `audit_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+            type: 'audit',
+            data: payload,
+          }],
+        }),
+      });
+      return { success: true };
+    } catch {
+      return { success: false };
+    }
   },
 
   async syncBatch(items: any[]): Promise<any> {
-    const res = await fetch('/api/v1/sync/batch', {
+    return request('/api/v1/sync/batch', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ items })
+      body: JSON.stringify({ items }),
     });
-    if (!res.ok) throw new Error(`Sync batch failed: ${res.statusText}`);
-    return res.json();
-  }
+  },
 };
-

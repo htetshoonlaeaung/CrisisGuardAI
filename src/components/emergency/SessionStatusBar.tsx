@@ -75,16 +75,6 @@ export const SessionStatusBar: React.FC<SessionStatusBarProps> = ({
             <PhoneCall className="w-3 h-3" />
             <span>{t('common.emergency199')}</span>
           </a>
-          <a
-            href="tel:18002221222"
-            className={`hidden lg:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md border text-xs font-semibold transition-colors hbtn ${
-              isLight
-                ? 'bg-white border-zinc-300 text-zinc-800 shadow-xs hover:bg-zinc-100'
-                : 'bg-[#1A1A1A] border-[#2A2A2A] text-zinc-300 hover:text-white hover:border-zinc-500'
-            }`}
-          >
-            <span>{t('common.poison')}</span>
-          </a>
         </div>
       </div>
 

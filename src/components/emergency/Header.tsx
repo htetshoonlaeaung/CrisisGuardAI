@@ -38,13 +38,6 @@ export const Header: React.FC<HeaderProps> = ({
               <PhoneCall className="w-3.5 h-3.5" /> 199 / 191 / 192
             </a>
             <a
-              id="dial-poison-btn"
-              href="tel:18002221222"
-              className="inline-flex items-center gap-1 bg-neutral-800 hover:bg-neutral-700 text-amber-300 px-3 py-1 rounded-md text-xs font-bold transition"
-            >
-              Poison: 1-800-222-1222
-            </a>
-            <a
               id="dial-sms-btn"
               href="sms:199"
               className="inline-flex items-center gap-1 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 px-2.5 py-1 rounded-md text-xs transition"

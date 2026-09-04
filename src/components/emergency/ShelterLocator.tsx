@@ -92,7 +92,7 @@ export const ShelterLocator: React.FC = () => {
               id="shelter-domain-filter"
               value={disasterFilter}
               onChange={(e) => setDisasterFilter(e.target.value)}
-              className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-3 py-2 text-xs font-semibold text-neutral-200 focus:outline-none focus:border-red-500"
+              className="crisisguard-input w-full border rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none"
             >
               <option value="all">All Safe Havens &amp; Havens</option>
               <option value="medical">Medical &amp; Trauma Shelters</option>
@@ -111,7 +111,7 @@ export const ShelterLocator: React.FC = () => {
               step="5"
               value={radiusKm}
               onChange={(e) => setRadiusKm(Number(e.target.value))}
-              className="w-full accent-red-600 cursor-pointer"
+              className="crisisguard-range w-full"
             />
           </div>
 

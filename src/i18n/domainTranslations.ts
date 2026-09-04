@@ -2,7 +2,7 @@ import { Language } from './translations';
 
 const presetLabels: Record<string, string> = {
   med_cardiac: 'နှလုံးရပ်ခြင်း',
-  med_arterial: 'သွေးလွှတ်ကြော သွေးယိုခြင်း',
+  med_arterial: 'သွေးထွက်သံယိုဖြစ်ခြင်း',
   med_choking: 'အသက်ရှူလမ်းကြောင်း ပိတ်ခြင်း',
   med_stroke: 'Stroke (F.A.S.T.)',
   med_burns: 'ပြင်းထန်သော မီးလောင်ဒဏ်',
@@ -494,7 +494,7 @@ const proofTextTranslations: Record<string, string> = {
   'Observed: symptom = choking': 'တွေ့ရှိချက်: symptom = choking',
   'Observed: airway_pass = blocked (inability to speak/cough)': 'တွေ့ရှိချက်: airway_pass = blocked (စကားမပြောနိုင် / ချောင်းမဆိုးနိုင်)',
   'Deduction: Mechanical foreign body airway obstruction.': 'ဆုံးဖြတ်ချက်: ပြင်ပအရာဝတ္ထုကြောင့် အသက်ရှူလမ်းကြောင်း ပိတ်ဆို့နေသည်။',
-  'medical_rule_03: ARTERIAL_HEMORRHAGE': 'medical_rule_03: သွေးလွှတ်ကြော သွေးယိုခြင်း',
+  'medical_rule_03: ARTERIAL_HEMORRHAGE': 'medical_rule_03: သွေးထွက်သံယိုဖြစ်ခြင်း',
   'Observed: bleeding = severe_pulsing / pooling': 'တွေ့ရှိချက်: bleeding = severe_pulsing / pooling',
   'Deduction: Arterial vascular rupture. High risk of hypovolemic hemorrhagic shock.': 'ဆုံးဖြတ်ချက်: သွေးလွှတ်ကြော ပေါက်ပြဲနေသည်။ သွေးဆုံးရှုံးမှုကြောင့် shock ဖြစ်နိုင်ခြေမြင့်သည်။',
   'medical_rule_04: ACUTE_CEREBROVASCULAR_EVENT_FAST': 'medical_rule_04: F.A.S.T. acute cerebrovascular event',

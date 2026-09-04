@@ -188,12 +188,7 @@ export const FactInputPanel: React.FC<FactInputPanelProps> = ({
           <select
             value={selectedQuickKey}
             onChange={(e) => handleSelectQuickKey(e.target.value)}
-            className={`w-full border text-xs rounded-lg px-3 py-2 focus:outline-none font-sans ${
-              isLight
-                ? 'bg-white border-zinc-300 text-zinc-900'
-                : 'bg-[#111111] border-[#2A2A2A] text-zinc-200'
-            }`}
-            style={{ borderColor: selectedQuickKey ? domainTheme.accent : undefined }}
+            className="crisisguard-input w-full border text-xs rounded-lg px-3 py-2 focus:outline-none font-sans"
           >
             <option value="">{t('factInput.selectCommonSign')}</option>
             {commonKeys.map((k: FactKeyConfig) => (
@@ -210,22 +205,14 @@ export const FactInputPanel: React.FC<FactInputPanelProps> = ({
             placeholder={t('factInput.factKeyPlaceholder')}
             value={customKey}
             onChange={(e) => setCustomKey(e.target.value)}
-            className={`sm:col-span-2 border text-xs rounded-lg px-3 py-2 focus:outline-none font-sans ${
-              isLight
-                ? 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
-                : 'bg-[#111111] border-[#2A2A2A] text-zinc-200'
-            }`}
+            className="crisisguard-input sm:col-span-2 border text-xs rounded-lg px-3 py-2 focus:outline-none font-sans"
           />
           <input
             type="text"
             placeholder={t('factInput.valuePlaceholder')}
             value={customVal}
             onChange={(e) => setCustomVal(e.target.value)}
-            className={`sm:col-span-2 border text-xs rounded-lg px-3 py-2 focus:outline-none font-sans ${
-              isLight
-                ? 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
-                : 'bg-[#111111] border-[#2A2A2A] text-zinc-200'
-            }`}
+            className="crisisguard-input sm:col-span-2 border text-xs rounded-lg px-3 py-2 focus:outline-none font-sans"
           />
           <HapticButton
             type="submit"

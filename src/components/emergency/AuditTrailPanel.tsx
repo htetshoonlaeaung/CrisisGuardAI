@@ -85,17 +85,13 @@ export const AuditTrailPanel: React.FC<AuditTrailPanelProps> = ({ sessionToken }
 
         {/* Search Filter */}
         <div className="relative">
-          <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-white absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             placeholder={t('audit.search')}
             value={filterQuery}
             onChange={(e) => setFilterQuery(e.target.value)}
-            className={`w-full border text-xs md:text-sm rounded-xl pl-10 pr-4 py-2.5 focus:outline-none font-sans ${
-              isLight
-                ? 'bg-zinc-50 border-zinc-300 text-zinc-900 placeholder:text-zinc-400 focus:border-amber-600'
-                : 'bg-[#090909] border-[#2A2A2A] text-zinc-200 focus:border-[#FFAB00]'
-            }`}
+            className="crisisguard-input w-full border text-xs md:text-sm rounded-xl pl-10 pr-4 py-2.5 focus:outline-none font-sans"
           />
         </div>
       </div>

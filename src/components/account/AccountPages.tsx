@@ -24,8 +24,8 @@ import { CrisisGuardLogo } from '../CrisisGuardLogo';
 
 type NavigateFn = (path: string) => void;
 
-const fieldClass = 'min-h-11 w-full rounded-xl border border-zinc-300 bg-white px-3 text-sm text-zinc-950 outline-none transition focus:border-[#FFAB00] focus:ring-2 focus:ring-[#FFAB00]/30 dark:border-[#2A2A2A] dark:bg-[#111111] dark:text-zinc-100';
-const passwordFieldClass = 'crisisguard-password-input min-h-11 w-full rounded-xl border border-[#1D4ED8]/40 bg-[#0F2742] px-3 text-sm text-[#FFFFFF] placeholder:text-[#CBD5E1] outline-none transition focus:border-[#3B82F6] focus:ring-2 focus:ring-[#3B82F6]/30';
+const fieldClass = 'crisisguard-input min-h-11 w-full rounded-xl border px-3 text-sm outline-none transition';
+const passwordFieldClass = 'crisisguard-input crisisguard-password-input min-h-11 w-full rounded-xl border px-3 text-sm outline-none transition';
 
 function AuthShell({ children }: { children: React.ReactNode }) {
   const { isLight } = useTheme();

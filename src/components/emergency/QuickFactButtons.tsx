@@ -73,9 +73,9 @@ export const QuickFactButtons: React.FC<QuickFactButtonsProps> = ({
                 color: domainTheme.accent,
               } : undefined}
             >
-              <div className="flex items-center w-full">
+              <div className="flex items-center w-full min-w-0">
                 <span
-                  className={`text-[14px] font-semibold whitespace-normal flex-1 text-left leading-[1.3] [word-break:normal] [overflow-wrap:normal] transition-colors ${
+                  className={`text-[14px] font-semibold whitespace-normal break-words flex-1 min-w-0 text-left leading-[1.3] transition-colors ${
                     active
                       ? ''
                       : isLight
@@ -88,7 +88,7 @@ export const QuickFactButtons: React.FC<QuickFactButtonsProps> = ({
                 </span>
               </div>
               <p
-                className={`text-[11px] font-sans text-left line-clamp-2 w-full transition-colors ${
+                className={`text-[11px] font-sans text-left whitespace-normal break-words leading-snug w-full transition-colors ${
                     active
                       ? isLight
                         ? 'text-zinc-800 font-medium'

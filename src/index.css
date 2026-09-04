@@ -100,6 +100,40 @@ html.light-theme ::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 0, 0, 0.35);
 }
 
+.crisisguard-input,
+.crisisguard-input[type="text"],
+.crisisguard-input[type="email"],
+.crisisguard-input[type="password"],
+.crisisguard-input[type="search"],
+textarea.crisisguard-input,
+select.crisisguard-input {
+  background-color: #0F2742 !important;
+  border-color: rgba(59, 130, 246, 0.45) !important;
+  color: #FFFFFF !important;
+  caret-color: #FFFFFF;
+}
+
+.crisisguard-input::placeholder {
+  color: #CBD5E1 !important;
+  opacity: 1;
+}
+
+.crisisguard-input:focus,
+.crisisguard-input:focus-visible {
+  border-color: #3B82F6 !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3) !important;
+  outline: none !important;
+}
+
+select.crisisguard-input option {
+  background-color: #0F2742;
+  color: #FFFFFF;
+}
+
+.crisisguard-input:-webkit-autofill,
+.crisisguard-input:-webkit-autofill:hover,
+.crisisguard-input:-webkit-autofill:focus,
+.crisisguard-input:-webkit-autofill:active,
 .crisisguard-password-input:-webkit-autofill,
 .crisisguard-password-input:-webkit-autofill:hover,
 .crisisguard-password-input:-webkit-autofill:focus,
@@ -113,6 +147,11 @@ html.light-theme ::-webkit-scrollbar-thumb:hover {
 
 .crisisguard-password-input {
   caret-color: #FFFFFF;
+}
+
+.crisisguard-range {
+  accent-color: #3B82F6;
+  cursor: pointer;
 }
 
 /* Shared interface typography: one family, differentiated hierarchy. */

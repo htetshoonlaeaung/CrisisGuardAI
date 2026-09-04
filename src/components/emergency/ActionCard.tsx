@@ -8,6 +8,7 @@ import { TTS } from '../../utils/textToSpeech';
 import { HapticButton } from '../ui/HapticButton';
 import { useTheme } from '../../context/ThemeContext';
 import { useLanguage } from '../../context/LanguageContext';
+import { getDomainTheme } from '../../utils/domainTheme';
 import {
   Volume2,
   VolumeX,
@@ -35,6 +36,7 @@ export const ActionCard: React.FC<ActionCardProps> = ({
 }) => {
   const { isLight } = useTheme();
   const { t, tr, ta } = useLanguage();
+  const domainTheme = getDomainTheme(result.domain);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [checkedSteps, setCheckedSteps] = useState<Record<number, boolean>>({});
   const translatedReasons = result.reasons.map((reason, index) =>
@@ -90,20 +92,10 @@ export const ActionCard: React.FC<ActionCardProps> = ({
           : 'bg-[#111111] border-[#2A2A2A] shadow-black/80'
       }`}
     >
-      {/* 1. Header with latency and severity */}
+      {/* 1. Header with severity */}
       <div className={`flex flex-wrap items-center justify-between gap-2.5 pb-2 border-b ${isLight ? 'border-zinc-200' : 'border-[#2A2A2A]'}`}>
         <div className="flex items-center gap-2">
           <SeverityBadge severity={result.severity} size="md" />
-          <div
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono border ${
-              isLight
-                ? 'bg-amber-50 border-amber-200 text-amber-900'
-                : 'bg-[rgba(255,171,0,0.10)] border-[rgba(255,171,0,0.25)] text-[#FFAB00]'
-            }`}
-          >
-            <Clock className={`w-3.5 h-3.5 ${isLight ? 'text-amber-700' : 'text-[#FFAB00]'}`} />
-            <span>{t('action.logicInference', { ms: result.evaluation_latency_ms })}</span>
-          </div>
         </div>
 
         {/* Quick action toolbar */}
@@ -120,22 +112,9 @@ export const ActionCard: React.FC<ActionCardProps> = ({
             {isSpeaking ? (
               <VolumeX className="w-4 h-4 text-zinc-950" />
             ) : (
-              <Volume2 className={`w-4 h-4 ${isLight ? 'text-amber-700' : 'text-[#FFAB00]'}`} />
+              <Volume2 className="w-4 h-4" style={{ color: domainTheme.accent }} />
             )}
             <span>{isSpeaking ? t('action.stopSpeech') : t('action.readDirectives')}</span>
-          </HapticButton>
-
-          <HapticButton
-            id="btn-view-xai-proof"
-            variant="secondary"
-            onClick={onOpenProofTree}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold ${
-              isLight ? 'bg-zinc-100 border-zinc-300 text-amber-800' : 'text-[#FFAB00] hover:border-[rgba(255,171,0,0.40)]'
-            }`}
-            title={t('action.inspectProofTitle')}
-          >
-            <GitBranch className={`w-4 h-4 ${isLight ? 'text-amber-700' : 'text-[#FFAB00]'}`} />
-            <span className="hidden sm:inline">{t('action.inspectTree')}</span>
           </HapticButton>
         </div>
       </div>
@@ -195,7 +174,7 @@ export const ActionCard: React.FC<ActionCardProps> = ({
             <h3 className={`text-xs md:text-sm font-mono font-bold flex items-center gap-2 ${
               isLight ? 'text-zinc-900' : 'text-zinc-200'
             }`}>
-              <CheckSquare className={`w-4 h-4 ${isLight ? 'text-amber-700' : 'text-[#FFAB00]'}`} />
+              <CheckSquare className="w-4 h-4" style={{ color: domainTheme.accent }} />
               <span>{t('action.protocol')}</span>
             </h3>
             <span className={`text-[11px] font-mono ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>
@@ -224,11 +203,11 @@ export const ActionCard: React.FC<ActionCardProps> = ({
                     {isChecked ? (
                       <CheckSquare className="w-4 h-4 text-emerald-500" />
                     ) : (
-                      <Square className={`w-4 h-4 ${isLight ? 'text-amber-700' : 'text-[#FFAB00]'}`} />
+                      <Square className="w-4 h-4" style={{ color: domainTheme.accent }} />
                     )}
                   </button>
                   <div className="flex-1 text-xs md:text-sm leading-relaxed">
-                    <span className={`font-mono font-bold mr-2 ${isLight ? 'text-amber-700' : 'text-[#FFAB00]'}`}>
+                    <span className="font-bold mr-2" style={{ color: domainTheme.accent }}>
                       0{idx + 1}.
                     </span>
                     <span>{step}</span>
@@ -243,6 +222,42 @@ export const ActionCard: React.FC<ActionCardProps> = ({
       {/* 6. Reasons / Evidence List (XAI) */}
       <ReasonsList reasons={translatedReasons} />
 
+      <details
+        className={`rounded-xl border p-4 ${
+          isLight ? 'bg-zinc-50 border-zinc-200 text-zinc-700' : 'bg-[#090909] border-[#2A2A2A] text-zinc-300'
+        }`}
+      >
+        <summary className="cursor-pointer text-sm font-bold">
+          {t('assistance.technicalDetails')}
+        </summary>
+        <div className="mt-3 grid gap-3 text-xs sm:grid-cols-2">
+          <div className={`rounded-lg border p-3 ${isLight ? 'bg-white border-zinc-200' : 'bg-[#111111] border-[#2A2A2A]'}`}>
+            <div className="mb-1 flex items-center gap-1.5 font-bold" style={{ color: domainTheme.accent }}>
+              <Clock className="h-3.5 w-3.5" />
+              <span>{t('assistance.inferenceTiming')}</span>
+            </div>
+            <p>{t('action.logicInference', { ms: result.evaluation_latency_ms })}</p>
+          </div>
+          <div className={`rounded-lg border p-3 ${isLight ? 'bg-white border-zinc-200' : 'bg-[#111111] border-[#2A2A2A]'}`}>
+            <div className="mb-2 flex items-center gap-1.5 font-bold" style={{ color: domainTheme.accent }}>
+              <GitBranch className="h-3.5 w-3.5" />
+              <span>{t('assistance.proofTree')}</span>
+            </div>
+            <HapticButton
+              id="btn-view-xai-proof"
+              variant="secondary"
+              onClick={onOpenProofTree}
+              className="rounded-lg px-3 py-1.5 text-xs font-bold"
+              title={t('action.inspectProofTitle')}
+              style={{ borderColor: domainTheme.accentBorder }}
+            >
+              <GitBranch className="w-4 h-4" style={{ color: domainTheme.accent }} />
+              <span>{t('assistance.viewProofTree')}</span>
+            </HapticButton>
+          </div>
+        </div>
+      </details>
+
       {/* 7. Bottom Quick Action Triggers */}
       <div className={`grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2 border-t ${isLight ? 'border-zinc-200' : 'border-[#2A2A2A]'}`}>
         {onOpenShelters && (
@@ -253,7 +268,7 @@ export const ActionCard: React.FC<ActionCardProps> = ({
               isLight ? 'bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border-zinc-300' : ''
             }`}
           >
-            <MapPin className={`w-4 h-4 ${isLight ? 'text-amber-700' : 'text-[#FFAB00]'}`} />
+            <MapPin className="w-4 h-4" style={{ color: domainTheme.accent }} />
             <span>{t('action.shelters')}</span>
           </HapticButton>
         )}

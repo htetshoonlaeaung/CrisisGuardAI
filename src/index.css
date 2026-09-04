@@ -511,13 +511,29 @@ h2 {
   .crisisguard-welcome-skip,
   .crisisguard-welcome-continue,
   .crisisguard-welcome-continue__icon,
-  .crisisguard-welcome-language__button {
+  .crisisguard-welcome-language__button,
+  .hbtn,
+  .skeuo-btn,
+  .skeuo-chip,
+  .skeuo-btn-amber {
     transition: none;
+  }
+
+  .ripple-dot,
+  .animate-cpr-pulse,
+  .animate-amber-glow {
+    animation: none !important;
   }
 
   .crisisguard-welcome-skip:hover,
   .crisisguard-welcome-continue:hover,
-  .crisisguard-welcome-continue:hover .crisisguard-welcome-continue__icon {
+  .crisisguard-welcome-continue:hover .crisisguard-welcome-continue__icon,
+  .hbtn:hover,
+  .hbtn:active,
+  .skeuo-btn:hover,
+  .skeuo-btn:active,
+  .skeuo-chip:hover,
+  .skeuo-chip:active {
     transform: none;
   }
 }

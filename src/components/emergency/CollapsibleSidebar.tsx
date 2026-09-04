@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Activity,
   MapPin,
@@ -6,13 +6,10 @@ import {
   History,
   Cpu,
   PhoneCall,
-  Sparkles,
   ChevronLeft,
   ChevronRight,
   Sun,
   Moon,
-  Copy,
-  Check,
   X
 } from 'lucide-react';
 import { TriageSeverity } from '../../types';
@@ -36,27 +33,19 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
   activeView,
   onChangeView,
   currentSeverity,
-  sessionToken,
   isCollapsed,
   onToggleCollapse,
   onCloseMobile,
 }) => {
   const { themeMode, setThemeMode, isLight } = useTheme();
   const { t } = useLanguage();
-  const [copied, setCopied] = useState(false);
-
-  const handleCopyToken = () => {
-    navigator.clipboard.writeText(sessionToken);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
 
   const navItems = [
-    { id: 'triage', labelKey: 'nav.triage', icon: Activity, tag: 'CORE' },
-    { id: 'shelters', labelKey: 'nav.shelters', icon: MapPin, tag: 'GEO' },
-    { id: 'scheduler', labelKey: 'nav.scheduler', icon: ListFilter, tag: 'SOLVER' },
-    { id: 'audit', labelKey: 'nav.audit', icon: History, tag: 'LOGS' },
-    { id: 'status', labelKey: 'nav.status', icon: Cpu, tag: 'KB' },
+    { id: 'triage', labelKey: 'nav.triage', icon: Activity },
+    { id: 'shelters', labelKey: 'nav.shelters', icon: MapPin },
+    { id: 'scheduler', labelKey: 'nav.scheduler', icon: ListFilter },
+    { id: 'audit', labelKey: 'nav.audit', icon: History },
+    { id: 'status', labelKey: 'nav.status', icon: Cpu },
   ] as const;
 
   const handleNavClick = (viewId: typeof navItems[number]['id']) => {
@@ -110,15 +99,6 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
                 </div>
               </div>
             )}
-            {!isCollapsed && (
-              <span
-                className={`mt-1 text-[10px] font-mono uppercase tracking-wider font-semibold truncate ${
-                  isLight ? 'text-amber-800' : 'text-[#FFAB00]'
-                }`}
-              >
-                {t('common.prologSymbolicLogic')}
-              </span>
-            )}
           </div>
 
           <div className="flex items-center gap-1">
@@ -151,34 +131,6 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
               </HapticButton>
             )}
           </div>
-        </div>
-
-        {/* Grounding Star Badge Ribbon */}
-        <div
-          className={`px-3 py-2 border-b flex items-center ${
-            isCollapsed ? 'justify-center' : 'gap-2'
-          } ${
-            isLight ? 'bg-amber-50/60 border-zinc-200' : 'bg-[#111111] border-[#2A2A2A]'
-          }`}
-          title={isCollapsed ? `${t('common.groundingPrefix')}${t('common.groundingKb')} (${t('common.deterministicAuditable')})` : undefined}
-        >
-          <div
-            className={`inline-flex items-center justify-center w-6 h-6 rounded-md flex-shrink-0 ${
-              isLight ? 'bg-amber-100 border border-amber-300 text-amber-800' : 'bg-[rgba(255,171,0,0.12)] border border-[rgba(255,171,0,0.30)] text-[#FFAB00]'
-            }`}
-          >
-            <Sparkles className="w-3.5 h-3.5 fill-current" />
-          </div>
-          {!isCollapsed && (
-            <div className="flex-1 min-w-0">
-              <div className={`text-[11px] font-mono font-bold leading-tight truncate ${isLight ? 'text-amber-900' : 'text-[#FFAB00]'}`}>
-                {t('common.groundingFormal')}
-              </div>
-              <div className={`text-[10px] truncate ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>
-                {t('common.deterministicAuditable')}
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Navigation Items with Haptic feel */}
@@ -228,19 +180,6 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
                 {!isCollapsed && (
                   <div className="flex-1 flex items-center justify-between min-w-0">
                     <span className="truncate">{t(item.labelKey)}</span>
-                    <span
-                      className={`text-[9px] font-mono px-1.5 py-0.5 rounded border ${
-                        isActive
-                          ? isLight
-                            ? 'bg-zinc-800 border-zinc-700 text-zinc-200'
-                            : 'bg-[rgba(255,171,0,0.15)] border-[rgba(255,171,0,0.35)] text-[#FFAB00]'
-                          : isLight
-                          ? 'bg-zinc-100 border-zinc-200 text-zinc-500'
-                          : 'bg-zinc-800/40 border-[#2A2A2A] text-zinc-500'
-                      }`}
-                    >
-                      {item.tag}
-                    </span>
                   </div>
                 )}
 
@@ -345,25 +284,6 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
             </HapticButton>
           </div>
         </div>
-
-        {/* Session Token */}
-        {!isCollapsed && (
-          <div
-            className={`pt-1 flex items-center justify-between text-[10px] font-mono border-t ${
-              isLight ? 'border-zinc-200 text-zinc-600' : 'border-[#2A2A2A] text-zinc-400'
-            }`}
-          >
-            <span className="truncate">{t('common.sess')} {sessionToken.slice(0, 8)}...</span>
-            <HapticButton
-              variant="ghost"
-              onClick={handleCopyToken}
-              className={`p-1 rounded ${isLight ? 'text-zinc-600 hover:text-black' : 'text-zinc-400 hover:text-[#FFAB00]'}`}
-              title={t('common.copyToken')}
-            >
-              {copied ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
-            </HapticButton>
-          </div>
-        )}
       </div>
     </aside>
   );

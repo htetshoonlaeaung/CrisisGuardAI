@@ -5,6 +5,7 @@ import { QuickFactPreset } from './data/quickFacts';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { WelcomeSplash } from './components/WelcomeSplash';
+import { EmergencySelectionScreen } from './components/emergency/EmergencySelectionScreen';
 import { CollapsibleSidebar } from './components/emergency/CollapsibleSidebar';
 import { SessionStatusBar } from './components/emergency/SessionStatusBar';
 import { FactInputPanel } from './components/emergency/FactInputPanel';
@@ -18,6 +19,9 @@ import { ExplanationDrawer } from './components/emergency/ExplanationDrawer';
 import OfflineIndicator from './components/emergency/OfflineIndicator';
 import { offlineEvaluator } from './services/offlineEvaluator';
 import { offlineDataService } from './services/offlineDataService';
+import { ArrowLeft, Check, Copy } from 'lucide-react';
+import { HapticButton } from './components/ui/HapticButton';
+import { getDomainTheme } from './utils/domainTheme';
 
 const WELCOME_SESSION_KEY = 'crisisguard_welcome_completed';
 
@@ -53,24 +57,27 @@ function AppContent() {
     return fresh;
   });
 
-  const [domain, setDomain] = useState<CrisisDomain>('medical');
-  const [facts, setFacts] = useState<FactItem[]>([
-    { key: 'unconscious', value: 'true' },
-    { key: 'breathing', value: 'none' },
-  ]);
+  const [domain, setDomain] = useState<CrisisDomain | null>(null);
+  const [facts, setFacts] = useState<FactItem[]>([]);
   const [latestResult, setLatestResult] = useState<EvaluateCrisisResponse | null>(null);
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [activeView, setActiveView] = useState<'triage' | 'shelters' | 'scheduler' | 'audit' | 'status'>('triage');
   const [showMetronome, setShowMetronome] = useState(false);
   const [showProofDrawer, setShowProofDrawer] = useState(false);
+  const [copiedSession, setCopiedSession] = useState(false);
 
   // Left taskbar state: collapsed vs expanded
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
     return typeof window !== 'undefined' ? window.innerWidth < 1024 : true;
   });
 
-  // Automatic initial evaluation on load with offline IndexedDB fallback
   const runEvaluation = async (domainToUse = domain, factsToUse = facts) => {
+    if (!domainToUse || factsToUse.length === 0) {
+      setLatestResult(null);
+      setIsEvaluating(false);
+      return;
+    }
+
     setIsEvaluating(true);
     try {
       // 1. Online attempt with FastAPI backend
@@ -178,10 +185,6 @@ function AppContent() {
     }
   };
 
-  useEffect(() => {
-    runEvaluation();
-  }, []);
-
   // Keyboard shortcut Ctrl+B or Cmd+B to toggle sidebar
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -224,13 +227,25 @@ function AppContent() {
 
   const handleClearFacts = () => {
     setFacts([]);
-    runEvaluation(domain, []);
+    setLatestResult(null);
   };
 
-  const handleChangeDomain = (newDomain: CrisisDomain) => {
+  const handleSelectDomain = (newDomain: CrisisDomain) => {
     setDomain(newDomain);
     setFacts([]);
-    runEvaluation(newDomain, []);
+    setLatestResult(null);
+    setShowMetronome(false);
+    setShowProofDrawer(false);
+    setActiveView('triage');
+  };
+
+  const handleChangeEmergency = () => {
+    setDomain(null);
+    setFacts([]);
+    setLatestResult(null);
+    setShowMetronome(false);
+    setShowProofDrawer(false);
+    setActiveView('triage');
   };
 
   const handleApplyPreset = (preset: QuickFactPreset) => {
@@ -238,7 +253,13 @@ function AppContent() {
     runEvaluation(domain, preset.facts);
   };
 
-  const currentSeverity: TriageSeverity = latestResult?.severity || 'moderate';
+  const handleCopySession = () => {
+    navigator.clipboard.writeText(sessionToken);
+    setCopiedSession(true);
+    window.setTimeout(() => setCopiedSession(false), 2000);
+  };
+
+  const currentSeverity: TriageSeverity = latestResult?.severity || 'informational';
 
   // Compute root background and style classes based on Theme Mode & Palette
   const getThemeWrapperClass = () => {
@@ -251,6 +272,13 @@ function AppContent() {
     // Default 'dark' mode (#090909 canvas with #111111 card surfaces)
     return 'bg-[#090909] text-zinc-100';
   };
+
+  if (!domain) {
+    return <EmergencySelectionScreen onSelectDomain={handleSelectDomain} />;
+  }
+
+  const domainTheme = getDomainTheme(domain);
+  const DomainIcon = domainTheme.Icon;
 
   return (
     <div className={`min-h-screen transition-colors duration-300 flex relative overflow-x-hidden ${getThemeWrapperClass()} ${isMyanmar ? 'break-words' : ''}`}>
@@ -287,13 +315,52 @@ function AppContent() {
           domain={domain}
           activeView={activeView}
           onChangeView={setActiveView}
-          evaluationLatencyMs={latestResult?.evaluation_latency_ms}
           isSidebarCollapsed={isSidebarCollapsed}
           onToggleSidebar={() => setIsSidebarCollapsed((prev) => !prev)}
         />
 
         {/* MAIN BODY AREA */}
         <main className="flex-1 w-full max-w-7xl mx-auto p-3 sm:p-4 md:p-6 lg:p-8 space-y-6">
+          <section
+            className={`rounded-2xl border p-4 md:p-5 ${
+              isLight ? 'bg-white border-zinc-200 shadow-sm' : 'bg-[#111111] border-[#2A2A2A]'
+            }`}
+          >
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex min-w-0 items-center gap-3">
+                <span
+                  className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl border"
+                  style={{
+                    backgroundColor: domainTheme.accentSoft,
+                    borderColor: domainTheme.accentBorder,
+                    color: domainTheme.accent,
+                  }}
+                >
+                  <DomainIcon className="h-6 w-6" />
+                </span>
+                <div className="min-w-0">
+                  <p className={`text-xs font-bold ${isLight ? 'text-zinc-500' : 'text-zinc-400'}`}>
+                    {t('assistance.selectedCategory')}
+                  </p>
+                  <h1 className="truncate text-2xl font-black">{t(`domain.${domain}`)}</h1>
+                </div>
+              </div>
+              <HapticButton
+                type="button"
+                variant="secondary"
+                skeuomorphic={false}
+                onClick={handleChangeEmergency}
+                className={`min-h-11 rounded-xl px-4 py-2 text-sm font-bold ${
+                  isLight ? 'bg-zinc-100 border-zinc-300 text-zinc-800 hover:bg-zinc-200' : ''
+                }`}
+                style={{ borderColor: domainTheme.accentBorder }}
+              >
+                <ArrowLeft className="h-4 w-4" />
+                <span>{t('assistance.changeEmergency')}</span>
+              </HapticButton>
+            </div>
+          </section>
+
           {/* VIEW 1: TRIAGE & DIRECTIVE EVALUATION DASHBOARD */}
           {activeView === 'triage' && (
             <div className="space-y-6">
@@ -309,7 +376,6 @@ function AppContent() {
                 <div className="lg:col-span-5 space-y-6">
                   <FactInputPanel
                     domain={domain}
-                    onChangeDomain={handleChangeDomain}
                     facts={facts}
                     onAddFact={handleAddFact}
                     onRemoveFact={handleRemoveFact}
@@ -331,13 +397,26 @@ function AppContent() {
                     />
                   ) : (
                     <div
-                      className={`p-8 md:p-12 text-center text-xs font-mono rounded-2xl border ${
+                      className={`rounded-2xl border p-8 md:p-12 text-center ${
                         isLight
-                          ? 'bg-white border-zinc-200 text-zinc-500 shadow-sm'
-                          : 'bg-[#111111] border-[#2A2A2A] text-zinc-500'
+                          ? 'bg-white border-zinc-200 text-zinc-600 shadow-sm'
+                          : 'bg-[#111111] border-[#2A2A2A] text-zinc-400'
                       }`}
                     >
-                      {t('factInput.noFacts')}
+                      <div
+                        className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl border"
+                        style={{
+                          backgroundColor: domainTheme.accentSoft,
+                          borderColor: domainTheme.accentBorder,
+                          color: domainTheme.accent,
+                        }}
+                      >
+                        <DomainIcon className="h-6 w-6" />
+                      </div>
+                      <h2 className="text-xl font-black text-current">{t('assistance.chooseSituation')}</h2>
+                      <p className="mx-auto mt-2 max-w-md text-sm leading-6">
+                        {t('assistance.chooseSituationBody')}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -356,6 +435,44 @@ function AppContent() {
 
           {/* VIEW 5: SYSTEM & PROLOG HEALTH STATUS */}
           {activeView === 'status' && <StatusScreen />}
+
+          <details
+            className={`rounded-2xl border p-4 ${
+              isLight ? 'bg-white border-zinc-200 text-zinc-700 shadow-sm' : 'bg-[#111111] border-[#2A2A2A] text-zinc-300'
+            }`}
+          >
+            <summary className="cursor-pointer text-sm font-bold">
+              {t('assistance.technicalDetails')}
+            </summary>
+            <div className="mt-4 grid gap-3 text-sm md:grid-cols-3">
+              <div className={`rounded-xl border p-3 ${isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-[#090909] border-[#2A2A2A]'}`}>
+                <div className="text-xs font-bold uppercase text-zinc-500">{t('assistance.sessionToken')}</div>
+                <div className="mt-2 flex items-center gap-2">
+                  <code className="min-w-0 flex-1 truncate text-xs">{sessionToken}</code>
+                  <HapticButton
+                    type="button"
+                    variant="ghost"
+                    skeuomorphic={false}
+                    onClick={handleCopySession}
+                    className="h-8 w-8 rounded-lg p-0"
+                    title={t('common.copySessionToken')}
+                  >
+                    {copiedSession ? <Check className="h-4 w-4 text-emerald-500" /> : <Copy className="h-4 w-4" />}
+                  </HapticButton>
+                </div>
+              </div>
+              <div className={`rounded-xl border p-3 ${isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-[#090909] border-[#2A2A2A]'}`}>
+                <div className="text-xs font-bold uppercase text-zinc-500">{t('assistance.inferenceTiming')}</div>
+                <p className="mt-2 text-xs">
+                  {latestResult ? t('action.logicInference', { ms: latestResult.evaluation_latency_ms }) : t('assistance.noResult')}
+                </p>
+              </div>
+              <div className={`rounded-xl border p-3 ${isLight ? 'bg-zinc-50 border-zinc-200' : 'bg-[#090909] border-[#2A2A2A]'}`}>
+                <div className="text-xs font-bold uppercase text-zinc-500">{t('assistance.knowledgeBase')}</div>
+                <p className="mt-2 text-xs">{t(`domain.${domain}`)}</p>
+              </div>
+            </div>
+          </details>
         </main>
 
         {/* 3. XAI EXPLANATION PROOF DRAWER MODAL */}

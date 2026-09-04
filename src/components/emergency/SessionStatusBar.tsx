@@ -1,15 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { TriageSeverity, CrisisDomain } from '../../types';
 import { SeverityBadge } from './SeverityBadge';
 import { useTheme } from '../../context/ThemeContext';
 import { HapticButton } from '../ui/HapticButton';
 import { useLanguage } from '../../context/LanguageContext';
 import { CrisisGuardLogo } from '../CrisisGuardLogo';
+import { getDomainTheme } from '../../utils/domainTheme';
 import {
-  Sparkles,
   PhoneCall,
-  Copy,
-  Check,
   Sun,
   Moon,
   Sidebar
@@ -29,19 +27,13 @@ interface SessionStatusBarProps {
 export const SessionStatusBar: React.FC<SessionStatusBarProps> = ({
   sessionToken,
   currentSeverity = 'moderate',
-  evaluationLatencyMs,
+  domain,
   isSidebarCollapsed,
   onToggleSidebar,
 }) => {
   const { themeMode, setThemeMode, isLight } = useTheme();
   const { language, setLanguage, languageNames, t } = useLanguage();
-  const [copied, setCopied] = useState(false);
-
-  const handleCopyToken = () => {
-    navigator.clipboard.writeText(sessionToken);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+  const accentColor = domain ? getDomainTheme(domain).accent : '#FFAB00';
 
   return (
     <header
@@ -61,33 +53,13 @@ export const SessionStatusBar: React.FC<SessionStatusBarProps> = ({
         }`}
       >
         <div className="flex min-w-0 flex-1 items-center gap-2">
-          {/* Grounding Badge (Amber/Gold system) */}
-          <div
-            className={`inline-flex max-w-[52vw] items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] tracking-wide font-mono font-bold shadow-xs whitespace-nowrap truncate sm:max-w-none ${
-              isLight
-                ? 'bg-amber-100/80 border border-amber-300 text-amber-900'
-                : 'bg-[rgba(255,171,0,0.12)] border border-[rgba(255,171,0,0.30)] text-[#FFAB00]'
+          <span
+            className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${
+              isLight ? 'bg-white border-zinc-300 text-zinc-800' : 'bg-[#1A1A1A] border-[#2A2A2A] text-zinc-200'
             }`}
           >
-            <Sparkles className={`w-3 h-3 flex-shrink-0 ${isLight ? 'text-amber-700 fill-amber-700' : 'text-[#FFAB00] fill-[#FFAB00]'}`} />
-            <span><span className="hidden sm:inline">{t('common.groundingPrefix')}</span>{t('common.groundingKb')}</span>
-          </div>
-
-          <div className="hidden md:flex items-center gap-1.5 text-zinc-400 font-mono text-[11px]">
-            <span>{t('common.session')}</span>
-            <button
-              onClick={handleCopyToken}
-              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded border font-mono transition-colors cursor-pointer ${
-                isLight
-                  ? 'bg-white border-zinc-300 text-zinc-800 hover:text-black hover:bg-zinc-50 shadow-xs'
-                  : 'bg-[#1A1A1A] border-[#2A2A2A] text-zinc-300 hover:text-white hover:border-zinc-500'
-              }`}
-              title={t('common.copySessionToken')}
-            >
-              <span>{sessionToken ? sessionToken.slice(0, 8) + '...' : 'init'}</span>
-              {copied ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3 text-zinc-400" />}
-            </button>
-          </div>
+            {t('common.emergencySupport')}
+          </span>
         </div>
 
         {/* Rapid One-Tap Emergency Hotlines */}
@@ -138,7 +110,7 @@ export const SessionStatusBar: React.FC<SessionStatusBarProps> = ({
             }`}
             title={t('common.toggleSidebar')}
           >
-            <Sidebar className={`w-4 h-4 ${isLight ? 'text-amber-700' : 'text-[#FFAB00]'}`} />
+            <Sidebar className="w-4 h-4" style={{ color: accentColor }} />
             <span className="hidden md:inline font-mono">
               {isSidebarCollapsed ? t('common.taskbar') : t('common.hide')}
             </span>
@@ -160,18 +132,6 @@ export const SessionStatusBar: React.FC<SessionStatusBarProps> = ({
 
         {/* Right side controls: Compact theme toggles + Responsive Severity Pill */}
         <div className="flex flex-shrink-0 items-center gap-1 sm:gap-2.5">
-          {evaluationLatencyMs !== undefined && (
-            <span
-              className={`hidden md:inline-flex items-center gap-1 text-xs font-mono px-2 py-0.5 rounded-lg border ${
-                isLight
-                  ? 'bg-amber-50 border-amber-200 text-amber-800 font-semibold'
-                  : 'text-[#FFAB00] bg-[rgba(255,171,0,0.10)] border-[rgba(255,171,0,0.25)] font-semibold'
-              }`}
-            >
-              <span>⚡ {evaluationLatencyMs}ms</span>
-            </span>
-          )}
-
           <div
             className={`flex items-center gap-0.5 p-0.5 sm:p-1 rounded-xl border flex-shrink-0 ${
               isLight
